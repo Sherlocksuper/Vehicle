@@ -17,6 +17,7 @@ import SendTestConfigVeriftCache from '../model/SendTestConfigVerifyCache.model'
 import Vehicle from "../model/Vehicle.model";
 import Project from "../model/3Project.model";
 import TestTemplateModel from "../model/TestTemplate.model";
+import TestObjectN from "../model/2TestObjectN";
 
 const {DB_NAME, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT} = DB_CONFIG
 
@@ -25,7 +26,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     dialect: 'mysql',
     port: DB_PORT,
     logging: false,
-    models: [User, TokenBlackListItem, TestProcess, TestObject, CollectorSignal, Controller, Collector, Signal, SendTestConfigRecord, SendTestConfigVeriftCache, Vehicle, Project, TestTemplateModel]
+    models: [User, TokenBlackListItem, TestProcess, TestObject, CollectorSignal, Controller, Collector, Signal, SendTestConfigRecord, SendTestConfigVeriftCache, Vehicle, Project, TestTemplateModel,TestObjectN]
 });
 
 const DB_OPT = {

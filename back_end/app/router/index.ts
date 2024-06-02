@@ -9,6 +9,7 @@ import AssetsController from '../controller/AssetsController'
 import VehicleController from "../controller/VehicleController";
 import ProjectController from "../controller/ProjectController";
 import TestTemplateController from "../controller/TestTemplateController";
+import TestObjectNController from "../controller/TestObjectNController";
 
 const router = new KoaRouter({
     prefix: ''
@@ -47,26 +48,45 @@ router.get('/getCollectorList', BaseInfoController.getCollectorList)
 router.get('/getSignalListByCollectorId', BaseInfoController.getSignalListByCollectorId)
 router.get('/getTestDevicesInfo', BaseInfoController.getTestDevicesInfo)
 
-//车辆管理接口
+/**
+ * 车辆管理接口
+ * created by lby on 6.2
+ */
 router.get('/getVehicleList', VehicleController.getVehicles)
 router.post('/createVehicle', VehicleController.createVehicle)
 router.get('/getVehicleById/:id', VehicleController.getVehicleById)
 router.post('/updateVehicle/:id', VehicleController.updateVehicle)
 router.post('/deleteVehicle/:id', VehicleController.deleteVehicle)
 
-//Project管理接口
+/**
+ * 项目管理接口
+ * created by lby on 6.2
+ */
 router.get('/getProjectList', ProjectController.getProjectList)
 router.post('/createProject', ProjectController.createProject)
 router.post('/updateProject/:id', ProjectController.updateProject)
 router.get('/getProjectById/:id', ProjectController.getProjectById)
 router.post('/deleteProject/:id', ProjectController.deleteProject)
 
-//测试模板管理结构 testTemplate
+/**
+ * 测试模板管理接口 TestTemplate
+ * created by lby on 6.2
+ */
 router.get('/getTestTemplateList', TestTemplateController.getTestTemplateList)
 router.post('/createTestTemplate', TestTemplateController.createTestTemplate)
 router.post('/updateTestTemplate/:id', TestTemplateController.updateTestTemplate)
 router.get('/getTestTemplateById/:id', TestTemplateController.getTestTemplateById)
 router.post('/deleteTestTemplate/:id', TestTemplateController.deleteTestTemplate)
+
+/**
+ * 测试对象管理接口 TestObject
+ * created by lby on 6.2
+ */
+router.get('/getTestObjectNList', TestObjectNController.getAllTestObjectN)
+router.post('/createTestObjectN', TestObjectNController.createTestObjectN)
+router.post('/updateTestObjectN/:id', TestObjectNController.updateTestObjectNById)
+router.get('/getTestObjectNById/:id', TestObjectNController.getTestObjectNById)
+router.post('/deleteTestObjectN/:id', TestObjectNController.deleteTestObjectNById)
 
 
 // 资源下载接口

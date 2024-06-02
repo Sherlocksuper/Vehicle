@@ -12,7 +12,7 @@ import {
 import TestObject from "./2TestObject.model";
 import CollectorSignal from "./4CollectorSignal.model";
 
-interface IProjectModel {
+export interface IProjectModel {
     id?: number
     projectName: string
     testObjectId?: number  // 这里将testObjectId设为可选

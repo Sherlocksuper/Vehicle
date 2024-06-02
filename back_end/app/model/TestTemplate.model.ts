@@ -6,11 +6,11 @@ import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table, UpdatedAt, Cr
 import {TestTemplateType} from "../constants";
 
 export interface ITestTemplate {
-    id: number
+    id?: number
     name: string
     description: string
-    createTime: string
-    updateTime: string
+    createdAt: Date
+    updatedAt: Date
     itemConfig: {
         type: string
         requestSignalId: number | null
@@ -48,12 +48,10 @@ export class TestTemplate extends Model<ITestTemplate> {
     description!: string
 
     @CreatedAt
-    @Column(DataType.STRING)
-    createTime!: string
+    createdAt!: Date
 
     @UpdatedAt
-    @Column(DataType.STRING)
-    updateTime!: string
+    updatedAt!: Date
 
     @Column(DataType.JSON)
     itemConfig!: {
