@@ -1,4 +1,7 @@
-import Project from "../model/3Project.model";
+import Project, {IProjectModel} from "../model/3Project.model";
+import {IControllerModel} from "../model/Controller.model";
+import {ICollectorModel} from "../model/Collector.model";
+import {ISignalModel} from "../model/Signal.model";
 
 
 export default class ProjectService {
@@ -15,8 +18,13 @@ export default class ProjectService {
             });
     }
 
-    async createProject(projectName: string) {
-        return await Project.create({projectName});
+    async createProject(projectName: string, controller: IControllerModel, collector: ICollectorModel, single: ISignalModel) {
+        return await Project.create({
+            projectName,
+            controller,
+            collector,
+            single
+        });
     }
 
     async updateProject(id: number, projectName: string) {

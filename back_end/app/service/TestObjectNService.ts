@@ -2,7 +2,7 @@
  * create by lby
  */
 
-import TestObjectN, {ITestObjectNModel} from "../model/2TestObjectN";
+import TestObjectN, {ITestObjectNModel} from "../model/2TestObjectN.model";
 
 export default class TestObjectNService {
     /**

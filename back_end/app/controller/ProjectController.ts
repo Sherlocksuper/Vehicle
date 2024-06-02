@@ -2,7 +2,7 @@ import {SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
 import {IResBody} from "../types";
 import {Context} from "koa";
 import ProjectService from "../service/ProjectService";
-import Project from "../model/3Project.model";
+import Project, {IProjectModel} from "../model/3Project.model";
 
 const projectService = new ProjectService();
 
@@ -36,8 +36,8 @@ class ProjectController {
 
     //创建Project
     async createProject(ctx: Context) {
-        const {projectName} = ctx.request.body as Project
-        const res = await projectService.createProject(projectName);
+        const project = ctx.request.body as IProjectModel;
+        const res = await projectService.createProject(project.projectName, project.controller, project.collector, project.single);
 
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,

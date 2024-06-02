@@ -3,7 +3,7 @@ import request, {Agent} from 'supertest'
 import BE_CONFIG from '../app/config/be_config'
 import OT_CONFIG from '../app/config/ot_config'
 import {Server} from 'http'
-import {ITestObjectNModel} from "../app/model/2TestObjectN";
+import {ITestObjectNModel} from "../app/model/2TestObjectN.model";
 import {SUCCESS_CODE} from "../app/constants";
 
 //router.get('/getTestObjectNList', TestTemplateController.getTestTemplateList)

@@ -2,7 +2,7 @@ import TestObjectNService from "../service/TestObjectNService";
 import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
 import {IResBody} from "../types";
 import {Context} from "koa";
-import {ITestObjectNModel} from "../model/2TestObjectN";
+import {ITestObjectNModel} from "../model/2TestObjectN.model";
 
 
 const testObjectNService = new TestObjectNService();

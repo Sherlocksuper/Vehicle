@@ -1,7 +1,6 @@
 /**
  * 用来存放测试模板的模型
  */
-
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table, UpdatedAt, CreatedAt} from "sequelize-typescript";
 import {TestTemplateType} from "../constants";
 
@@ -35,7 +34,7 @@ export interface ITestTemplate {
     timestamps: false
 })
 
-export class TestTemplate extends Model<ITestTemplate> {
+export default class TestTemplate extends Model<ITestTemplate> {
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)
@@ -72,5 +71,3 @@ export class TestTemplate extends Model<ITestTemplate> {
         label?: string
     }[]
 }
-
-export default TestTemplate;
