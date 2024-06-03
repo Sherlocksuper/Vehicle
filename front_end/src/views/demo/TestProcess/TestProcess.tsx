@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import { Button, Flex, Input, message, Modal, Table, TableProps } from "antd";
 import './TestProcess.css';
 import { deleteTest, getTestList } from "@/apis/request/test.ts";
-import { CreateTest } from "@/views/demo/test_process/test_modal/CreateTest.tsx";
-import { CreateTestContext, CreateTestFunctions } from "@/views/demo/test_process/test_modal/CreateTestFunction.ts";
 import { SUCCESS_CODE } from "@/constants";
 import { ITestProcess } from "@/apis/standard/test.ts";
 import { request } from "@/utils/request";
 import { ContentType, Method, ResponseType } from "@/apis/standard/all";
 import { v4 as uuidv4 } from 'uuid';
+import {CreateTestContext, CreateTestFunctions} from "@/views/demo/TestProcess/TestModel/CreateTestFunction.ts";
+import {CreateTest} from "@/views/demo/TestProcess/TestModel/CreateTest.tsx";
 
 export interface TestItem {
     id: string;

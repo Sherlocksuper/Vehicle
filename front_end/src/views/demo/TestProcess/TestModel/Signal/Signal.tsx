@@ -1,10 +1,10 @@
 ///TODO: 采集指标项目选择
 import {CollectorSignalFormat, TestObjectsFormat} from "@/apis/standard/test.ts";
 import {useContext} from "react";
-import {CreateTestContext} from "@/views/demo/test_process/test_modal/CreateTestFunction.ts";
 import {COLLECT_SIGNAL, TEST_OBJECT} from "@/constants/name.ts";
-import NewBoardSelect from "@/views/demo/test_process/test_modal/signal/Select.tsx";
 import {Button, Modal, Descriptions} from "antd";
+import {CreateTestContext} from "@/views/demo/TestProcess/TestModel/CreateTestFunction.ts";
+import NewBoardSelect from "@/views/demo/TestProcess/TestModel/Signal/Select.tsx";
 
 export const CollectorSignalItem = ({signal}: { signal: CollectorSignalFormat }) => {
     const createTestObject = useContext(CreateTestContext)

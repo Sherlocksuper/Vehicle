@@ -1,15 +1,15 @@
 import Login from "@/views/login"
 import RequirAuthRoute from "../components/RequireAuthRoute.tsx/index.tsx"
 import SystemTotalPage from "@/views/demo";
-import TestProcessPage from "@/views/demo/test_process/TestProcess.tsx";
-import DataDisplay from "@/views/demo/data_display/display.tsx";
-import PhyTopology from "@/views/demo/topology/PhyTopology.tsx";
 import {createBrowserRouter, Outlet} from "react-router-dom";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import {ReactElement} from "react";
 import userUtils from "@/utils/UserUtils.ts";
-import UserManage from "@/views/demo/user/UserList.tsx";
+import TestProcessPage from "@/views/demo/TestProcess/TestProcess.tsx";
+import DataDisplay from "@/views/demo/DataDisplay/display.tsx";
+import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
+import UserManage from "@/views/demo/User/UserList.tsx";
 
 interface RouteItem {
     key: string

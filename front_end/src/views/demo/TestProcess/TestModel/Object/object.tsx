@@ -3,10 +3,10 @@ import {CollectorSignalFormat, TestObjectsFormat} from "@/apis/standard/test.ts"
 import {hasDuplicate} from "@/utils";
 import {v4 as uuidv4} from "uuid";
 import React, {useContext} from "react";
-import {CreateTestContext} from "@/views/demo/test_process/test_modal/CreateTestFunction.ts";
-import {CollectorSignalItem} from "@/views/demo/test_process/test_modal/signal/Signal.tsx";
-import {formatInput} from "@/views/demo/test_process/test_modal/CreateTest.tsx";
 import {Button, Modal} from "antd";
+import {CreateTestContext} from "@/views/demo/TestProcess/TestModel/CreateTestFunction.ts";
+import {formatInput} from "@/views/demo/TestProcess/TestModel/CreateTest.tsx";
+import {CollectorSignalItem} from "@/views/demo/TestProcess/TestModel/Signal/Signal.tsx";
 
 export const TestObjectsItem: React.FC<{ object: TestObjectsFormat }> = ({object}) => {
     const createTestObject = useContext(CreateTestContext)

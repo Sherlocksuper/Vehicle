@@ -2,8 +2,8 @@ import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Cascader, message } from 'antd';
 import { getCollectorList, getControllerList, getSignalListByCollectorId } from "@/apis/request/test.ts";
 import { ERROR_MSG, SUCCESS_CODE } from "@/constants";
-import { CreateTestContext } from "@/views/demo/test_process/test_modal/CreateTestFunction.ts";
 import { CollectorSignalFormat } from "@/apis/standard/test.ts";
+import {CreateTestContext} from "@/views/demo/TestProcess/TestModel/CreateTestFunction.ts";
 
 interface Option {
     value?: string | number | null;
