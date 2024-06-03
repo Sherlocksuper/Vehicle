@@ -23,7 +23,6 @@ import {ISignalModel} from "./Signal.model";
 export interface IProjectModel {
     id?: number
     projectName: string
-    testObjectId?: number  // 这里将testObjectId设为可选
 
     controller: IControllerModel
     collector: ICollectorModel
@@ -32,10 +31,13 @@ export interface IProjectModel {
 
 @Table({
     tableName: 'projects',
-    timestamps: false
 })
 
-//Project可以作为一个独立的元素，也可以属于一个TestObject
+/**
+ * Project可以作为一个独立的元素，也可以属于一个TestObject
+ * Project示例：室外项目、越野项目
+ * 每个Project包含一个指标、Controller、一个Collector、一个Signal
+ */
 export default class Project extends Model<IProjectModel> {
 
     @PrimaryKey

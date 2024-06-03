@@ -21,7 +21,25 @@ describe('测试测试对象（新）', () => {
         },
         project: {
             projectName: 'project',
-            testObjectId: 1,
+
+            controller: {
+                controllerName: 'controller',
+                controllerAddress: 'address',
+                userId: 1
+            },
+            collector: {
+                collectorName: 'collector',
+                collectorAddress: 'address',
+                userId: 1
+            },
+            single: {
+                signalName: 'signal',
+                signalUnit: 'unit',
+                signalType: 'type',
+                remark: 'remark',
+                collectorId: 1,
+                innerIndex: 1
+            }
         },
         template: {
             name: 'template',
@@ -40,8 +58,26 @@ describe('测试测试对象（新）', () => {
             vehicleName: 'vehicle2',
         },
         project: {
-            projectName: 'project2',
-            testObjectId: 2,
+            projectName: 'project',
+
+            controller: {
+                controllerName: 'controller',
+                controllerAddress: 'address',
+                userId: 1
+            },
+            collector: {
+                collectorName: 'collector',
+                collectorAddress: 'address',
+                userId: 1
+            },
+            single: {
+                signalName: 'signal',
+                signalUnit: 'unit',
+                signalType: 'type',
+                remark: 'remark',
+                collectorId: 1,
+                innerIndex: 1
+            }
         },
         template: {
             name: 'template2',

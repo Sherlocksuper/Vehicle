@@ -1,3 +1,8 @@
+/**
+ * 此目录用来存储standard类型即接口
+ * created by lby on 6.3
+ */
+
 export interface APIStandard {
     url: string
     method: Method
