@@ -45,7 +45,7 @@ class ControllerService {
     }
     async getControllers(userId?: number) {
         const data = await Controller.findAll({
-            attributes: ['id', ['controllerName', 'name']],
+            // attributes: ['id', ['controllerName', 'name']],
             where: userId ? { userId } : { userId: null }
         })
         return data

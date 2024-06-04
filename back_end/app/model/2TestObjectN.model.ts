@@ -34,7 +34,7 @@ export default class TestObjectN extends Model<ITestObjectNModel> {
 
 
     @Column(DataType.JSON)
-    project!: IProjectModel
+    project!: IProjectModel[]
 
     @Column(DataType.JSON)
     template!: ITestTemplate

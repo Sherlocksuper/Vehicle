@@ -50,7 +50,7 @@ class CollectorService {
     }
     async getCollectors(userId?: number) {
         const data = await Collector.findAll({
-            attributes: ['id', ['collectorName', 'name']],
+            // attributes: ['id', ['collectorName', 'name']],
             where: userId ? { userId } : { userId: null }
         })
         return data

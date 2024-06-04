@@ -10,7 +10,7 @@ class SignalService {
     async getSignalListByCollectorId(collectorId: number) {
         const data = await Signal.findAll({
             where: { collectorId },
-            attributes: ['id', ['signalName', 'name']]
+            // attributes: ['id', ['signalName', 'name']]
         })
         return data
     }

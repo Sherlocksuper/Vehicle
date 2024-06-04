@@ -10,6 +10,7 @@ import TestProcessPage from "@/views/demo/TestProcess/TestProcess.tsx";
 import DataDisplay from "@/views/demo/DataDisplay/display.tsx";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import UserManage from "@/views/demo/User/UserList.tsx";
+import TestProject from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
 
 interface RouteItem {
     key: string
@@ -33,7 +34,7 @@ export const routeItems: RouteItem[] = [
             {
                 key: '/test-config/test-config',
                 label: '测试项目',
-                element: <p>测试预1111111111111111111111111111111111111111111111111111配置</p>
+                element: <TestProject/>
             },
             {
                 key: '/test-config/test-object',
