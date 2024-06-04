@@ -1,32 +1,3 @@
-//export const PROJECT_API: UrlMap = {
-//     getProjectList: {
-//         url: '/getProjectList',
-//         method: Method.GET,
-//         format: ContentType.JSON
-//     },
-//     createProject: {
-//         url: '/createProject',
-//         method: Method.POST,
-//         format: ContentType.JSON
-//     },
-//     updateProject: {
-//         url: '/updateProject/:id',
-//         method: Method.POST,
-//         format: ContentType.JSON
-//     },
-//     getProjectById: {
-//         url: '/getProjectById/:id',
-//         method: Method.GET,
-//         format: ContentType.JSON
-//     },
-//     deleteProject: {
-//         url: '/deleteProject/:id',
-//         method: Method.POST,
-//         format: ContentType.JSON
-//     }
-// }
-
-//增删改查
 /**
  * 获取项目列表
  */

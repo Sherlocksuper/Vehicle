@@ -1,4 +1,5 @@
 import {
+    AllowNull,
     AutoIncrement,
     BelongsTo,
     Column,
@@ -18,6 +19,7 @@ export interface ICollectorModel {
     collectorName: string
     collectorAddress: string
     userId: number | null
+    isDisabled: boolean
 }
 
 @Table({
@@ -31,6 +33,11 @@ export interface ICollectorModel {
  * 1. 采集板卡的信号
  */
 export default class Collector extends Model<ICollectorModel> {
+    @Column({
+        type: DataType.BOOLEAN,
+        defaultValue: false
+    })
+    isDisabled!: boolean
 
     @PrimaryKey
     @AutoIncrement

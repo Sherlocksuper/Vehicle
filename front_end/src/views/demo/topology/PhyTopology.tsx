@@ -13,19 +13,21 @@ import { SUCCESS_CODE } from "@/constants";
 import userUtils from "@/utils/UserUtils";
 import {useNavigate } from "react-router-dom";
 
-export interface IcontrollersConfigItem {
+export interface IControllersConfigItem {
     id: number
     controllerName: string
     controllerAddress: string
+    isDisabled: boolean
 }
 
-export interface IcollectorsConfigItem {
+export interface ICollectorsConfigItem {
     id: number
     collectorName: string
     collectorAddress: string
+    isDisabled: boolean
 }
 
-export interface IsignalsConfigItem {
+export interface ISignalsConfigItem {
     id: number
     signalName: string
     signalUnit: string
@@ -36,9 +38,9 @@ export interface IsignalsConfigItem {
 }
 
 interface ITestData {
-    controllersConfig: IcontrollersConfigItem[]
-    collectorsConfig: IcollectorsConfigItem[]
-    signalsConfig: IsignalsConfigItem[]
+    controllersConfig: IControllersConfigItem[]
+    collectorsConfig: ICollectorsConfigItem[]
+    signalsConfig: ISignalsConfigItem[]
 }
 
 

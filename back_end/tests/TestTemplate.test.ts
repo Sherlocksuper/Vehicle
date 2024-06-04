@@ -1,10 +1,9 @@
-import {SEARCH_SUCCESS_MSG, SUCCESS_CODE, TestTemplateType} from "../app/constants";
 import request, {Agent} from "supertest";
 import run from "../app";
 import BE_CONFIG from "../app/config/be_config";
 import OT_CONFIG from "../app/config/ot_config";
 import {Server} from "http";
-import {ITestTemplate} from "../app/model/TestTemplate.model";
+import {ITestTemplate, TestTemplateType} from "../app/model/TestTemplate.model";
 
 
 describe('测试模板', () => {
@@ -17,8 +16,8 @@ describe('测试模板', () => {
             id: 1,
             name: "Test Template 1",
             description: "This is a test template",
-            createTime: "2022-01-01T00:00:00Z",
-            updateTime: "2022-01-01T00:00:00Z",
+            createdAt: new Date(),
+            updatedAt: new Date(),
             itemConfig: [
                 {
                     type: TestTemplateType.NUMBER,
@@ -65,14 +64,14 @@ describe('测试模板', () => {
 
     it('should update a TestTemplate', async () => {
         const {status} = await request(backendServer)
-            .put(`/updateTestTemplate/${testTemplateData.id}`)
+            .post(`/updateTestTemplate/${testTemplateData.id}`)
             .send({name: 'Updated Test Template'});
         expect(status).toBe(200);
     });
 
     it('should delete a TestTemplate', async () => {
         const {status} = await request(backendServer)
-            .delete(`/deleteTestTemplate/${testTemplateData.id}`);
+            .post(`/deleteTestTemplate/${testTemplateData.id}`);
         expect(status).toBe(200);
     });
 

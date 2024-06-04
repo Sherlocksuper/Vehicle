@@ -4,6 +4,7 @@
  */
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {IProject} from "@/apis/standard/project.ts";
+import {ITemplate} from "@/apis/standard/template.ts";
 
 export interface ITestObjectN {
     id: number

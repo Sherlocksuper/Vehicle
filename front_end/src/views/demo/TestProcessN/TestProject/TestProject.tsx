@@ -5,40 +5,51 @@ import {IProject} from "@/apis/standard/project.ts";
 import CreateProject from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
 import {getProjects} from "@/apis/request/project.ts";
 
-// export interface IProject {
-//     id?: number
-//     projectName: string
-//
-//     controller: IcontrollersConfigItem
-//     collector: IcollectorsConfigItem
-//     single: IsignalsConfigItem
-// }
-
-const columns: TableProps<IProject>['columns'] = [
-    {
-        title: "项目名称",
-        dataIndex: "projectName",
-        key: "projectName",
-    },
-    {
-        title: "操作",
-        key: "action",
-        render: () => (
-            <Space>
-                <Button type="link">详情</Button>
-            </Space>
-        )
-    }
-];
-
 const TestProject: React.FC = () => {
-    const [showCreateProject, setShowCreateProject] = React.useState<boolean>(false)
+    const [showCreateProject, setShowCreateProject] = React.useState<{
+        disabled: boolean,
+        open: boolean,
+        initValue: string
+    }>({
+        disabled: false,
+        open: false,
+        initValue: ""
+    })
     const [projects, setProjects] = React.useState<IProject[]>([])
 
-    React.useEffect(() => {
+
+    const columns: TableProps<IProject>['columns'] = [
+        {
+            title: "项目名称",
+            dataIndex: "projectName",
+            key: "projectName",
+        },
+        {
+            title: "操作",
+            key: "action",
+            render: (_, record) => (
+                <Space>
+                    <Button type="link" onClick={() => {
+                        console.log(record)
+                        setShowCreateProject({
+                            disabled: true,
+                            open: true,
+                            initValue: JSON.stringify(record)
+                        })
+                    }}>详情</Button>
+                </Space>
+            )
+        }
+    ];
+
+    const fetchProjects = () => {
         getProjects().then((res) => {
             setProjects(res.data)
         })
+    }
+
+    React.useEffect(() => {
+        fetchProjects()
     }, [])
 
     return (
@@ -47,13 +58,23 @@ const TestProject: React.FC = () => {
         }}>
             <Row justify="end" style={{marginBottom: 20}}>
                 <Button type="primary" onClick={() => {
-                    setShowCreateProject(true)
+                    setShowCreateProject({
+                        disabled: false,
+                        open: true,
+                        initValue: ""
+                    })
                 }}>New</Button>
             </Row>
-            <CreateProject open={showCreateProject} mode={"create"} onFinished={() => {
-                setShowCreateProject(false)
-            }}/>
-            <Table columns={columns} dataSource={projects}/>
+            <CreateProject open={showCreateProject.open} mode={"create"} onFinished={() => {
+                setShowCreateProject({
+                    disabled: false,
+                    open: false,
+                    initValue: ""
+                })
+                fetchProjects()
+
+            }} disable={showCreateProject.disabled} initValue={showCreateProject.initValue} key={new Date().getTime()}/>
+            <Table columns={columns} dataSource={projects} key={projects.length} rowKey={"id"}/>
         </div>
     );
 };

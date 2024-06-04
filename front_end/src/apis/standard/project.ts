@@ -4,13 +4,14 @@
  * project包含测试指标、controller、collector、single等信息
  * 指标举例:速度、里程
  */
-import {IcollectorsConfigItem, IcontrollersConfigItem, IsignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
+import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 
 export interface IProject {
     id?: number
     projectName: string
-
-    controller: IcontrollersConfigItem
-    collector: IcollectorsConfigItem
-    single: IsignalsConfigItem
+    projectConfig: {
+        controller: IControllersConfigItem
+        collector: ICollectorsConfigItem
+        signal: ISignalsConfigItem
+    }[]
 }

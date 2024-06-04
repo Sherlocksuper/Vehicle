@@ -1,8 +1,8 @@
 import { Table } from "antd";
-import { IcontrollersConfigItem } from "../PhyTopology";
+import { IControllersConfigItem } from "../PhyTopology";
 
 const ControllerInfoTable: React.FC<{
-    dataSource: IcontrollersConfigItem[]
+    dataSource: IControllersConfigItem[]
 }> = ({ dataSource }) => {
     const columns = [
         {

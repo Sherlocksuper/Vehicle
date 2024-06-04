@@ -1,4 +1,14 @@
-import { AllowNull, AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript'
+import {
+    AllowNull,
+    AutoIncrement,
+    BelongsTo,
+    Column,
+    DataType,
+    ForeignKey,
+    Model,
+    PrimaryKey,
+    Table
+} from 'sequelize-typescript'
 import User from './User.model';
 
 export interface IControllerModel {
@@ -6,6 +16,7 @@ export interface IControllerModel {
     controllerName: string
     controllerAddress: string
     userId: number | null
+    isDisabled: boolean
 }
 
 @Table({
@@ -17,6 +28,11 @@ export interface IControllerModel {
  * 核心控制板卡
  */
 export default class Controller extends Model<IControllerModel> {
+    @Column({
+        type: DataType.BOOLEAN,
+        defaultValue: false
+    })
+    isDisabled!: boolean
 
     @PrimaryKey
     @AutoIncrement

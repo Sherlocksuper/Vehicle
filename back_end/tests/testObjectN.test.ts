@@ -18,6 +18,7 @@ describe('测试测试对象（新）', () => {
         title: 'test',
         vehicle: {
             vehicleName: 'vehicle',
+            isDisabled: false
         },
         project: {
             projectName: 'project',
@@ -25,12 +26,14 @@ describe('测试测试对象（新）', () => {
             controller: {
                 controllerName: 'controller',
                 controllerAddress: 'address',
-                userId: 1
+                userId: 1,
+                isDisabled: false
             },
             collector: {
                 collectorName: 'collector',
                 collectorAddress: 'address',
-                userId: 1
+                userId: 1,
+                isDisabled: false
             },
             single: {
                 signalName: 'signal',
@@ -56,6 +59,7 @@ describe('测试测试对象（新）', () => {
         title: 'test2',
         vehicle: {
             vehicleName: 'vehicle2',
+            isDisabled: false
         },
         project: {
             projectName: 'project',
@@ -63,12 +67,14 @@ describe('测试测试对象（新）', () => {
             controller: {
                 controllerName: 'controller',
                 controllerAddress: 'address',
-                userId: 1
+                userId: 1,
+                isDisabled: false
             },
             collector: {
                 collectorName: 'collector',
                 collectorAddress: 'address',
-                userId: 1
+                userId: 1,
+                isDisabled: false
             },
             single: {
                 signalName: 'signal',

@@ -23,10 +23,11 @@ import {ISignalModel} from "./Signal.model";
 export interface IProjectModel {
     id?: number
     projectName: string
-
-    controller: IControllerModel
-    collector: ICollectorModel
-    single: ISignalModel
+    projectConfig: {
+        controller: IControllerModel
+        collector: ICollectorModel
+        single: ISignalModel
+    }[]
 }
 
 @Table({
@@ -47,4 +48,11 @@ export default class Project extends Model<IProjectModel> {
 
     @Column(DataType.STRING)
     projectName!: string;
+
+    @Column(DataType.JSON)
+    projectConfig!: {
+        controller: IControllerModel
+        collector: ICollectorModel
+        single: ISignalModel
+    }[]
 }

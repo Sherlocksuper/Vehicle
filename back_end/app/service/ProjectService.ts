@@ -18,13 +18,8 @@ export default class ProjectService {
             });
     }
 
-    async createProject(projectName: string, controller: IControllerModel, collector: ICollectorModel, single: ISignalModel) {
-        return await Project.create({
-            projectName,
-            controller,
-            collector,
-            single
-        });
+    async createProject(project: IProjectModel) {
+        return await Project.create(project);
     }
 
     async updateProject(id: number, projectName: string) {

@@ -1,4 +1,4 @@
-import {SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
+import {SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE, WRITE_SUCCESS_MSG} from "../constants";
 import {IResBody} from "../types";
 import {Context} from "koa";
 import ProjectService from "../service/ProjectService";
@@ -37,16 +37,16 @@ class ProjectController {
     //创建Project
     async createProject(ctx: Context) {
         const project = ctx.request.body as IProjectModel;
-        const res = await projectService.createProject(project.projectName, project.controller, project.collector, project.single);
+        const res = await projectService.createProject(project);
 
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,
-            msg: SEARCH_SUCCESS_MSG,
+            msg: WRITE_SUCCESS_MSG,
             data: res
         })
         !res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,
-            msg: SEARCH_FAIL_MSG,
+            msg: WRITE_SUCCESS_MSG,
             data: null
         })
     }
