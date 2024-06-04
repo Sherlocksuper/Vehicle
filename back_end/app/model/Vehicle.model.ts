@@ -3,6 +3,7 @@ import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from "sequeli
 export interface IVehicleModel {
     id?: number
     vehicleName: string
+    isDisabled: boolean
 }
 
 @Table({
@@ -17,4 +18,10 @@ export default class Vehicle extends Model<IVehicleModel> {
 
     @Column(DataType.STRING)
     vehicleName!: string;
+
+    @Column({
+        type: DataType.BOOLEAN,
+        defaultValue: false
+    })
+    isDisabled!: boolean;
 }

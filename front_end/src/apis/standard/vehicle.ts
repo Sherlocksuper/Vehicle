@@ -5,4 +5,5 @@
 export interface IVehicle {
     id?: number
     vehicleName: string
+    isDisabled: boolean
 }

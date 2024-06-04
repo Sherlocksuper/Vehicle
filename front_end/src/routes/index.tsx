@@ -12,6 +12,7 @@ import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import UserManage from "@/views/demo/User/UserList.tsx";
 import TestProject from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
 import TestTemplate from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.tsx";
+import TestVehicle from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
 
 interface RouteItem {
     key: string
@@ -30,7 +31,7 @@ export const routeItems: RouteItem[] = [
             {
                 key: '/test-config/test-vehicle',
                 label: '车辆管理',
-                element: <p>车辆管理</p>
+                element: <TestVehicle/>
             },
             {
                 key: '/test-config/test-config',

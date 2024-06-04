@@ -1,10 +1,13 @@
 // vehicle.service.ts
 
-import Vehicle from "../model/Vehicle.model";
+import Vehicle, {IVehicleModel} from "../model/Vehicle.model";
 
 class VehicleService {
     async createVehicle(vehicleName: string): Promise<Vehicle> {
-        return Vehicle.create({ vehicleName });
+        return Vehicle.create({
+            vehicleName: vehicleName,
+            isDisabled: false
+        });
     }
 
     async getVehicles(): Promise<Vehicle[]> {
@@ -15,10 +18,11 @@ class VehicleService {
         return Vehicle.findByPk(id);
     }
 
-    async updateVehicle(id: number, vehicleName: string): Promise<Vehicle | null> {
+    async updateVehicle(id: number, newVehicle: IVehicleModel): Promise<Vehicle | null> {
         const vehicle = await Vehicle.findByPk(id);
         if (vehicle) {
-            vehicle.vehicleName = vehicleName;
+            vehicle.vehicleName = newVehicle.vehicleName;
+            vehicle.isDisabled = newVehicle.isDisabled
             await vehicle.save();
             return vehicle;
         }

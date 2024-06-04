@@ -1,6 +1,6 @@
 import VehicleService from "../service/VehicleService";
 import {Context} from "koa";
-import Vehicle from "../model/Vehicle.model";
+import Vehicle, {IVehicleModel} from "../model/Vehicle.model";
 import {IResBody} from "../types";
 import {LOGIN_FAIL, LOGIN_SUCCESS, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
 import tokenUtils from "../../utils/token";
@@ -58,8 +58,8 @@ class VehicleController {
     //更新车辆
     async updateVehicle(ctx: Context) {
         const {id} = ctx.params;
-        const {vehicleName} = ctx.request.body as Vehicle;
-        const res = await vehicleService.updateVehicle(Number(id), vehicleName);
+        const newVehicle = ctx.request.body as IVehicleModel;
+        const res = await vehicleService.updateVehicle(Number(id), newVehicle);
 
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,
