@@ -51,6 +51,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished}) =
     }
 
     useEffect(() => {
+        form.resetFields()
         setSingleKey(Math.random().toString(36).slice(-8))
         getController()
         getCollector()

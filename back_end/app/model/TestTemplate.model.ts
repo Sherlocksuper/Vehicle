@@ -2,7 +2,12 @@
  * 用来存放测试模板的模型
  */
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table, UpdatedAt, CreatedAt} from "sequelize-typescript";
-import {TestTemplateType} from "../constants";
+
+export enum TestTemplateType {
+    BOOLEAN = 'BOOLEAN',
+    LINE = 'LINE',
+    NUMBER = 'NUMBER'
+}
 
 export interface ITestTemplate {
     id?: number
@@ -11,7 +16,7 @@ export interface ITestTemplate {
     createdAt: Date
     updatedAt: Date
     itemConfig: {
-        type: string
+        type: TestTemplateType
         requestSignalId: number | null
         x: number
         y: number
