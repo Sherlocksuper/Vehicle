@@ -8,6 +8,7 @@ import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {getTestProcess} from "@/apis/standard/test.ts";
 import {getProcessNById, getProcessNList} from "@/apis/request/testProcessN.ts";
 import {SUCCESS_CODE} from "@/constants";
+import ProcessNTree from "@/views/demo/TestProcessN/ProcessNTree.tsx";
 
 const columns: TableProps<ITestProcessN>['columns'] = [
     {
@@ -16,7 +17,7 @@ const columns: TableProps<ITestProcessN>['columns'] = [
         key: "id",
     },
     {
-        title: "测试名称",
+        title: "配置名称",
         dataIndex: "testName",
         key: "testName",
         render: (value, record, index) => (
@@ -53,17 +54,9 @@ const columns: TableProps<ITestProcessN>['columns'] = [
         key: "action",
         render: (value, record, index) => (
             <Space>
-                <Button type="primary" onClick={() => {
-                    getProcessNById(record.id!).then(res => {
-                        if (res.code !== SUCCESS_CODE) {
-                            message.error(res.message);
-                            return;
-                        }
-                        console.log(res.data);
-                    })
-                }}>查看</Button>
-                <Button type="primary">编辑</Button>
-                <Button type="primary">删除</Button>
+                <ProcessNTree record={record}/>
+                <Button type="primary">下发</Button>
+                <Button type="primary" danger={true}>删除</Button>
             </Space>
         )
     }

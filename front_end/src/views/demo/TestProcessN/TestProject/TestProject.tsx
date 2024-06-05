@@ -74,7 +74,7 @@ const TestProject: React.FC = () => {
                 fetchProjects()
 
             }} disable={showCreateProject.disabled} initValue={showCreateProject.initValue} key={new Date().getTime()}/>
-            <Table columns={columns} dataSource={projects} key={projects.length} rowKey={"id"}/>
+            <Table columns={columns} dataSource={projects} key={projects?.length ?? 0} rowKey={"id"}/>
         </div>
     );
 };
