@@ -1,9 +1,10 @@
 import React from 'react';
-import {Space, Table} from 'antd';
+import {Button, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {ITestObjectN} from "@/apis/standard/testObjectN.ts";
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {IProject} from "@/apis/standard/project.ts";
+import NewTestProcessN from "@/views/demo/TestProcessN/NewTestProcessN.tsx";
 
 const columns: TableProps<ITestObjectN>['columns'] = [
     {
@@ -28,7 +29,7 @@ const columns: TableProps<ITestObjectN>['columns'] = [
         )
     },
     {
-        title: "测测试项目",
+        title: "测试项目",
         dataIndex: "project",
         key: "project",
         render: (project: IProject) => (
@@ -39,17 +40,32 @@ const columns: TableProps<ITestObjectN>['columns'] = [
         )
     },
     {
-        title: "Template",
+        title: "测试模板",
         dataIndex: "template",
         key: "template",
-        render: () => (
+        render: (value, record, index) => (
             <Space>
-                <span>123</span>
+                <span>{`${record.template.name} - ${record.template.id}`}</span>
             </Space>
         )
     }
 ];
 
-const TestProcessN: React.FC = () => <Table columns={columns} dataSource={[]}/>;
+const TestProcessN: React.FC = () => {
+
+
+    return (
+        <div style={{padding: 20}}>
+            <div style={{
+                marginBottom: 20,
+                display: 'flex',
+                justifyContent: 'flex-end'
+            }}>
+                <NewTestProcessN/>
+            </div>
+            <Table columns={columns} dataSource={[]}/>
+        </div>
+    )
+}
 
 export default TestProcessN;

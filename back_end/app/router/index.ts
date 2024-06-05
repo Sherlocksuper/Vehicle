@@ -10,6 +10,7 @@ import VehicleController from "../controller/VehicleController";
 import ProjectController from "../controller/ProjectController";
 import TestTemplateController from "../controller/TestTemplateController";
 import TestObjectNController from "../controller/TestObjectNController";
+import TestProcessNController from "../controller/TestProcessNController";
 
 const router = new KoaRouter({
     prefix: ''
@@ -87,6 +88,17 @@ router.post('/createTestObjectN', TestObjectNController.createTestObjectN)
 router.post('/updateTestObjectN/:id', TestObjectNController.updateTestObjectNById)
 router.get('/getTestObjectNById/:id', TestObjectNController.getTestObjectNById)
 router.post('/deleteTestObjectN/:id', TestObjectNController.deleteTestObjectNById)
+
+
+/**
+ * 测试流程管理接口 TestProcessN
+ * created by lby on 6.5
+ */
+router.get('/getTestProcessNList', TestProcessNController.getAllTestProcessNs)
+router.post('/createTestProcessN', TestProcessNController.createTestProcessN)
+router.get('/getTestProcessNById/:id', TestProcessNController.getTestProcessN)
+router.post('/updateTestProcessN/:id', TestProcessNController.updateTestProcessN)
+router.post('/deleteTestProcessN/:id', TestProcessNController.deleteTestProcessN)
 
 
 // 资源下载接口

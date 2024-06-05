@@ -4,7 +4,7 @@ import SystemTotalPage from "@/views/demo";
 import {createBrowserRouter, Outlet} from "react-router-dom";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
-import {ReactElement} from "react";
+import React, {ReactElement} from "react";
 import userUtils from "@/utils/UserUtils.ts";
 import TestProcessPage from "@/views/demo/TestProcess/TestProcess.tsx";
 import DataDisplay from "@/views/demo/DataDisplay/display.tsx";
@@ -14,6 +14,7 @@ import TestProject from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
 import TestTemplate from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.tsx";
 import TestVehicle from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
 import NewTestTemplate from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import TestProcessN from "@/views/demo/TestProcessN/TestProcessN.tsx";
 
 interface RouteItem {
     key: string
@@ -50,6 +51,11 @@ export const routeItems: RouteItem[] = [
         key: '/process-management',
         label: '测试配置生成管理',
         element: <TestProcessPage/>
+    },
+    {
+        key: '/process-execution',
+        label: '测试配置生成',
+        element: <TestProcessN/>
     },
     {
         key: '/data-display',

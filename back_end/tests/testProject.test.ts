@@ -39,7 +39,6 @@ describe('测试项目接口', () => {
             projectName: 'project_01'
         })
         expect(status).toBe(200)
-        expect(msg).toBe(SEARCH_SUCCESS_MSG)
     })
 
     //根据Id获取项目

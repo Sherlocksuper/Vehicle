@@ -7,7 +7,7 @@ class TestProcessNService {
      * @param userId
      * @param data
      */
-    async createTestProcess(userId: number, data: ITestProcessNModel): Promise<ITestProcessNModel | null> {
+    async createTestProcessN(userId: number, data: ITestProcessNModel): Promise<TestProcessN | null> {
         try {
             const testProcess = await TestProcessN.create({...data, userId})
             return testProcess
@@ -21,7 +21,7 @@ class TestProcessNService {
      * 读取一个TestProcess
      * @param id
      */
-    async readTestProcess(id: number): Promise<ITestProcessNModel | null> {
+    async readTestProcessN(id: number): Promise<TestProcessN | null> {
         try {
             const testProcess = await TestProcessN.findByPk(id)
             return testProcess
@@ -36,7 +36,7 @@ class TestProcessNService {
      * @param id
      * @param data
      */
-    async updateTestProcess(id: number, data: ITestProcessNModel): Promise<ITestProcessNModel | null> {
+    async updateTestProcessN(id: number, data: ITestProcessNModel): Promise<TestProcessN | null> {
         try {
             const testProcess = await TestProcessN.findByPk(id)
             if (testProcess) {
@@ -54,7 +54,7 @@ class TestProcessNService {
      * 删除一个TestProcess
      * @param id
      */
-    async deleteTestProcess(id: number): Promise<boolean> {
+    async deleteTestProcessN(id: number): Promise<boolean> {
         try {
             const testProcess = await TestProcessN.findByPk(id)
             if (testProcess) {
@@ -72,8 +72,11 @@ class TestProcessNService {
      * 获取用户的所有TestProcess
      * @param userId
      */
-    async getTestProcessList(userId: number): Promise<ITestProcessNModel[] | null> {
+    async getTestProcessNList(userId?: number): Promise<TestProcessN[] | null> {
         try {
+            if (!userId) return await TestProcessN.findAll(
+                {include: [{all: true}]}
+            )
             const testProcessList = await TestProcessN.findAll({where: {userId}})
             return testProcessList
         } catch (error) {
@@ -82,3 +85,5 @@ class TestProcessNService {
         }
     }
 }
+
+export default new TestProcessNService()

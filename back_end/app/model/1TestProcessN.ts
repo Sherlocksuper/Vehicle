@@ -11,12 +11,14 @@ import {
 } from 'sequelize-typescript'
 import TestObject from './2TestObject.model';
 import User from './User.model';
-import TestObjectN from "./2TestObjectN.model";
+import TestObjectN, {ITestObjectNModel} from "./2TestObjectN.model";
+import {Col} from "sequelize/types/utils";
 
 export interface ITestProcessNModel {
     id?: number
     userId: number
     testName: string
+    testObjectNs: ITestObjectNModel[]
     createAt?: Date
     updateAt?: Date
 }
@@ -38,15 +40,15 @@ export default class TestProcessN extends Model<ITestProcessNModel> {
     @Column(DataType.INTEGER)
     id!: number;
 
-    @Column(DataType.STRING)
-    testName!: string;
-
-    @HasMany(() => TestObjectN)
-    testObjects!: TestObjectN[]
-
     @ForeignKey(() => User)
     @Column
     userId!: number
+
+    @Column(DataType.STRING)
+    testName!: string;
+
+    @Column(DataType.JSON)
+    testObjectNs!: ITestObjectNModel[]
 
     @BelongsTo(() => User)
     user!: User

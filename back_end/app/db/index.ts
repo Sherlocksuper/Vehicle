@@ -27,7 +27,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     dialect: 'mysql',
     port: DB_PORT,
     logging: false,
-    models: [User, TokenBlackListItem, TestProcess, TestObject, CollectorSignal, Controller, Collector, Signal, SendTestConfigRecord, SendTestConfigVeriftCache, Vehicle, Project, TestTemplate, TestObjectN, /*TestProcessN*/]
+    models: [User, TokenBlackListItem, TestProcess, TestObject, CollectorSignal, Controller, Collector, Signal, SendTestConfigRecord, SendTestConfigVeriftCache, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN]
 });
 
 const DB_OPT = {
