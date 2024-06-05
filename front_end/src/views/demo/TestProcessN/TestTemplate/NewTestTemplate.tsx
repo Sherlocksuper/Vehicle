@@ -2,7 +2,8 @@
  * @file NewTestTemplate.tsx
  * @desc NewTestTemplate Page
  */
-import React, {FC, useRef, useState} from 'react';
+import React, {FC, useEffect, useRef, useState} from 'react';
+import {v4 as uuidv4} from 'uuid';
 import {useDrop} from 'react-dnd';
 import GridLayout from "react-grid-layout";
 import DraggableComponent, {
@@ -22,6 +23,13 @@ export enum DragItemType {
     BOOLEAN = 'BOOLEAN',
     LINE = 'LINE',
     NUMBER = 'NUMBER',
+}
+
+//模式
+export enum NewTestTemplateMode {
+    ADD = 'ADD',
+    EDIT = 'EDIT',
+    SHOW = 'SHOW'
 }
 
 export interface IDragItem {
@@ -45,14 +53,32 @@ export interface IDragItem {
     }
 }
 
-interface IDataDisplay {
-    // mode: 'ONLINE' | 'OFFLINE'
-}
 
-const NewTestTemplate: React.FC<IDataDisplay> = () => {
+const NewTestTemplate: React.FC = () => {
 
     const ref = useRef<HTMLDivElement>(null)
     const [dragItems, setDragItems] = useState<IDragItem[]>([])
+    const [mode, setMode] = useState<NewTestTemplateMode>(NewTestTemplateMode.ADD)
+    const [name, setName] = useState("默认名称")
+    const [description, setDescription] = useState("默认描述")
+
+    useEffect(() => {
+        const search = window.location.search
+        const params = new URLSearchParams(search)
+        const templateRecord = params.get('templateRecord')
+        const mode = params.get('model')
+
+        if (templateRecord && mode) {
+            const template: ITemplate = JSON.parse(templateRecord)
+            console.log(transferToDragItems(template))
+            const dragItems = transferToDragItems(template)
+            setDragItems(dragItems)
+            setName(template.name)
+            setDescription(template.description)
+            setMode(mode as NewTestTemplateMode)
+        }
+    }, [])
+
     const [, drop] = useDrop<{ id: string } & IDraggleComponent>({
         accept: 'box',
         drop({
@@ -93,11 +119,10 @@ const NewTestTemplate: React.FC<IDataDisplay> = () => {
     })
     drop(ref)
 
-
     const transferToDragItems = (template: ITemplate): IDragItem[] => {
-        return template.itemsConfig.map((item) => {
+        const dragItems = template.itemsConfig.map((item) => {
             const newItem: IDragItem = {
-                id: '',
+                id: item.id,
                 type: item.type,
                 itemConfig: {
                     requestSignalId: null,
@@ -118,6 +143,9 @@ const NewTestTemplate: React.FC<IDataDisplay> = () => {
             }
             return newItem
         })
+        console.log("转换为DragItems")
+        console.log(JSON.stringify(dragItems))
+        return dragItems
     }
 
     function renderADDModeInfo() {
@@ -182,6 +210,30 @@ const NewTestTemplate: React.FC<IDataDisplay> = () => {
         }))
     }
 
+    function updateAllByLayout(layout: GridLayout.Layout[]) {
+        if (mode === NewTestTemplateMode.SHOW) {
+            message.error('展示模式下不允许修改')
+            return
+        }
+
+        setDragItems(dragItems.map((item) => {
+            const newItem = layout.find((newItem) => newItem.i === item.id)
+            if (newItem) {
+                return {
+                    ...item,
+                    itemConfig: {
+                        ...item.itemConfig,
+                        width: newItem.w * 30,
+                        height: newItem.h * 30,
+                        x: newItem.x,
+                        y: newItem.y
+                    }
+                }
+            }
+            return item
+        }))
+    }
+
     function renderSendedPage() {
         return (
             <div className='dd_container' style={{
@@ -190,14 +242,27 @@ const NewTestTemplate: React.FC<IDataDisplay> = () => {
             }}>
                 <div className="dd_body">
                     <div className="dd_drop_container" ref={ref}>
-                        <DropContainer ifStartGetData={false} selectedItemId={null}
+                        <DropContainer ifStartGetData={mode === NewTestTemplateMode.SHOW} selectedItemId={null}
                                        selectFunc={() => {
                                        }} items={dragItems}
-                                       onUpdateItems={updateItemsByLayout}/>
+                                       onUpdateItems={updateItemsByLayout}
+                                       onLayoutChange={updateAllByLayout}
+                        />
                     </div>
                     <div className="dd_info">
                         {renderADDModeInfo()}
-                        <ButtonModal dragItems={dragItems}/>
+                        {
+
+                            <ButtonModal dragItems={dragItems} name={name} description={description}
+                                         updateDescription={(value) => {
+                                             setDescription(value)
+                                         }}
+                                         updateName={(value) => {
+                                             setName(value)
+                                         }}
+                                         mode={mode}
+                            />
+                        }
                     </div>
                 </div>
             </div>
@@ -213,13 +278,17 @@ export default NewTestTemplate;
 
 interface IButtonModalProps {
     dragItems: IDragItem[]
+    name: string
+    description: string
+    updateName: (name: string) => void
+    updateDescription: (name: string) => void
+    mode: NewTestTemplateMode
 }
 
-const ButtonModal: FC<IButtonModalProps> = ({dragItems}) => {
+const ButtonModal: FC<IButtonModalProps> = ({
+                                                dragItems, name, description, updateName, updateDescription, mode
+                                            }) => {
     const [visible, setVisible] = useState(false);
-    const [name, setName] = useState('')
-    const [description, setDescription] = useState('')
-
 
     const newTemplate = (template: ITemplate) => {
         createTestTemplate(template)
@@ -249,6 +318,7 @@ const ButtonModal: FC<IButtonModalProps> = ({dragItems}) => {
             itemsConfig: [
                 ...dragItems.map((item) => {
                     const newItem: ITemplateItem = {
+                        id: uuidv4(),
                         type: item.type,
                         ...item.itemConfig
                     }
@@ -282,9 +352,14 @@ const ButtonModal: FC<IButtonModalProps> = ({dragItems}) => {
 
     return (
         <>
-            <Button type="primary" onClick={showModal}>
+            {
+                mode !== NewTestTemplateMode.SHOW &&
+              <Button type="primary" onClick={showModal}>
                 确认
-            </Button>
+              </Button>
+            }
+            <p>名称：{name}</p>
+            <p>描述：{description}</p>
             <Modal
                 title="请输入模板名称和描述"
                 open={visible}
@@ -292,10 +367,10 @@ const ButtonModal: FC<IButtonModalProps> = ({dragItems}) => {
                 onCancel={handleCancel}
             >
                 <Input placeholder="请输入该模板名称" value={name} onChange={(e) => {
-                    setName(e.target.value)
+                    updateName(e.target.value)
                 }}/>
                 <TextArea placeholder="请输入该模板描述" value={description} onChange={(e) => {
-                    setDescription(e.target.value)
+                    updateDescription(e.target.value)
                 }} style={{
                     marginTop: 10
                 }}/>

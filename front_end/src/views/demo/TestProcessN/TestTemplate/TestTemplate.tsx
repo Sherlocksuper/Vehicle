@@ -3,6 +3,7 @@ import {Button, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {ITemplate} from "@/apis/standard/template.ts";
 import {getTestTemplateList} from "@/apis/request/template.ts";
+import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
 
 const columns: TableProps<ITemplate>['columns'] = [
     {
@@ -19,27 +20,30 @@ const columns: TableProps<ITemplate>['columns'] = [
         title: '创建日期',
         dataIndex: 'createdAt',
         key: 'createdAt',
-        render: (text) => {
-            return new Date(text).toLocaleString()
+        render: (value, record, index) => {
+            return new Date(value).toLocaleString()
         }
     },
     {
         title: '更新日期',
         dataIndex: 'updatedAt',
         key: 'updatedAt',
-        render: (text) => {
-            return new Date(text).toLocaleString()
+        render: (value, record, index) => {
+            return new Date(value).toLocaleString()
         }
     },
     {
         title: '操作',
         key: 'action',
-        render: () => (
-            <Space size="middle">
-                <a>Edit</a>
-                <a>Delete</a>
+        render: (value, record, index) => {
+            const templateRecord = JSON.stringify(record)
+            const model = NewTestTemplateMode.SHOW
+
+            return <Space size="middle">
+                <Button type="link"
+                        href={`/test-template-config?templateRecord=${templateRecord}&model=${model}`} target={"_blank"}>查看</Button>
             </Space>
-        ),
+        }
     },
 ];
 

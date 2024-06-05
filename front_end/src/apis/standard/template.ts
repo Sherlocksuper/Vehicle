@@ -11,6 +11,7 @@ export interface ITemplate {
 
 
 export interface ITemplateItem {
+    id: string
     type: DragItemType
     requestSignalId: number | null
     x: number
