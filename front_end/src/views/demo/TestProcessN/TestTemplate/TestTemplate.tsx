@@ -19,11 +19,17 @@ const columns: TableProps<ITemplate>['columns'] = [
         title: '创建日期',
         dataIndex: 'createdAt',
         key: 'createdAt',
+        render: (text) => {
+            return new Date(text).toLocaleString()
+        }
     },
     {
         title: '更新日期',
         dataIndex: 'updatedAt',
         key: 'updatedAt',
+        render: (text) => {
+            return new Date(text).toLocaleString()
+        }
     },
     {
         title: '操作',
@@ -38,14 +44,17 @@ const columns: TableProps<ITemplate>['columns'] = [
 ];
 
 const TestTemplate: React.FC = () => {
-    const [showCreateProject, setShowCreateProject] = React.useState<boolean>(false)
     const [templates, setTemplate] = React.useState<ITemplate[]>([])
 
-    React.useEffect(() => {
+    const fetchTestTemplate = async () => {
         getTestTemplateList().then((res) => {
             console.log("template:" + res.data)
             setTemplate(res.data)
         })
+    }
+
+    React.useEffect(() => {
+        fetchTestTemplate()
     }, [])
 
     return (
@@ -55,8 +64,9 @@ const TestTemplate: React.FC = () => {
             <Row justify="end" style={{marginBottom: 20}}>
                 <Button type="link" href={"/test-template-config"}
                         target={"_blank"}>模板配置</Button>
+                <Button type="primary">刷新</Button>
             </Row>
-            <Table columns={columns} dataSource={templates}/>
+            <Table columns={columns} dataSource={templates} rowKey={(record) => record.id!.toString()}/>
         </div>
     );
 };

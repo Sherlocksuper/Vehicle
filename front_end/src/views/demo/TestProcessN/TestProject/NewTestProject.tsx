@@ -189,6 +189,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
                                         </Select>
                                     </Form.Item>
                                     <MinusCircleOutlined onClick={() => {
+                                        if (disable) return
                                         remove(field.name)
                                         const newProjectResult = {...projectResult} as IProject
                                         newProjectResult.projectConfig.splice(index, 1)

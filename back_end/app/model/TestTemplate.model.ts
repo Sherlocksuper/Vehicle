@@ -52,13 +52,15 @@ export default class TestTemplate extends Model<ITestTemplate> {
     description!: string
 
     @CreatedAt
+    @Column(DataType.DATE)
     createdAt!: Date
 
     @UpdatedAt
+    @Column(DataType.DATE)
     updatedAt!: Date
 
     @Column(DataType.JSON)
-    itemConfig!: {
+    itemsConfig!: {
         type: TestTemplateType
         requestSignalId: number | null
         x: number

@@ -4,6 +4,9 @@ import { TOKEN_MSG, TOKEN_NOTFOUND_CODE } from '../constants'
 
 async function AuthMiddleware(ctx: Context, next: Next) {
     const token = ctx.headers['authorization']
+    if (ctx.path === '/createTestTemplate' || ctx.path === '/register') {
+        return next()
+    }
     if (!!token) {
         const { err } = await tokenUtils.verify(token)
         if (!!err) {

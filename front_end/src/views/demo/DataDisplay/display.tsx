@@ -77,7 +77,7 @@ const DataDisplay: React.FC<IDataDisplay> = () => {
     const [selectedDragItemId, setSelectedDragItemId] = useState<string | null>(null)
     const [signals, setSignals] = useState<ISignalItem[]>([])
     const testProcessIdRef = useRef<number | null>(null)
-    const [ifSwitchLoading, setIfSwitchLoading] = useState(false)
+    const [_, setIfSwitchLoading] = useState(false)
 
     useMemo(() => {
         request({

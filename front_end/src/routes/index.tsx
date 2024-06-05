@@ -81,7 +81,9 @@ export const my_router = createBrowserRouter([
         {
             //测试模板配置
             path: '/test-template-config',
-            element: <NewTestTemplate/>,
+            element: <DndProvider backend={HTML5Backend}>
+                <NewTestTemplate/>,
+            </DndProvider>
         },
         {
             path: "/",
