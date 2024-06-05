@@ -13,12 +13,14 @@ import TestObject from './2TestObject.model';
 import User from './User.model';
 import TestObjectN, {ITestObjectNModel} from "./2TestObjectN.model";
 import {Col} from "sequelize/types/utils";
+import {ITestTemplate} from "./TestTemplate.model";
 
 export interface ITestProcessNModel {
     id?: number
     userId: number
     testName: string
     testObjectNs: ITestObjectNModel[]
+    template: ITestTemplate
     createAt?: Date
     updateAt?: Date
 }
@@ -49,6 +51,9 @@ export default class TestProcessN extends Model<ITestProcessNModel> {
 
     @Column(DataType.JSON)
     testObjectNs!: ITestObjectNModel[]
+
+    @Column(DataType.JSON)
+    template!: ITestTemplate
 
     @BelongsTo(() => User)
     user!: User

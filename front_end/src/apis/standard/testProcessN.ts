@@ -1,10 +1,12 @@
 import {ITestObjectN} from "@/apis/standard/testObjectN.ts";
+import {ITemplate} from "@/apis/standard/template.ts";
 
 export interface ITestProcessN {
     id?: number
     userId: number
     testName: string
-    testObjects: ITestObjectN[]
+    testObjectNs: ITestObjectN[]
+    template: ITemplate
     createAt?: Date
     updateAt?: Date
 }

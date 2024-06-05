@@ -8,6 +8,7 @@ import {getProjects} from "@/apis/request/project.ts";
 import {getTestTemplateList} from "@/apis/request/template.ts";
 import {ITestObjectN} from "@/apis/standard/testObjectN.ts";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
+import {createProcessN} from "@/apis/request/testProcessN.ts";
 
 const NewTestProcessN = () => {
     const [testProcessN, setTestProcessN] = useState<ITestProcessN>()
@@ -37,18 +38,22 @@ const NewTestProcessN = () => {
             message.error('测试流程名称不能为空');
             return false;
         }
-        if (!testProcessN?.testObjects) {
+        if (!testProcessN?.testObjectNs) {
             message.error('测试对象不能为空');
             return false;
         }
 
-        testProcessN.testObjects.forEach((testObject) => {
-            if (!testObject.title || !testObject.vehicle || !testObject.project || !testObject.template) {
+        if (!testProcessN?.template) {
+            message.error('测试模板不能为空');
+            return false;
+        }
+
+        testProcessN.testObjectNs.forEach((testObject) => {
+            if (!testObject.vehicle || !testObject.project) {
                 message.error('测试对象信息不完整');
                 return false;
             }
         });
-
         return true;
     }
 
@@ -67,10 +72,15 @@ const NewTestProcessN = () => {
                 onOk={() => {
                     if (!check()) return;
                     setConfirmLoading(true);
-                    setTimeout(() => {
+                    createProcessN(testProcessN!).then((res) => {
+                        message.success('创建成功');
                         setVisible(false);
+                        setTestProcessN({} as ITestProcessN);
                         setConfirmLoading(false);
-                    }, 2000);
+                    }).catch((err) => {
+                        message.error('创建失败');
+                        setConfirmLoading(false);
+                    });
                 }}
                 onCancel={() => {
                     setVisible(false);
@@ -78,12 +88,30 @@ const NewTestProcessN = () => {
                 }}
                 confirmLoading={confirmLoading}
             >
-                <Input value={testProcessN?.testName} disabled={modalType === 'show'}
-                       onChange={(e) => {
-                           setTestProcessN({...testProcessN, testName: e.target.value} as ITestProcessN);
-                       }} placeholder="请输入测试流程名称"/>
+                <Input
+                    prefix="测试流程名称："
+                    value={testProcessN?.testName} disabled={modalType === 'show'}
+                    onChange={(e) => {
+                        setTestProcessN({...testProcessN, testName: e.target.value} as ITestProcessN);
+                    }} placeholder="请输入测试流程名称"/>
+                测试模板：
+                <Select
+                    placeholder={'请选择测试模板'}
+                    onSelect={(value) => {
+                        const newTestProcess = testProcessN
+                        newTestProcess!.template = testTemplateList.find((item) => item.id === value) as ITemplate
+                        setTestProcessN(newTestProcess)
+                    }} size={'middle'} style={{
+                    width: 200,
+                    marginTop: 20,
+                    marginBottom: 20
+                }}>
+                    {testTemplateList.map((item) => (
+                        <Select.Option value={item.id}>{item.name}</Select.Option>
+                    ))}
+                </Select>
                 <Table
-                    dataSource={testProcessN?.testObjects}
+                    dataSource={testProcessN?.testObjectNs}
                     columns={[
                         {
                             title: '车辆',
@@ -92,7 +120,7 @@ const NewTestProcessN = () => {
                             render: (value, record, index) => (
                                 <Select onSelect={(value) => {
                                     const newTestProcess = testProcessN
-                                    newTestProcess!.testObjects[index].vehicle = vehicleList.find((item) => item.id === value) as IVehicle
+                                    newTestProcess!.testObjectNs[index].vehicle = vehicleList.find((item) => item.id === value) as IVehicle
                                     setTestProcessN(newTestProcess)
                                 }}
                                         size={'middle'} style={{width: 200}}>
@@ -109,7 +137,7 @@ const NewTestProcessN = () => {
                             render: (value, record, index) => (
                                 <Select mode={"multiple"} onSelect={(value) => {
                                     const newTestProcess = testProcessN
-                                    newTestProcess!.testObjects[index].project = projectList.find((item) => item.id === value) as IProject
+                                    newTestProcess!.testObjectNs[index].project = projectList.find((item) => item.id === value) as IProject
                                     setTestProcessN(newTestProcess)
                                 }} size={"middle"} style={{width: 200}}>
                                     {projectList.map((item) => (
@@ -118,22 +146,7 @@ const NewTestProcessN = () => {
                                 </Select>
                             )
                         },
-                        {
-                            title: '模板',
-                            dataIndex: 'template.name',
-                            key: 'template.name',
-                            render: (value, record, index) => (
-                                <Select onSelect={(value) => {
-                                    const newTestProcess = testProcessN
-                                    newTestProcess!.testObjects[index].template = testTemplateList.find((item) => item.id === value) as ITemplate
-                                    setTestProcessN(newTestProcess)
-                                }} size={"middle"} style={{width: 200}}>
-                                    {testTemplateList.map((item) => (
-                                        <Select.Option value={item.id}>{item.name}</Select.Option>
-                                    ))}
-                                </Select>
-                            )
-                        },
+
                         {
                             title: '操作',
                             key: 'action',
@@ -142,7 +155,7 @@ const NewTestProcessN = () => {
                                     <a onClick={() => {
                                         setTestProcessN({
                                             ...testProcessN,
-                                            testObjects: testProcessN?.testObjects?.filter((item) => item !== record)
+                                            testObjectNs: testProcessN?.testObjectNs?.filter((item) => item !== record)
                                         } as ITestProcessN);
                                     }}>删除</a>
                                 </span>
@@ -153,7 +166,7 @@ const NewTestProcessN = () => {
                 <Button onClick={() => {
                     setTestProcessN({
                         ...testProcessN,
-                        testObjects: [...testProcessN?.testObjects || [], {} as ITestObjectN]
+                        testObjectNs: [...testProcessN?.testObjectNs || [], {} as ITestObjectN]
                     } as ITestProcessN);
                 }}>添加测试对象</Button>
             </Modal>

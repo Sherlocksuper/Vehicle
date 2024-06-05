@@ -8,7 +8,7 @@ import {request} from "@/utils/request.ts";
 // // router.post('/updateTestProcessN/:id', TestProcessNController.updateTestProcessN)
 // // router.post('/deleteTestProcessN/:id', TestProcessNController.deleteTestProcessN)
 
-const createProcessN = (processN: ITestProcessN) => {
+export const createProcessN = (processN: ITestProcessN) => {
     const api = TEST_PROCESSN_API.createTestProcessN;
     return request({
         api: api,
@@ -16,14 +16,14 @@ const createProcessN = (processN: ITestProcessN) => {
     });
 }
 
-const getProcessNList = () => {
+export const getProcessNList = () => {
     const api = TEST_PROCESSN_API.getTestProcessNList;
     return request({
         api: api
     });
 }
 
-const getProcessNById = (id: number) => {
+export const getProcessNById = (id: number) => {
     const api = TEST_PROCESSN_API.getTestProcessNById;
     api.url = api.url.replace(':id', id.toString());
     return request({
@@ -31,7 +31,7 @@ const getProcessNById = (id: number) => {
     });
 }
 
-const updateProcessN = (id: number, processN: ITestProcessN) => {
+export const updateProcessN = (id: number, processN: ITestProcessN) => {
     const api = TEST_PROCESSN_API.updateTestProcessN;
     api.url = api.url.replace(':id', id.toString());
     return request({
@@ -40,7 +40,7 @@ const updateProcessN = (id: number, processN: ITestProcessN) => {
     });
 }
 
-const deleteProcessN = (id: number) => {
+export const deleteProcessN = (id: number) => {
     const api = TEST_PROCESSN_API.deleteTestProcessN;
     api.url = api.url.replace(':id', id.toString());
     return request({
