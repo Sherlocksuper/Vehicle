@@ -69,10 +69,7 @@ const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
 
     useEffect(() => {
         if (disable) {
-            console.log("file")
-            console.log(initValue)
             setProjectResult(JSON.parse(initValue))
-            return
         } else {
             form.resetFields()
             setSingleKey(Math.random().toString(36).slice(-8))

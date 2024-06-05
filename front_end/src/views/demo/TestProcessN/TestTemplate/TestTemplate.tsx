@@ -1,7 +1,6 @@
 import React from 'react';
 import {Button, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
-import CreateProject from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
 import {ITemplate} from "@/apis/standard/template.ts";
 import {getTestTemplateList} from "@/apis/request/template.ts";
 
@@ -38,7 +37,7 @@ const columns: TableProps<ITemplate>['columns'] = [
     },
 ];
 
-const TestProject: React.FC = () => {
+const TestTemplate: React.FC = () => {
     const [showCreateProject, setShowCreateProject] = React.useState<boolean>(false)
     const [templates, setTemplate] = React.useState<ITemplate[]>([])
 
@@ -54,16 +53,12 @@ const TestProject: React.FC = () => {
             padding: 20
         }}>
             <Row justify="end" style={{marginBottom: 20}}>
-                <Button type="primary" onClick={() => {
-                    setShowCreateProject(true)
-                }}>New</Button>
+                <Button type="link" href={"/test-template-config"}
+                        target={"_blank"}>模板配置</Button>
             </Row>
-            <CreateProject open={showCreateProject} mode={"create"} onFinished={() => {
-                setShowCreateProject(false)
-            }}/>
             <Table columns={columns} dataSource={templates}/>
         </div>
     );
 };
 
-export default TestProject;
+export default TestTemplate;

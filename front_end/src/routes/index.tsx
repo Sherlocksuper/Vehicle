@@ -13,6 +13,7 @@ import UserManage from "@/views/demo/User/UserList.tsx";
 import TestProject from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
 import TestTemplate from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.tsx";
 import TestVehicle from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
+import NewTestTemplate from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
 
 interface RouteItem {
     key: string
@@ -76,6 +77,11 @@ export const my_router = createBrowserRouter([
         {
             path: "/login",
             element: <Login/>,
+        },
+        {
+            //测试模板配置
+            path: '/test-template-config',
+            element: <NewTestTemplate/>,
         },
         {
             path: "/",
