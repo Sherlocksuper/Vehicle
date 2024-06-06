@@ -33,3 +33,7 @@
 .dcm_inner--line {
     background-image: url(../../../../assets/line.JPG);
 }
+
+.dcm_inner--lines {
+    background-image: url(../../../../assets/lines.png);
+}

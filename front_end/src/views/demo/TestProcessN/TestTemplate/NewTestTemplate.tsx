@@ -3,9 +3,7 @@
  * @desc NewTestTemplate Page
  */
 import React, {FC, useEffect, useRef, useState} from 'react';
-import {v4 as uuidv4} from 'uuid';
 import {useDrop} from 'react-dnd';
-import GridLayout from "react-grid-layout";
 import DraggableComponent, {
     IBooleanChartExtra,
     IDraggleComponent,
@@ -15,21 +13,26 @@ import DraggableComponent, {
 import DropContainer from "@/views/demo/DataDisplay/DropContainer";
 import {Button, Input, message, Modal} from "antd";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
+import TextArea from "antd/es/input/TextArea";
+import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
+import GridLayout from "react-grid-layout";
 import {createTestTemplate} from "@/apis/request/template.ts";
 import {SUCCESS_CODE} from "@/constants";
-import TextArea from "antd/es/input/TextArea";
+import {v4 as uuidv4} from 'uuid';
 
-export enum DragItemType {
-    BOOLEAN = 'BOOLEAN',
-    LINE = 'LINE',
-    NUMBER = 'NUMBER',
-}
 
+/**
+ * @enum NewTestTemplateMode
+ * @desc
+ * ADD: 新建
+ * SHOW: 展示
+ * CONFIG:配置数据关联关系
+ */
 //模式
 export enum NewTestTemplateMode {
     ADD = 'ADD',
-    EDIT = 'EDIT',
-    SHOW = 'SHOW'
+    SHOW = 'SHOW',
+    CONFIG = 'CONFIG'
 }
 
 export interface IDragItem {
@@ -186,7 +189,20 @@ const NewTestTemplate: React.FC = () => {
                     defaultDuring: 10,  // 10s
                     defaultLabel: '数值'
                 }
-            }}/></>
+            }}/>
+            <DraggableComponent type={DragItemType.LINES} draggleConfig={{
+                defaultTitle: '请编辑默认标题',
+                defaultX: 0,
+                defaultY: 0,
+                defaultWidth: 400,
+                defaultHeight: 400,
+                defaultInterval: 1000,
+                extra: {
+                    defaultDuring: 10,  // 10s
+                    defaultLabel: '数值'
+                }
+            }}/>
+        </>
     }
 
     function updateItemsByLayout(newItem: GridLayout.Layout) {
@@ -242,28 +258,24 @@ const NewTestTemplate: React.FC = () => {
             }}>
                 <div className="dd_body">
                     <div className="dd_drop_container" ref={ref}>
-                        <DropContainer ifStartGetData={mode === NewTestTemplateMode.SHOW} selectedItemId={null}
+                        <DropContainer banModify={mode === NewTestTemplateMode.SHOW} selectedItemId={null}
                                        selectFunc={() => {
                                        }} items={dragItems}
                                        onUpdateItems={updateItemsByLayout}
                                        onLayoutChange={updateAllByLayout}
                         />
                     </div>
-                    <div className="dd_info">
-                        {renderADDModeInfo()}
-                        {
-
-                            <ButtonModal dragItems={dragItems} name={name} description={description}
-                                         updateDescription={(value) => {
-                                             setDescription(value)
-                                         }}
-                                         updateName={(value) => {
-                                             setName(value)
-                                         }}
-                                         mode={mode}
-                            />
-                        }
-                    </div>
+                    {
+                        mode === NewTestTemplateMode.ADD &&
+                      <div className="dd_info">
+                          {renderADDModeInfo()}
+                        <ButtonModal dragItems={dragItems} name={name} description={description}
+                                     updateDescription={setDescription}
+                                     updateName={setName}
+                                     mode={mode}
+                        />
+                      </div>
+                    }
                 </div>
             </div>
         );

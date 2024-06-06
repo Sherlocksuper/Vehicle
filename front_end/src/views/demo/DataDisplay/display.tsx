@@ -20,6 +20,7 @@ export enum DragItemType {
     BOOLEAN = 'BOOLEAN',
     LINE = 'LINE',
     NUMBER = 'NUMBER',
+    LINES= 'LINES',
 }
 
 export interface IDragItem {
@@ -242,7 +243,8 @@ const DataDisplay: React.FC<IDataDisplay> = () => {
             <div className="dd_form_header">{`${{
                 [DragItemType.BOOLEAN]: '布尔',
                 [DragItemType.NUMBER]: '数值',
-                [DragItemType.LINE]: '折线图'
+                [DragItemType.LINE]: '折线图',
+                [DragItemType.LINES]: '多折线图'
             }[selectedDragItem.type]}控件编辑器`}
             </div>
             <Form
@@ -503,9 +505,9 @@ const DataDisplay: React.FC<IDataDisplay> = () => {
             </div>
             <div className="dd_body">
                 <div className="dd_drop_container" ref={ref}>
-                    <DropContainer ifStartGetData={ifStartGetData} selectedItemId={selectedDragItemId}
-                        selectFunc={setSelectedDragItemId} items={dragItems}
-                        onUpdateItems={updateItemsByLayout} onLayoutChange={()=>{}}/>
+                    <DropContainer banModify={ifStartGetData} selectedItemId={selectedDragItemId}
+                                   selectFunc={setSelectedDragItemId} items={dragItems}
+                                   onUpdateItems={updateItemsByLayout} onLayoutChange={()=>{}}/>
                 </div>
                 <div className="dd_info">
                     {selectedDragItemId ? renderEDITModeInfo() : !ifStartGetData ? renderADDModeInfo() : <></>}
@@ -518,80 +520,9 @@ const DataDisplay: React.FC<IDataDisplay> = () => {
     }
 
     return <>
-        {ifSendTestConfig ? renderSendedPage() : renderUnsendPage()}
+        {/*{ifSendTestConfig ? renderSendedPage() : renderUnsendPage()}*/}
+        {renderSendedPage()}
     </>
 };
-
-//
-// const oldFamen = () =>{
-//     return
-//     // {isOnline && <>
-//     //     数据阀门：<Switch checkedChildren="开启" loading={ifSwitchLoading} unCheckedChildren="关闭"
-//     //                      checked={ifStartGetData} defaultChecked onChange={(value) => {
-//     //     if (checkDataIntegrity()) {
-//     //         value && setIfSwitchLoading(true)
-//     //
-//     //         // 保存当前测试配置
-//     //         value && request({
-//     //             api: {
-//     //                 method: Method.POST,
-//     //                 url: '/sendTestConfig',
-//     //                 format: ContentType.JSON,
-//     //             },
-//     //             params: {
-//     //                 testProcessId: Number(testProcessIdRef.current),
-//     //                 dashbordConfig: dragItems
-//     //             }
-//     //         }).then(res => {
-//     //             if (res.code === SUCCESS_CODE) {
-//     //                 setIfStartGetData(true)
-//     //                 message.success('已开启数据阀门')
-//     //             } else {
-//     //                 message.error(res.msg)
-//     //             }
-//     //             setIfSwitchLoading(false)
-//     //         })
-//     //         !value && setIfStartGetData(false)
-//     //         !value && message.success('已关闭数据阀门')
-//     //     } else {
-//     //         return message.error('存在未关联的信号，无法开启数据阀门！')
-//     //     }
-//     // }
-//     // }/>
-//     //     <Button style={{marginLeft: 40}} type='primary' onClick={
-//     //         async () => {
-//     //             try {
-//     //                 const response = await request({
-//     //                     api: {
-//     //                         url: '/downloadUserSendedTestProcessConfig',
-//     //                         method: Method.GET,
-//     //                         responseType: ResponseType.ARRAY_BUFFER,
-//     //                         format: ContentType.FILE
-//     //                     }
-//     //                 })
-//     //                 if (response.byteLength === 0) return message.error('该用户暂未下发配置文件')
-//     //                 // const response = await fetch('http://localhost:3000/api/downloadPreTestConfigFile')
-//     //                 // 将二进制ArrayBuffer转换成Blob
-//     //                 const blob = new Blob([response], {type: ContentType.FILE})
-//     //
-//     //                 //  创建一个 <a> 元素，并设置其属性
-//     //                 const downloadLink = document.createElement('a');
-//     //                 downloadLink.href = window.URL.createObjectURL(blob);
-//     //                 downloadLink.download = '已下发的配置文件.xlsx';
-//     //
-//     //                 // 将 <a> 元素添加到 DOM，并模拟点击以触发下载
-//     //                 document.body.appendChild(downloadLink);
-//     //                 downloadLink.click();
-//     //
-//     //                 // 下载完成后移除 <a> 元素
-//     //                 document.body.removeChild(downloadLink);
-//     //
-//     //             } catch (error) {
-//     //                 console.error('下载文件时出错：', error);
-//     //             }
-//     {/*        }*/}
-//     {/*    }>下载当前已下发的测试配置文件</Button>*/}
-//     {/*</>}*/}
-// }
 
 export default DataDisplay;
