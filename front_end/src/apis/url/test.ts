@@ -1,6 +1,9 @@
 //POST: /createTestProcess
 import {UrlMap} from "@/apis/url/myUrl.ts";
 import {ContentType, Method} from "@/apis/standard/all.ts";
+import {ControllerMap} from "@/apis/url/board-signal/controller.ts";
+import {CollectorMap} from "@/apis/url/board-signal/collector.ts";
+import {SignalMap} from "@/apis/url/board-signal/signal.ts";
 
 export const TEST: UrlMap = {
     createTestProcess: {
@@ -26,34 +29,14 @@ export const TEST: UrlMap = {
         url: '/getTestProcessList',
         method: Method.GET
     },
-    createController: {
-        url: '/createController',
-        method: Method.POST,
-        format: ContentType.JSON
-    },
-    getControllerList: {
-        url: '/getControllerList',
-        method: Method.GET
-    },
-    getAllControllerList: {
-        url: '/getAllControllerList',
-        method: Method.GET
-    },
-    createCollector: {
-        url: '/createCollector',
-        method: Method.POST,
-        format: ContentType.JSON
-    },
-    getCollectorList: {
-        url: '/getCollectorList',
-        method: Method.GET
-    },
-    getAllCollectorList: {
-        url: '/getAllCollectorList',
-        method: Method.GET
-    },
-    getSignalListByCollectorId: {
-        url: '/getSignalListByCollectorId',
-        method: Method.GET
-    },
+    createController: ControllerMap.createController,
+    getControllerList: ControllerMap.getControllerList,
+    getAllControllerList: ControllerMap.getAllControllerList,
+
+    createCollector: CollectorMap.createCollector,
+    getCollectorList: CollectorMap.getCollectorList,
+    getAllCollectorList: CollectorMap.getAllCollectorList,
+
+    getSignalListByCollectorId: SignalMap.getSignalListByCollectorId,
+    createSignal: SignalMap.createSignal
 }

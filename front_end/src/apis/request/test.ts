@@ -5,13 +5,13 @@ import {
     getActiveControllerList,
     getAllControllerList,
     createController,
-} from "@/apis/request/controller.ts";
+} from "@/apis/request/board-signal/controller.ts";
 
 import {
     getActiveCollectorList,
     getAllCollectorList,
     createCollector,
-} from "@/apis/request/collector.ts";
+} from "@/apis/request/board-signal/collector.ts";
 
 const defaultPageSize: number = 7
 
@@ -74,15 +74,7 @@ const editTest = async (data: ITestProcess) => {
 }
 
 
-const getSignalListByCollectorId = async (collectorId: number) => {
-    const api = MyUrl.TEST.getSignalListByCollectorId
-    return request({
-        api: api,
-        params: {
-            collectorId: collectorId
-        }
-    });
-}
+
 
 
 export {
@@ -95,7 +87,6 @@ export {
     getAllControllerList,
     getActiveCollectorList,
     getAllCollectorList,
-    getSignalListByCollectorId,
     createController,
     createCollector
 }

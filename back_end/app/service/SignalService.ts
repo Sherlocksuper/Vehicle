@@ -66,5 +66,9 @@ class SignalService {
             ]
         })
     }
+
+    async createSignal(signal: ISignalModel) {
+        return await Signal.create(signal)
+    }
 }
 export default new SignalService

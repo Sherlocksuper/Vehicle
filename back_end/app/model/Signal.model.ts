@@ -35,6 +35,7 @@ export default class Signal extends Model<ISignalModel> {
     remark!: string;
     
     @Column(DataType.INTEGER)
+    @AutoIncrement
     innerIndex!: string;
 
     @ForeignKey(() => Collector)

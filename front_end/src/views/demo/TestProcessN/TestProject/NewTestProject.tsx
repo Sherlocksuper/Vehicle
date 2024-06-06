@@ -2,11 +2,12 @@ import {Button, Form, Input, Modal, Select, Space} from "antd";
 import React, {useEffect} from "react";
 import {ITestProcess} from "@/apis/standard/test.ts";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import {getActiveCollectorList, getActiveControllerList, getSignalListByCollectorId} from "@/apis/request/test.ts";
+import {getActiveCollectorList, getActiveControllerList} from "@/apis/request/test.ts";
 import {IProject} from "@/apis/standard/project.ts";
 import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 import {createProject} from "@/apis/request/project.ts";
 import {SUCCESS_CODE} from "@/constants";
+import {getSignalListByCollectorId} from "@/apis/request/board-signal/signal.ts";
 
 interface CreateProjectProps {
     open: boolean,

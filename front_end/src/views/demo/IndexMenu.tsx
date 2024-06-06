@@ -61,7 +61,6 @@ export const HomeMenu = () => {
             mode="inline"
             items={items}
             defaultOpenKeys={items.map(item => item.key)}
-            openKeys={items.map(item => item.key)}
         />
 
         <Modal open={visible} onOk={onFinish} onCancel={() => setVisible(false)}>

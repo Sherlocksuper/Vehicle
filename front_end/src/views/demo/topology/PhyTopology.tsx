@@ -1,4 +1,19 @@
-import {Button, Card, List, Modal, Popconfirm, Result, Tabs, TabsProps, Tag, message, Row, Col, Input} from "antd"
+import {
+    Button,
+    Card,
+    List,
+    Modal,
+    Popconfirm,
+    Result,
+    Tabs,
+    TabsProps,
+    Tag,
+    message,
+    Row,
+    Col,
+    Input,
+    Select
+} from "antd"
 import ControllerInfoTable from "./ControllerInfoTabl"
 import {useMemo, useState} from "react";
 import {request} from "@/utils/request";
@@ -12,7 +27,8 @@ import ExcelJs from 'exceljs'
 import {SUCCESS_CODE} from "@/constants";
 import userUtils from "@/utils/UserUtils";
 import {useNavigate} from "react-router-dom";
-import {createCollector, createController} from "@/apis/request/test.ts";
+import {createCollector, createController, getActiveCollectorList} from "@/apis/request/test.ts";
+import {createSignal} from "@/apis/request/board-signal/signal.ts";
 
 export interface IControllersConfigItem {
     id: number
@@ -35,7 +51,8 @@ export interface ISignalsConfigItem {
     signalType: string
     remark: string
     innerIndex: number
-    collectorName: number
+    collectorId: number
+    collector: ICollectorsConfigItem
 }
 
 interface ITestData {
@@ -98,8 +115,9 @@ const PreTestManager: React.FC = () => {
         </Col>
         <AddConOrCollect reloadData={reloadData} type="controller"/>
         <AddConOrCollect reloadData={reloadData} type="collector"/>
+        <AddSignal reloadData={reloadData}/>
     </Row>}>
-        <Tabs className="tm_tabs" defaultActiveKey="1" items={items} style={{}}/>
+        <Tabs className="tm_tabs" defaultActiveKey="1" items={items}/>
     </Card>
 }
 
@@ -199,11 +217,141 @@ const AddConOrCollect = ({reloadData, type}: AddManagerProps) => {
                     setName(e.target.value)
                 }
             }/>
-            <Input placeholder={`请输入${boardType}地址,格式如：127.0.0.1`} style={{marginBottom: 10}} required={true} onChange={
+            <Input placeholder={`请输入${boardType}地址,格式如：127.0.0.1`} style={{marginBottom: 10}} required={true}
+                   onChange={
+                       (e) => {
+                           setAddress(e.target.value)
+                       }
+                   }/>
+        </Modal>
+    </>
+}
+
+
+//添加采集指标
+interface AddSignalProps {
+    reloadData: () => void
+}
+
+const AddSignal = ({reloadData}: AddSignalProps) => {
+    const [open, setOpen] = useState(false)
+    const [single, setSingle] = useState<ISignalsConfigItem>({
+        signalName: '',
+        signalUnit: '',
+        signalType: '',
+        remark: '',
+        collectorId: 0
+    } as ISignalsConfigItem)
+
+    //获取采集板卡列表
+    const [collectors, setCollectors] = useState<any[]>([])
+
+    const newSignal = () => {
+        if (!checkValid()) return
+        createSignal(single).then((res: any) => {
+            console.log(res)
+            if (res.code === SUCCESS_CODE) {
+                message.success('添加成功')
+                close()
+                reloadData()
+            } else {
+                message.error('添加失败')
+            }
+        }).catch((error) => {
+            console.log(error)
+            message.error('添加失败')
+        })
+    }
+
+    const checkValid = () => {
+        if (single.signalName === '' || single.signalUnit === '' || single.signalType === '') {
+            message.error('请填写完整信息')
+            return false
+        }
+        return true
+    }
+
+    const close = () => {
+        setOpen(false)
+        setSingle({
+            signalName: '',
+            signalUnit: '',
+            signalType: '',
+            remark: '',
+            innerIndex: 0,
+            collectorId: 0
+        } as ISignalsConfigItem)
+    }
+
+    useMemo(() => {
+        (async () => {
+            getActiveCollectorList().then((res: any) => {
+                if (res.code === SUCCESS_CODE) {
+                    setCollectors(res.data)
+                } else {
+                    message.error('获取采集板卡列表失败')
+
+                }
+            })
+        })()
+    }, [])
+
+    return <>
+        <Col>
+            <Button type="primary" onClick={() => {
+                setOpen(true)
+            }}>
+                添加采集指标
+            </Button>
+        </Col>
+        <Modal
+            title="添加采集指标"
+            open={open}
+            onOk={() => {
+                newSignal()
+            }}
+            onCancel={close}
+            key={single.innerIndex + open.toString()}
+        >
+            请选择采集板卡：
+            <Select placeholder="采集板卡" style={{marginBottom: 10}} onSelect={(value) => {
+                setSingle({...single, collectorId: value})
+            }}>
+                {collectors.map((item: any) => {
+                    return <Select.Option value={item.id}>{item.collectorName}</Select.Option>
+                })}
+            </Select>
+
+            <br/>
+            请输入信号名：
+            <Input placeholder="信号名" style={{marginBottom: 10}} required={true} onChange={
                 (e) => {
-                    setAddress(e.target.value)
+                    setSingle({...single, signalName: e.target.value})
                 }
             }/>
+
+            <br/>
+            请选择信号单位：
+            <Select placeholder="单位" style={{marginBottom: 10}} onSelect={(value) => {
+                setSingle({...single, signalUnit: value})
+            }}>
+                <Select.Option value="V">V</Select.Option>
+                <Select.Option value="A">A</Select.Option>
+                <Select.Option value="W">W</Select.Option>
+                <Select.Option value="Hz">Hz</Select.Option>
+                <Select.Option value="℃">℃</Select.Option>
+                <Select.Option value="%">%</Select.Option>
+            </Select>
+
+            <br/>
+
+            请选择信号类型：
+            <Select placeholder="信号类型" style={{marginBottom: 10}} onSelect={(value) => {
+                setSingle({...single, signalType: value})
+            }}>
+                <Select.Option value="模拟量">模拟量</Select.Option>
+                <Select.Option value="数字量">数字量</Select.Option>
+            </Select>
         </Modal>
     </>
 }

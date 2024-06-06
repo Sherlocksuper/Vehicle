@@ -1,9 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
-import { Cascader, message } from 'antd';
-import { getActiveCollectorList, getActiveControllerList, getSignalListByCollectorId } from "@/apis/request/test.ts";
-import { ERROR_MSG, SUCCESS_CODE } from "@/constants";
-import { CollectorSignalFormat } from "@/apis/standard/test.ts";
+import React, {useCallback, useContext, useEffect, useState} from 'react';
+import {Cascader, message} from 'antd';
+import {getActiveCollectorList, getActiveControllerList} from "@/apis/request/test.ts";
+import {ERROR_MSG, SUCCESS_CODE} from "@/constants";
+import {CollectorSignalFormat} from "@/apis/standard/test.ts";
 import {CreateTestContext} from "@/views/demo/TestProcess/TestModel/CreateTestFunction.ts";
+import {getSignalListByCollectorId} from "@/apis/request/board-signal/signal.ts";
 
 interface Option {
     value?: string | number | null;

@@ -1,9 +1,9 @@
 import {ControllerAndCollector, getCollectorFromLocal, getControllerFromLocal} from "@/utils/DataUtils.ts";
 import {useContext, useEffect, useState} from "react";
-import {getSignalListByCollectorId} from "@/apis/request/test.ts";
 import {CollectorSignalFormat} from "@/apis/standard/test.ts";
 import './SignalSelect.css'
 import {CreateTestContext} from "@/views/demo/TestProcess/TestModel/CreateTestFunction.ts";
+import {getSignalListByCollectorId} from "@/apis/request/board-signal/signal.ts";
 
 export enum BoardType {
     CORE_CONTROL = '核心控制板卡',

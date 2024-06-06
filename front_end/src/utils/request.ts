@@ -2,6 +2,9 @@ import axios, {  AxiosRequestConfig } from 'axios';
 import { BASE_URL } from "@/apis/url/myUrl.ts";
 import userUtils from "@/utils/UserUtils.ts";
 import { APIStandard, ContentType, ResponseType } from "@/apis/standard/all.ts";
+import {FAIL_CODE, TOKEN_VALID_CODE} from "@/constants";
+import {message} from "antd";
+import {sleep} from "@/utils/index.ts";
 // import { FAIL_CODE,  TOKEN_VALID_CODE } from '@/constants';
 // import { message } from 'antd';
 // import { sleep } from '.';
@@ -80,15 +83,15 @@ function shouldUseData(method: string) {
     return method === 'PUT' || method === 'POST' || method === 'DELETE' || method === 'PATCH';
 }
 
-// axiosInstance.interceptors.response.use(async res => {
-//     if (res.data?.code && res.data.code !== TOKEN_VALID_CODE && res.data.code !== FAIL_CODE) {
-//         message.error(res.data.msg)
-//         message.loading('即将返回登录页面')
-//         userUtils.removeUserInfo()
-//         await sleep(3000)
-//         window.location.href = '/login'
-//     }
-//     return res
-// }, err => {
-//     return err
-// })
+axiosInstance.interceptors.response.use(async res => {
+    if (res.data?.code && res.data.code !== TOKEN_VALID_CODE && res.data.code !== FAIL_CODE) {
+        message.error(res.data.msg)
+        message.loading('即将返回登录页面')
+        userUtils.removeUserInfo()
+        await sleep(3000)
+        window.location.href = '/login'
+    }
+    return res
+}, err => {
+    return err
+})
