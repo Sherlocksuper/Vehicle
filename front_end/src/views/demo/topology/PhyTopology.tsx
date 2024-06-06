@@ -34,6 +34,7 @@ export interface IControllersConfigItem {
     id: number
     controllerName: string
     controllerAddress: string
+    userId?: number
     isDisabled: boolean
 }
 
@@ -41,6 +42,7 @@ export interface ICollectorsConfigItem {
     id: number
     collectorName: string
     collectorAddress: string
+    userId?: number
     isDisabled: boolean
 }
 
@@ -91,12 +93,12 @@ const PreTestManager: React.FC = () => {
         {
             key: '1',
             label: '核心板卡描述',
-            children: <ControllerInfoTable dataSource={testData?.controllersConfig || []}/>,
+            children: <ControllerInfoTable dataSource={testData?.controllersConfig || []} reload={reloadData}/>,
         },
         {
             key: '2',
             label: '采集板卡描述',
-            children: <CollectorInfoTable dataSource={testData?.collectorsConfig || []}></CollectorInfoTable>,
+            children: <CollectorInfoTable dataSource={testData?.collectorsConfig || []} reload={reloadData}/>
         },
         {
             key: '3',
@@ -240,6 +242,7 @@ const AddSignal = ({reloadData}: AddSignalProps) => {
         signalUnit: '',
         signalType: '',
         remark: '',
+        innerIndex: 0,
         collectorId: 0
     } as ISignalsConfigItem)
 

@@ -2,7 +2,7 @@ import {Table} from "antd";
 import {ISignalsConfigItem} from "../PhyTopology";
 
 const SignalInfoTable: React.FC<{
-    dataSource: ISignalsConfigItem[]
+    dataSource: ISignalsConfigItem[],
 }> = ({dataSource}) => {
     const columns = [
         {

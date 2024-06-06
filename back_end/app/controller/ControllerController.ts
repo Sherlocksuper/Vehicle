@@ -81,6 +81,30 @@ class ControllerController {
             }
         }
     }
+
+    async updateController(ctx: Context) {
+        try {
+            const controller = ctx.request.body as IControllerModel
+            console.log(controller)
+            const result = await ControllerService.updateController(controller)
+            if (result) {
+                (ctx.body as IResBody) = {
+                    code: SUCCESS_CODE,
+                    msg: '更新核心板卡成功',
+                    data: null
+                }
+            } else {
+                throw new Error('更新核心板卡失败')
+            }
+        } catch (error) {
+            (ctx.body as IResBody) = {
+                code: FAIL_CODE,
+                msg: (error as Error).toString(),
+                data: null
+
+            }
+        }
+    }
 }
 
 export default new ControllerController

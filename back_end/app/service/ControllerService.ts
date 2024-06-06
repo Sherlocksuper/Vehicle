@@ -60,5 +60,11 @@ class ControllerService {
     async createController(data: IControllerModel) {
         return await Controller.create(data)
     }
+
+    async updateController(data: IControllerModel) {
+        return await Controller.update(data, {
+            where: { id: data.id }
+        })
+    }
 }
 export default new ControllerService

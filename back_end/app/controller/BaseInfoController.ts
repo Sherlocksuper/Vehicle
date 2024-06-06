@@ -17,6 +17,7 @@ class BaseInfoController {
     createController = Controller.createController
     getActiveControllerList = Controller.getActiveControllerList
     getAllControllerList = Controller.getAllControllerList
+    updateController = Controller.updateController
 
     /**
      * 采集卡创建、获取
@@ -26,6 +27,7 @@ class BaseInfoController {
     createCollector = Collector.createCollector
     getActiveCollectorList = Collector.getActiveCollectorList
     getAllCollectorList = Collector.getAllCollectorList
+    updateCollector = Collector.updateCollector
 
 
     /**

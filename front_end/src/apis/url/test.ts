@@ -32,10 +32,12 @@ export const TEST: UrlMap = {
     createController: ControllerMap.createController,
     getControllerList: ControllerMap.getControllerList,
     getAllControllerList: ControllerMap.getAllControllerList,
+    updateController: ControllerMap.updateController,
 
     createCollector: CollectorMap.createCollector,
     getCollectorList: CollectorMap.getCollectorList,
     getAllCollectorList: CollectorMap.getAllCollectorList,
+    updateCollector: CollectorMap.updateCollector,
 
     getSignalListByCollectorId: SignalMap.getSignalListByCollectorId,
     createSignal: SignalMap.createSignal

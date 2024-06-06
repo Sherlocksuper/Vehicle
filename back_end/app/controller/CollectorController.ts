@@ -82,6 +82,29 @@ class CollectorController {
             }
         }
     }
+
+    // 更新采集卡
+    async updateCollector(ctx: Context) {
+        try {
+            const collector = ctx.request.body as ICollectorModel
+            const result = await CollectorService.updateCollector(collector)
+            if (result) {
+                (ctx.body as IResBody) = {
+                    code: SUCCESS_CODE,
+                    msg: '更新采集板卡成功',
+                    data: result
+                }
+            } else {
+                throw new Error('更新采集板卡失败')
+            }
+        } catch (error) {
+            (ctx.body as IResBody) = {
+                code: FAIL_CODE,
+                msg: (error as Error).toString(),
+                data: null
+            }
+        }
+    }
 }
 
 export default new CollectorController()

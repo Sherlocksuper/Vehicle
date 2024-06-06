@@ -24,3 +24,11 @@ export const getAllControllerList = async () => {
         api: api,
     });
 }
+
+export const updateController = async (controller: IControllersConfigItem) => {
+    const api = MyUrl.TEST.updateController
+    return request({
+        api: api,
+        params: controller,
+    });
+}

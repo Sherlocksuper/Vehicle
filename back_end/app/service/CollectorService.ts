@@ -60,6 +60,12 @@ class CollectorService {
     async createCollector(data: ICollectorModel) {
         return await Collector.create(data)
     }
+
+    async updateCollector(data: ICollectorModel) {
+        return await Collector.update(data, {
+            where: {id: data.id}
+        })
+    }
 }
 
 export default new CollectorService

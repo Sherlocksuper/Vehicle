@@ -15,4 +15,9 @@ export const ControllerMap: UrlMap = {
         url: '/getAllControllerList',
         method: Method.GET
     },
+    updateController: {
+        url: '/updateController',
+        method: Method.POST,
+        format: ContentType.JSON
+    }
 }

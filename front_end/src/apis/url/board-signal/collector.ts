@@ -16,4 +16,9 @@ export const CollectorMap: UrlMap = {
         url: '/getAllCollectorList',
         method: Method.GET
     },
+    updateCollector: {
+        url: '/updateCollector',
+        method: Method.POST,
+        format: ContentType.JSON
+    }
 }

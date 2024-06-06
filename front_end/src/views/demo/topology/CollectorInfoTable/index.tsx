@@ -1,9 +1,13 @@
 import {Button, Space, Table} from "antd";
 import {ICollectorsConfigItem} from "../PhyTopology";
+import {updateCollector} from "@/apis/request/board-signal/collector.ts";
+import {SUCCESS_CODE} from "@/constants";
+import {NOT_ON_USED, ON_USED, USED_INFO} from "@/constants/board.ts";
 
 const CollectorInfoTable: React.FC<{
-    dataSource: ICollectorsConfigItem[]
-}> = ({dataSource}) => {
+    dataSource: ICollectorsConfigItem[],
+    reload: () => void
+}> = ({dataSource, reload}) => {
     const columns = [
         {
             title: '采集板卡代号',
@@ -16,19 +20,32 @@ const CollectorInfoTable: React.FC<{
             key: 'collectorAddress',
         },
         {
-            title: '是否禁用',
-            dataIndex: 'isDisabled',
+            title: USED_INFO,
             key: 'isDisabled',
-            render: (isDisabled: boolean) => isDisabled ? '是' : '否'
+            render: (record: ICollectorsConfigItem) => {
+                return record.isDisabled ? NOT_ON_USED : ON_USED
+            }
         },
         {
             title: '操作',
             key: 'action',
-            render: (text: any, record: any) => (
-                <Space size="middle">
-                    <Button type="primary">禁用</Button>
+            render: (record: ICollectorsConfigItem) => {
+                return <Space size="middle">
+                    <Button type="primary" onClick={() => {
+                        const newCollector = {...record, isDisabled: !record.isDisabled}
+                        delete newCollector.userId
+                        updateCollector(newCollector).then((res) => {
+                            if (res.code === SUCCESS_CODE) {
+                                reload()
+                            } else {
+                                console.error(res.msg)
+                            }
+                        })
+                    }}>
+                        {record.isDisabled ? '启用' : '禁用'}
+                    </Button>
                 </Space>
-            ),
+            }
         }
     ];
 

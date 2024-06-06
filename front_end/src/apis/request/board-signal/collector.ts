@@ -24,3 +24,11 @@ export const getAllCollectorList = async () => {
         api: api,
     });
 }
+
+export const updateCollector = async (collector: ICollectorsConfigItem) => {
+    const api = MyUrl.TEST.updateCollector
+    return request({
+        api: api,
+        params: collector,
+    });
+}

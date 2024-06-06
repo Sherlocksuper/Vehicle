@@ -49,6 +49,7 @@ router.post('/copyTestProcess', TestProcessController.copyTestProcess)
 router.post('/createController', BaseInfoController.createController)
 router.get('/getControllerList', BaseInfoController.getActiveControllerList)
 router.get('/getAllControllerList', BaseInfoController.getAllControllerList)
+router.post('/updateController', BaseInfoController.updateController)
 
 /**
  * 采集卡相关接口
@@ -56,12 +57,12 @@ router.get('/getAllControllerList', BaseInfoController.getAllControllerList)
 router.post('/createCollector', BaseInfoController.createCollector)
 router.get('/getCollectorList', BaseInfoController.getActiveCollectorList)
 router.get('/getAllCollectorList', BaseInfoController.getAllCollectorList)
+router.post('/updateCollector', BaseInfoController.updateCollector)
 
 
 /**
  * 信号相关接口
  */
-
 router.post('/createSignal', BaseInfoController.createSignal)
 router.get('/getSignalListByCollectorId', BaseInfoController.getSignalListByCollectorId)
 router.get('/getTestDevicesInfo', BaseInfoController.getTestDevicesInfo)
@@ -119,7 +120,9 @@ router.post('/updateTestProcessN/:id', TestProcessNController.updateTestProcessN
 router.post('/deleteTestProcessN/:id', TestProcessNController.deleteTestProcessN)
 
 
-// 资源下载接口
+/**
+ * 资源下载框架
+ */
 router.get('/downloadPreTestConfigFile', AssetsController.downloadPreTestConfigFile)
 router.get('/downloadPreTestConfigFileTemp', AssetsController.downloadPreTestConfigFileTemp)
 router.get('/downloadTestProcessConfigFileById', AssetsController.downloadTestProcessConfigFileById)
