@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Form, Input, message, Modal, Select, Table} from "antd";
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {IProject} from "@/apis/standard/project.ts";
@@ -9,8 +9,13 @@ import {getTestTemplateList} from "@/apis/request/template.ts";
 import {ITestObjectN} from "@/apis/standard/testObjectN.ts";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {createProcessN} from "@/apis/request/testProcessN.ts";
+import {SUCCESS_CODE} from "@/constants";
 
-const NewTestProcessN = () => {
+interface INewTestProcessNProps {
+    onFinish: () => void;
+}
+
+const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
     const [testProcessN, setTestProcessN] = useState<ITestProcessN>()
 
     const [visible, setVisible] = useState(false);
@@ -23,7 +28,7 @@ const NewTestProcessN = () => {
 
     useEffect(() => {
         getVehicles().then((res) => {
-            setVehicleList(res.data);
+            setVehicleList(res.data.filter((item:IVehicle) => !item.isDisabled));
         });
         getProjects().then((res) => {
             setProjectList(res.data);
@@ -73,9 +78,15 @@ const NewTestProcessN = () => {
                     if (!check()) return;
                     setConfirmLoading(true);
                     createProcessN(testProcessN!).then((res) => {
-                        message.success('创建成功');
-                        setVisible(false);
-                        setTestProcessN({} as ITestProcessN);
+                        if (res.code === SUCCESS_CODE) {
+                            message.success('创建成功');
+                            setVisible(false);
+                            setTestProcessN({} as ITestProcessN);
+                            setConfirmLoading(false);
+                            onFinish();
+                            return
+                        }
+                        message.error('创建失败');
                         setConfirmLoading(false);
                     }).catch((err) => {
                         message.error('创建失败');

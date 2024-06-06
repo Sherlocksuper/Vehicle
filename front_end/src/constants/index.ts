@@ -28,3 +28,12 @@ export const USER_EXISTED = '该用户已存在'
 export enum ERROR_MSG {
     NETWORK_ERROR = '  请检查网络连接后重试',
 }
+
+//增加
+export const ADD = '增加'
+//删除
+export const DELETE = '删除'
+//编辑
+export const EDIT = '编辑'
+//查看
+export const SEE = '查看'

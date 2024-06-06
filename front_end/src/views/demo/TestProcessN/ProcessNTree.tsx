@@ -3,6 +3,9 @@ import {Button, Modal, Tree} from 'antd';
 import type {TreeDataNode, TreeProps} from 'antd';
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 
+//查看配置树
+const SEE_PROCESS_TREE = '查看配置树';
+
 const generateData = (record: ITestProcessN) => {
     const data: TreeDataNode[] = [];
     for (let i = 0; i < record.testObjectNs.length; i++) {
@@ -49,8 +52,8 @@ const ProcessTree: React.FC<IProcessTreeProps> = ({record}) => {
 
     return (
         <>
-            <Button onClick={() => setOpen(true)}>查看</Button>
-            <Modal title="配置树" open={open} onOk={() => setOpen(false)} onCancel={() => setOpen(false)}>
+            <Button onClick={() => setOpen(true)}>{SEE_PROCESS_TREE}</Button>
+            <Modal title={SEE_PROCESS_TREE} open={open} onOk={() => setOpen(false)} onCancel={() => setOpen(false)}>
                 <Tree
                     className="draggable-tree"
                     blockNode

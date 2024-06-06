@@ -15,6 +15,7 @@ import TestTemplate from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.ts
 import TestVehicle from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
 import NewTestTemplate from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
 import TestProcessN from "@/views/demo/TestProcessN/TestProcessN.tsx";
+import MyLinesChart from "@/views/demo/ZTestPage/Test.tsx";
 
 interface RouteItem {
     key: string
@@ -76,6 +77,11 @@ export const routeItems: RouteItem[] = [
         element: <UserManage/>
     } : {
         key: '', label: '', element: <></>
+    },
+    {
+        key: `/testtest`,
+        label: '测试',
+        element: <MyLinesChart/>
     }
 ].filter(item => item.key !== '')
 

@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Button, Form, Input, Modal, Row, Space, Table} from 'antd';
+import {Button, Form, Input, message, Modal, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {createVehicle, getVehicles, updateVehicle} from "@/apis/request/vehicle.ts";
@@ -21,7 +21,6 @@ const columns: TableProps<IVehicle>['columns'] = [
     {
         title: '操作',
         key: 'action',
-
     },
 ];
 
@@ -29,11 +28,15 @@ const TestVehicle: React.FC = () => {
         const [vehicles, setVehicles] = React.useState<IVehicle[]>([])
         const [showCreateTestVehicle, setShowCreateTestVehicle] = React.useState<boolean>(false)
 
+        const fetchVehicles = async () => {
+            getVehicles().then((res) => {
+                console.log("vehicle:" + res.data)
+                setVehicles(res.data)
+            })
+        }
+
         useEffect(() => {
-                getVehicles().then((res) => {
-                    console.log("vehicle:" + res.data)
-                    setVehicles(res.data)
-                })
+                fetchVehicles()
 
                 columns[columns.length - 1].render = (_, record) => (
                     <Space size="middle">
@@ -42,14 +45,9 @@ const TestVehicle: React.FC = () => {
                                 record.isDisabled = !record.isDisabled
                                 updateVehicle(Number(record.id), record).then((res) => {
                                     if (res.code === SUCCESS_CODE) {
-                                        setVehicles(vehicles.map((item) => {
-                                                if (item.id === record.id) {
-                                                    return record
-                                                } else {
-                                                    return item
-                                                }
-                                            }
-                                        ))
+                                        fetchVehicles()
+                                    } else {
+                                        message.error("操作失败")
                                     }
                                 })
                             }
