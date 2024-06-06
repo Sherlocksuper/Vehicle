@@ -16,8 +16,8 @@ export async function getPreTestProcessConfigTempBuffer(assetsPath: string) {
 }
 export async function getPreTestProcessConfigBuffer() {
     const workboot = new ExcelJs.Workbook()
-    const controllersConfig = await ControllerService.getcontrollersConfig();
-    const collectorsConfig = await CollectorService.getcollectorsConfig();
+    const controllersConfig = await ControllerService.getAllControllers();
+    const collectorsConfig = await CollectorService.getAllCollectors();
     const signalsConfig = await SignalService.getsignalsConfig();
     const controllerConfigWorkSheet = workboot.addWorksheet(CONTROLLER_WORKSHEET)
     controllerConfigWorkSheet.columns = [

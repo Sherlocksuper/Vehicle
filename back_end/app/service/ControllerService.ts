@@ -43,18 +43,22 @@ class ControllerService {
             return false
         }
     }
-    async getControllers(userId?: number) {
+    async getActiveControllers(userId?: number) {
         const data = await Controller.findAll({
-            // attributes: ['id', ['controllerName', 'name']],
+            where: userId ? { userId, isDisabled: false } : { userId: null, isDisabled: false }
+        })
+        return data
+    }
+
+    async getAllControllers(userId?: number) {
+        const data = await Controller.findAll({
             where: userId ? { userId } : { userId: null }
         })
         return data
     }
-    async getcontrollersConfig(userId?: number) {
-        const data = await Controller.findAll({
-            where: userId ? { userId } : { userId: null }
-        })
-        return data
+
+    async createController(data: IControllerModel) {
+        return await Controller.create(data)
     }
 }
 export default new ControllerService

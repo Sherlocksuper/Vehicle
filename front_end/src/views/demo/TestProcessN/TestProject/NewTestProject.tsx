@@ -2,7 +2,7 @@ import {Button, Form, Input, Modal, Select, Space} from "antd";
 import React, {useEffect} from "react";
 import {ITestProcess} from "@/apis/standard/test.ts";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import {getCollectorList, getControllerList, getSignalListByCollectorId} from "@/apis/request/test.ts";
+import {getActiveCollectorList, getActiveControllerList, getSignalListByCollectorId} from "@/apis/request/test.ts";
 import {IProject} from "@/apis/standard/project.ts";
 import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 import {createProject} from "@/apis/request/project.ts";
@@ -43,12 +43,12 @@ const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
     const [projectResult, setProjectResult] = React.useState<IProject | null>(null)
 
     const getController = async () => {
-        const res = await getControllerList()
+        const res = await getActiveControllerList()
         setControllerList(res.data)
     }
 
     const getCollector = async () => {
-        const res = await getCollectorList()
+        const res = await getActiveCollectorList()
         setCollectorList(res.data)
     }
 

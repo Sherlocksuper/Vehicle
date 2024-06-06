@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { Cascader, message } from 'antd';
-import { getCollectorList, getControllerList, getSignalListByCollectorId } from "@/apis/request/test.ts";
+import { getActiveCollectorList, getActiveControllerList, getSignalListByCollectorId } from "@/apis/request/test.ts";
 import { ERROR_MSG, SUCCESS_CODE } from "@/constants";
 import { CollectorSignalFormat } from "@/apis/standard/test.ts";
 import {CreateTestContext} from "@/views/demo/TestProcess/TestModel/CreateTestFunction.ts";
@@ -27,7 +27,7 @@ const NewBoardSelect: React.FC = () => {
     //获取采集器列表
     const getControllers = useCallback(async () => {
         let newOptions: Option[] = [];
-        const response = await getControllerList()
+        const response = await getActiveControllerList()
         if (response.code !== SUCCESS_CODE) {
             messageApi.error(response.msg + ERROR_MSG.NETWORK_ERROR);
             return;
@@ -46,7 +46,7 @@ const NewBoardSelect: React.FC = () => {
     const getCollectors = useCallback(async () => {
         const newOptions: Option[] = [];
 
-        const collectResponse = await getCollectorList()
+        const collectResponse = await getActiveCollectorList()
         if (collectResponse.code !== SUCCESS_CODE) {
             messageApi.error(collectResponse.msg + ERROR_MSG.NETWORK_ERROR);
             return;

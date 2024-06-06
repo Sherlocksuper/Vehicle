@@ -43,11 +43,19 @@ router.get('/getSendedTestConfig', TestProcessController.getSendedTestConfig)
 router.get('/getUserTestDashbordConfig', TestProcessController.getUserTestDashbordConfig)
 router.post('/copyTestProcess', TestProcessController.copyTestProcess)
 
-// 基本信息获取接口
-router.get('/getControllerList', BaseInfoController.getControllerList)
-router.get('/getCollectorList', BaseInfoController.getCollectorList)
+/**
+ * 基础信息管理接口
+ */
+router.get('/getControllerList', BaseInfoController.getActiveControllerList)
+router.get('/getAllControllerList', BaseInfoController.getAllControllerList)
+router.get('/getCollectorList', BaseInfoController.getActiveCollectorList)
+router.get('/getAllCollectorList', BaseInfoController.getAllCollectorList)
 router.get('/getSignalListByCollectorId', BaseInfoController.getSignalListByCollectorId)
 router.get('/getTestDevicesInfo', BaseInfoController.getTestDevicesInfo)
+
+router.post('/createController', BaseInfoController.createController)
+router.post('/createCollector', BaseInfoController.createCollector)
+
 
 /**
  * 车辆管理接口

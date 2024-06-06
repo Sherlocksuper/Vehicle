@@ -25,6 +25,11 @@ interface RouteItem {
 
 export const routeItems: RouteItem[] = [
     {
+        key: '/physical-topology',
+        label: '测试板卡信息管理',
+        element: <PhyTopology/>
+    },
+    {
         //测试预配置
         key: '/test-config',
         label: '测试预配置',
@@ -64,11 +69,7 @@ export const routeItems: RouteItem[] = [
             <DataDisplay/>
         </DndProvider>
     },
-    {
-        key: '/physical-topology',
-        label: '测试板卡信息管理',
-        element: <PhyTopology/>
-    },
+
     userUtils.isRootUser() ? {
         key: '/user-management',
         label: '用户管理',

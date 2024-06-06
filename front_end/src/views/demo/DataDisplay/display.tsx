@@ -505,7 +505,7 @@ const DataDisplay: React.FC<IDataDisplay> = () => {
                 <div className="dd_drop_container" ref={ref}>
                     <DropContainer ifStartGetData={ifStartGetData} selectedItemId={selectedDragItemId}
                         selectFunc={setSelectedDragItemId} items={dragItems}
-                        onUpdateItems={updateItemsByLayout} />
+                        onUpdateItems={updateItemsByLayout} onLayoutChange={()=>{}}/>
                 </div>
                 <div className="dd_info">
                     {selectedDragItemId ? renderEDITModeInfo() : !ifStartGetData ? renderADDModeInfo() : <></>}

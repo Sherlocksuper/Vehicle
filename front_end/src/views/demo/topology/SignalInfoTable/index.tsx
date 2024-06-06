@@ -1,9 +1,9 @@
-import { Table } from "antd";
-import { ISignalsConfigItem } from "../PhyTopology";
+import {Table} from "antd";
+import {ISignalsConfigItem} from "../PhyTopology";
 
 const SignalInfoTable: React.FC<{
     dataSource: ISignalsConfigItem[]
-}> = ({ dataSource }) => {
+}> = ({dataSource}) => {
     const columns = [
         {
             title: '卡内序号',
@@ -38,10 +38,8 @@ const SignalInfoTable: React.FC<{
     ];
 
 
-
-    return <div style={{ height: 350 }}>
-        <Table sticky={true} scroll={{ y: 300 }} bordered={true} pagination={false} rowKey={'id'} dataSource={dataSource} columns={columns} />
-    </div>
+    return <Table sticky={true} bordered={true} pagination={false} rowKey={'id'}
+                  dataSource={dataSource} columns={columns}/>
 }
 
 export default SignalInfoTable  

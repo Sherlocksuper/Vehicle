@@ -26,12 +26,30 @@ export const TEST: UrlMap = {
         url: '/getTestProcessList',
         method: Method.GET
     },
-    getControllList: {
+    createController: {
+        url: '/createController',
+        method: Method.POST,
+        format: ContentType.JSON
+    },
+    getControllerList: {
         url: '/getControllerList',
         method: Method.GET
     },
+    getAllControllerList: {
+        url: '/getAllControllerList',
+        method: Method.GET
+    },
+    createCollector: {
+        url: '/createCollector',
+        method: Method.POST,
+        format: ContentType.JSON
+    },
     getCollectorList: {
         url: '/getCollectorList',
+        method: Method.GET
+    },
+    getAllCollectorList: {
+        url: '/getAllCollectorList',
         method: Method.GET
     },
     getSignalListByCollectorId: {

@@ -1,6 +1,17 @@
 import {request} from "@/utils/request.ts";
 import {MyUrl} from "@/apis/url/myUrl.ts";
 import {ITestProcess} from "@/apis/standard/test.ts";
+import {
+    getActiveControllerList,
+    getAllControllerList,
+    createController,
+} from "@/apis/request/controller.ts";
+
+import {
+    getActiveCollectorList,
+    getAllCollectorList,
+    createCollector,
+} from "@/apis/request/collector.ts";
 
 const defaultPageSize: number = 7
 
@@ -21,9 +32,10 @@ const getTestList = async (pageNum: number, pageSize?: number, keywords?: string
 }
 
 
-/// TODO createTest  by   Post
-
-//创建测试
+/**
+ * 创建测试
+ * @param icreateTestProcess
+ */
 const createTest = (icreateTestProcess: ITestProcess) => {
     const api = MyUrl.TEST.createTestProcess
     return request({
@@ -61,19 +73,6 @@ const editTest = async (data: ITestProcess) => {
     });
 }
 
-const getControllerList = async () => {
-    const api = MyUrl.TEST.getControllList
-    return request({
-        api: api,
-    });
-}
-
-const getCollectorList = async () => {
-    const api = MyUrl.TEST.getCollectorList
-    return request({
-        api: api,
-    });
-}
 
 const getSignalListByCollectorId = async (collectorId: number) => {
     const api = MyUrl.TEST.getSignalListByCollectorId
@@ -92,7 +91,11 @@ export {
     deleteTest,
     editTest,
     getTestList,
-    getControllerList,
-    getCollectorList,
-    getSignalListByCollectorId
+    getActiveControllerList,
+    getAllControllerList,
+    getActiveCollectorList,
+    getAllCollectorList,
+    getSignalListByCollectorId,
+    createController,
+    createCollector
 }

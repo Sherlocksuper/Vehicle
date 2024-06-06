@@ -29,7 +29,7 @@ class SignalService {
                 data = srcData
             }
 
-            const collectors = await CollectorService.getcollectorsConfig(config?.userId || undefined)
+            const collectors = await CollectorService.getAllCollectors(config?.userId || undefined)
             data!.forEach((value) => {
                 const { collectorName: cn } = value
                 // 找到collectorName所对应的id
