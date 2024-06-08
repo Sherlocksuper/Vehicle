@@ -81,6 +81,11 @@ const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
 
 
     const handleSubmit = () => {
+        if (disable) {
+            onFinished()
+            return
+        }
+
         form.validateFields().then(() => {
             newProject(projectResult as IProject)
         });

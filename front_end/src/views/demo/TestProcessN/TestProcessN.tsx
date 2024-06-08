@@ -64,13 +64,13 @@ const TestProcessN: React.FC = () => {
     const [processNList, setProcessNList] = React.useState<ITestProcessN[]>([]);
 
     const ActionButtons = (record: ITestProcessN) => {
-        const templateRecord = JSON.stringify(record.template)
+        const testProcessNRecord = JSON.stringify(record)
         const model = NewTestTemplateMode.CONFIG
 
         return (
             <Space>
                 <Button type="link"
-                        href={`/test-template-config?templateRecord=${templateRecord}&model=${model}`}
+                        href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${model}`}
                         target={"_blank"}>前往配置采集关系</Button>
 
                 <ProcessNTree record={record}/>
@@ -123,7 +123,9 @@ const TestProcessN: React.FC = () => {
             }}>
                 <NewTestProcessN onFinish={fetchTestProcessN}/>
             </div>
-            <Table columns={newColumns} dataSource={processNList}/>
+            <Table columns={newColumns} dataSource={processNList} rowKey={(value) => {
+                return value.id ?? value.testName
+            }}/>
         </div>
     )
 }

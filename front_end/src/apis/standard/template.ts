@@ -1,4 +1,5 @@
-import {DragItemType} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
+import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
 
 export interface ITemplate {
     id?: number
@@ -14,6 +15,7 @@ export interface ITemplateItem {
     id: string
     type: DragItemType
     requestSignalId: number | null
+    requestSignals: ISignalItem[]
     x: number
     y: number
     width: number

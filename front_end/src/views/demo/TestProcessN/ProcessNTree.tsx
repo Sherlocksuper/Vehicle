@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
+import type {TreeDataNode} from 'antd';
 import {Button, Modal, Tree} from 'antd';
-import type {TreeDataNode, TreeProps} from 'antd';
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 
 //查看配置树
@@ -16,26 +16,12 @@ const generateData = (record: ITestProcessN) => {
             children: [] as TreeDataNode[]
         }
 
-        for (let j = 0; j < record.testObjectNs.length; j++) {
-            const key = `${i}-${j}`;
-            const projectLeaf = {
-                title: `项目 ${record.testObjectNs[j].project.projectName}`,
-                key: key,
-                children: [] as TreeDataNode[]
+        vehicleLeaf.children = record.testObjectNs[i].project.map((project, index) => {
+            return {
+                title: `项目 ${project.projectName}`,
+                key: `${key}-${index}`
             }
-
-            for (let k = 0; k < record.testObjectNs[i].project.projectConfig.length; k++) {
-                const key = `${i}-${j}-${k}`;
-                const configLeaf = {
-                    title: `${record.testObjectNs[i].project.projectConfig[k].controller.controllerName} - ${record.testObjectNs[i].project.projectConfig[k].collector.collectorName} - ${record.testObjectNs[i].project.projectConfig[k].signal.signalName}`,
-                    key: key,
-                }
-                projectLeaf.children.push(configLeaf);
-            }
-
-            vehicleLeaf.children.push(projectLeaf);
-        }
-
+        });
         data.push(vehicleLeaf);
     }
     return data;

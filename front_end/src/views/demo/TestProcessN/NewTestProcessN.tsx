@@ -16,7 +16,12 @@ interface INewTestProcessNProps {
 }
 
 const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
-    const [testProcessN, setTestProcessN] = useState<ITestProcessN>()
+    const [testProcessN, setTestProcessN] = useState<ITestProcessN>({
+        userId: 1,
+        testName: '',
+        testObjectNs: [],
+        template: {} as ITemplate
+    })
 
     const [visible, setVisible] = useState(false);
     const [modalType, setModalType] = useState<'show' | 'edit'>('edit');
@@ -28,7 +33,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
 
     useEffect(() => {
         getVehicles().then((res) => {
-            setVehicleList(res.data.filter((item:IVehicle) => !item.isDisabled));
+            setVehicleList(res.data.filter((item: IVehicle) => !item.isDisabled));
         });
         getProjects().then((res) => {
             setProjectList(res.data);
@@ -100,11 +105,11 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                 confirmLoading={confirmLoading}
             >
                 <Input
-                    prefix="测试流程名称："
+                    prefix="测试配置名称："
                     value={testProcessN?.testName} disabled={modalType === 'show'}
                     onChange={(e) => {
                         setTestProcessN({...testProcessN, testName: e.target.value} as ITestProcessN);
-                    }} placeholder="请输入测试流程名称"/>
+                    }} placeholder="请输入测试配置名称"/>
                 测试模板：
                 <Select
                     placeholder={'请选择测试模板'}
@@ -118,7 +123,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                     marginBottom: 20
                 }}>
                     {testTemplateList.map((item) => (
-                        <Select.Option value={item.id}>{item.name}</Select.Option>
+                        <Select.Option key={item.id} value={item.id}>{item.name}-{item.id}</Select.Option>
                     ))}
                 </Select>
                 <Table
@@ -136,7 +141,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                                 }}
                                         size={'middle'} style={{width: 200}}>
                                     {vehicleList.map((item) => (
-                                        <Select.Option value={item.id}>{item.vehicleName}</Select.Option>
+                                        <Select.Option key={item.id} value={item.id}>{item.vehicleName}</Select.Option>
                                     ))}
                                 </Select>
                             )
@@ -146,18 +151,20 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                             dataIndex: 'project.projectName',
                             key: 'project.projectName',
                             render: (value, record, index) => (
-                                <Select mode={"multiple"} onSelect={(value) => {
-                                    const newTestProcess = testProcessN
-                                    newTestProcess!.testObjectNs[index].project = projectList.find((item) => item.id === value) as IProject
-                                    setTestProcessN(newTestProcess)
-                                }} size={"middle"} style={{width: 200}}>
+                                <Select mode={"multiple"}
+                                        onChange={(value) => {
+                                            console.log(value)
+                                            const newTestProcess = testProcessN
+                                            newTestProcess!.testObjectNs[index].project = value.map((item: number) => projectList.find((project) => project.id === Number(item)) as IProject)
+                                            setTestProcessN(newTestProcess)
+                                        }}
+                                        size={"middle"} style={{width: 200}}>
                                     {projectList.map((item) => (
-                                        <Select.Option value={item.id}>{item.projectName}</Select.Option>
+                                        <Select.Option key={item.id} value={item.id}>{item.projectName}</Select.Option>
                                     ))}
                                 </Select>
                             )
                         },
-
                         {
                             title: '操作',
                             key: 'action',
@@ -173,6 +180,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                             ),
                         }
                     ]}
+                    rowKey={(record, index) => index ?? 1}
                 />
                 <Button onClick={() => {
                     setTestProcessN({

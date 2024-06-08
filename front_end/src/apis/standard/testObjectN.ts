@@ -10,6 +10,6 @@ export interface ITestObjectN {
     id: number
     title: string
     vehicle: IVehicle
-    project: IProject
+    project: IProject[]
     template: ITemplate
 }

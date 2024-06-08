@@ -1,10 +1,11 @@
-import axios, {  AxiosRequestConfig } from 'axios';
-import { BASE_URL } from "@/apis/url/myUrl.ts";
+import axios, {AxiosRequestConfig} from 'axios';
+import {BASE_URL} from "@/apis/url/myUrl.ts";
 import userUtils from "@/utils/UserUtils.ts";
-import { APIStandard, ContentType, ResponseType } from "@/apis/standard/all.ts";
+import {APIStandard, ContentType, ResponseType} from "@/apis/standard/all.ts";
 import {FAIL_CODE, TOKEN_VALID_CODE} from "@/constants";
 import {message} from "antd";
 import {sleep} from "@/utils/index.ts";
+import {log} from "@antv/g2plot/lib/utils";
 // import { FAIL_CODE,  TOKEN_VALID_CODE } from '@/constants';
 // import { message } from 'antd';
 // import { sleep } from '.';
@@ -18,7 +19,7 @@ const axiosInstance = axios.create({
 //1.默认x-www-form-urlencoded,如果不传递format，就是默认的
 //2.根据method判断放到data还是params
 //3.根据format判断Content-Type
-export const request = ({ api, params }: {
+export const request = ({api, params}: {
     api: APIStandard,
     params?: any,
 }) => {
@@ -28,7 +29,10 @@ export const request = ({ api, params }: {
     const responseType = api.responseType || ResponseType.JSON
 
     const axiosConfig = getAxiosConfig(url, method, params, format || ContentType.WWW_FORM, responseType)
-    console.log("正在通过", method + "方法\n", "向", url, "发送请求\n，请求参数为", JSON.stringify(params), "\n格式为", format)
+    console.log("正在通过", method + "方法\n", "向", url, "发送请求\n，请求参数为:")
+    console.table(params)
+    console.log("\n格式为", format)
+
 
     return axiosInstance(axiosConfig).then(response => {
         console.log(method, "     response.data", JSON.stringify(response.data))

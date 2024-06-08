@@ -4,6 +4,7 @@ import type {TableProps} from 'antd';
 import {ITemplate} from "@/apis/standard/template.ts";
 import {getTestTemplateList} from "@/apis/request/template.ts";
 import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 
 const columns: TableProps<ITemplate>['columns'] = [
     {
@@ -36,12 +37,20 @@ const columns: TableProps<ITemplate>['columns'] = [
         title: '操作',
         key: 'action',
         render: (value, record, index) => {
-            const templateRecord = JSON.stringify(record)
+            const newTestProcessN: ITestProcessN = {
+                userId: 0,
+                testName: record.name,
+                testObjectNs: [],
+                template: record
+            }
+            const testProcessNRecord = JSON.stringify(newTestProcessN)
+
             const model = NewTestTemplateMode.SHOW
 
             return <Space size="middle">
                 <Button type="link"
-                        href={`/test-template-config?templateRecord=${templateRecord}&model=${model}`} target={"_blank"}>查看</Button>
+                        href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${model}`}
+                        target={"_blank"}>查看</Button>
             </Space>
         }
     },
@@ -68,7 +77,9 @@ const TestTemplate: React.FC = () => {
             <Row justify="end" style={{marginBottom: 20}}>
                 <Button type="link" href={"/test-template-config"}
                         target={"_blank"}>模板配置</Button>
-                <Button type="primary">刷新</Button>
+                <Button type="primary" onClick={() => {
+                    fetchTestTemplate()
+                }}>刷新</Button>
             </Row>
             <Table columns={columns} dataSource={templates} rowKey={(record) => record.id!.toString()}/>
         </div>

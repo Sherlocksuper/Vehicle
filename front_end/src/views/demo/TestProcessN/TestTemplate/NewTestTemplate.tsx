@@ -19,6 +19,13 @@ import GridLayout from "react-grid-layout";
 import {createTestTemplate} from "@/apis/request/template.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {v4 as uuidv4} from 'uuid';
+import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
+import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
+import {updateProcessN} from "@/apis/request/testProcessN.ts";
+
+/**
+ * 新建template的modal
+ */
 
 
 /**
@@ -40,6 +47,7 @@ export interface IDragItem {
     type: DragItemType,
     itemConfig: {
         requestSignalId: number | null
+        requestSignals: ISignalItem[]
         x: number,
         y: number,
         width: number
@@ -56,6 +64,16 @@ export interface IDragItem {
     }
 }
 
+/**
+ * label: string,
+ */
+export interface ISignalItem {
+    vehicleName: string
+    projectName: string
+    controller: IControllersConfigItem
+    collector: ICollectorsConfigItem
+    signal: ISignalsConfigItem
+}
 
 const NewTestTemplate: React.FC = () => {
 
@@ -64,21 +82,23 @@ const NewTestTemplate: React.FC = () => {
     const [mode, setMode] = useState<NewTestTemplateMode>(NewTestTemplateMode.ADD)
     const [name, setName] = useState("默认名称")
     const [description, setDescription] = useState("默认描述")
+    const [testProcessN, setTestProcessN] = useState<ITestProcessN | null>(null)
+
 
     useEffect(() => {
         const search = window.location.search
         const params = new URLSearchParams(search)
-        const templateRecord = params.get('templateRecord')
-        const mode = params.get('model')
+        const testProcessNRecord = params.get('testProcessNRecord')
 
-        if (templateRecord && mode) {
-            const template: ITemplate = JSON.parse(templateRecord)
-            console.log(transferToDragItems(template))
-            const dragItems = transferToDragItems(template)
-            setDragItems(dragItems)
-            setName(template.name)
-            setDescription(template.description)
-            setMode(mode as NewTestTemplateMode)
+        if (testProcessNRecord && params.get('model')) {
+            const testProcess = JSON.parse(testProcessNRecord) as ITestProcessN
+            setTestProcessN(testProcess)
+
+
+            setName(testProcess.template.name)
+            setDescription(testProcess.template.description)
+            setDragItems(transferToDragItems(testProcess.template))
+            setMode(params.get('model') as NewTestTemplateMode)
         }
     }, [])
 
@@ -91,6 +111,7 @@ const NewTestTemplate: React.FC = () => {
              }) {
             const itemConfig: IDragItem['itemConfig'] = {
                 requestSignalId: null,
+                requestSignals: [],
                 x: defaultX,
                 y: defaultY,
                 width: defaultWidth,
@@ -122,13 +143,14 @@ const NewTestTemplate: React.FC = () => {
     })
     drop(ref)
 
-    const transferToDragItems = (template: ITemplate): IDragItem[] => {
+    function transferToDragItems(template: ITemplate): IDragItem[] {
         const dragItems = template.itemsConfig.map((item) => {
             const newItem: IDragItem = {
                 id: item.id,
                 type: item.type,
                 itemConfig: {
                     requestSignalId: null,
+                    requestSignals: item.requestSignals,
                     x: item.x,
                     y: item.y,
                     width: item.width,
@@ -149,6 +171,40 @@ const NewTestTemplate: React.FC = () => {
         console.log("转换为DragItems")
         console.log(JSON.stringify(dragItems))
         return dragItems
+    }
+
+    const transferToTestProcessN = (dragItems: IDragItem[]): ITestProcessN => {
+        const newTestProcessN = {...testProcessN} as ITestProcessN
+
+        newTestProcessN.template = {
+            name: name,
+            description: description,
+            createdAt: testProcessN?.template.createdAt || new Date(),
+            updatedAt: new Date(),
+            itemsConfig: dragItems.map((item) => {
+                const newItem: ITemplateItem = {
+                    id: item.id,
+                    type: item.type,
+                    ...item.itemConfig
+                }
+                return newItem
+            })
+        }
+
+        //递归delete所有 值为undefined或者null的属性
+        function deleteUndefined(obj: any) {
+            for (let key in obj) {
+                if (obj[key] === undefined || obj[key] === null) {
+                    delete obj[key]
+                } else if (typeof obj[key] === 'object') {
+                    deleteUndefined(obj[key])
+                }
+            }
+        }
+
+        deleteUndefined(newTestProcessN)
+
+        return newTestProcessN
     }
 
     function renderADDModeInfo() {
@@ -205,20 +261,19 @@ const NewTestTemplate: React.FC = () => {
         </>
     }
 
-    function updateItemsByLayout(newItem: GridLayout.Layout) {
+    function updateDragItem(id: string, itemConfig: IDragItem['itemConfig']) {
+        if (mode === NewTestTemplateMode.SHOW) {
+            message.error('展示模式下不允许修改')
+            return
+        }
+
         setDragItems(dragItems.map((item) => {
-            if (item.id === newItem.i) {
-                //更新了
-                console.log("更新id为", newItem.i, "的控件")
-                // console.log('更新为', newItem)
+            if (item.id === id) {
                 return {
                     ...item,
                     itemConfig: {
                         ...item.itemConfig,
-                        width: newItem.w * 30,
-                        height: newItem.h * 30,
-                        x: newItem.x,
-                        y: newItem.y
+                        ...itemConfig
                     }
                 }
             }
@@ -250,40 +305,51 @@ const NewTestTemplate: React.FC = () => {
         }))
     }
 
-    function renderSendedPage() {
-        return (
-            <div className='dd_container' style={{
-                backgroundColor: '#f8f8f8',
-                backgroundImage: 'linear-gradient(#e2e2e2 1px, transparent 1px), linear-gradient(90deg, #e2e2e2 1px, transparent 1px)'
-            }}>
-                <div className="dd_body">
-                    <div className="dd_drop_container" ref={ref}>
-                        <DropContainer banModify={mode === NewTestTemplateMode.SHOW} selectedItemId={null}
-                                       selectFunc={() => {
-                                       }} items={dragItems}
-                                       onUpdateItems={updateItemsByLayout}
-                                       onLayoutChange={updateAllByLayout}
-                        />
-                    </div>
-                    {
-                        mode === NewTestTemplateMode.ADD &&
-                      <div className="dd_info">
-                          {renderADDModeInfo()}
-                        <ButtonModal dragItems={dragItems} name={name} description={description}
-                                     updateDescription={setDescription}
-                                     updateName={setName}
-                                     mode={mode}
-                        />
-                      </div>
-                    }
+    return (
+        <div className='dd_container' style={{
+            backgroundColor: '#f8f8f8',
+            backgroundImage: 'linear-gradient(#e2e2e2 1px, transparent 1px), linear-gradient(90deg, #e2e2e2 1px, transparent 1px)'
+        }}>
+            <div className="dd_body">
+                <div className="dd_drop_container" ref={ref}>
+                    <DropContainer
+                        banModify={mode === NewTestTemplateMode.SHOW || mode === NewTestTemplateMode.CONFIG}
+                        selectedItemId={null}
+                        selectFunc={() => {
+                        }}
+                        items={dragItems}
+                        onLayoutChange={updateAllByLayout}
+                        updateDragItem={updateDragItem}
+                    />
                 </div>
+                {
+                    mode === NewTestTemplateMode.ADD && <div className="dd_info" style={{
+                        zIndex: 100
+                    }}>
+                        {renderADDModeInfo()}
+                    <ButtonModal dragItems={dragItems} name={name} description={description}
+                                 updateDescription={setDescription}
+                                 updateName={setName}
+                                 mode={mode}
+                    />
+                  </div>
+                }
+                {
+                    mode === NewTestTemplateMode.CONFIG &&
+                  <Button onClick={() => {
+                      const newTestProcessN = transferToTestProcessN(dragItems)
+                      updateProcessN(testProcessN?.id!, newTestProcessN).then((res) => {
+                          if (res.code === SUCCESS_CODE) {
+                              message.success('更新成功')
+                          } else {
+                              message.error('更新失败')
+                          }
+                      })
+                  }}>确定更改配置</Button>
+                }
             </div>
-        );
-    }
-
-    return <>
-        {renderSendedPage()}
-    </>
+        </div>
+    );
 };
 
 export default NewTestTemplate;
