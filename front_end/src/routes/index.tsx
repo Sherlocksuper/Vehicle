@@ -4,10 +4,8 @@ import SystemTotalPage from "@/views/demo";
 import {createBrowserRouter, Outlet} from "react-router-dom";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
-import React, {ReactElement} from "react";
-import userUtils from "@/utils/UserUtils.ts";
-import TestProcessPage from "@/views/demo/TestProcess/TestProcess.tsx";
-import DataDisplay from "@/views/demo/DataDisplay/display.tsx";
+import {ReactElement} from "react";
+import userUtils from "@/utils/userUtils.ts";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import UserManage from "@/views/demo/User/UserList.tsx";
 import TestProject from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
@@ -15,6 +13,7 @@ import TestTemplate from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.ts
 import TestVehicle from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
 import NewTestTemplate from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
 import TestProcessN from "@/views/demo/TestProcessN/TestProcessN.tsx";
+import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 
 interface RouteItem {
     key: string
@@ -53,23 +52,15 @@ export const routeItems: RouteItem[] = [
         ]
     },
     {
-        key: '/process-management',
-        label: '测试配置生成管理',
-        element: <TestProcessPage/>
-    },
-    {
         key: '/process-execution',
         label: '测试配置生成',
         element: <TestProcessN/>
     },
     {
-        key: '/data-display',
-        label: '测试数据接收展示',
-        element: <DndProvider backend={HTML5Backend}>
-            <DataDisplay/>
-        </DndProvider>
+        key:'/offline',
+        label:'离线数据展示',
+        element:<OfflineDate/>
     },
-
     userUtils.isRootUser() ? {
         key: '/user-management',
         label: '用户管理',

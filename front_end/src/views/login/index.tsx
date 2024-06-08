@@ -8,8 +8,8 @@ import {throttle} from "@/utils";
 import {useForm} from "antd/es/form/Form";
 import {changePassword} from "@/apis/request/user.ts";
 import {SUCCESS_CODE} from "@/constants";
-import UserUtils from "@/utils/UserUtils.ts";
-import userUtils from '@/utils/UserUtils.ts';
+import UserUtils from "@/utils/userUtils.ts";
+import userUtils from '@/utils/userUtils.ts';
 
 interface FormData {
     username: string;

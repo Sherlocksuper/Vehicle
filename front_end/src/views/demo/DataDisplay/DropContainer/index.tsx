@@ -168,7 +168,7 @@ const UpdateItemModal: React.FC<IUpdateItemModal> = ({
  * @constructor
  * 功能：根据不同的type返回不同的控件
  */
-const SetDragItem = ({item, banModify}: {
+export const SetDragItem = ({item, banModify}: {
                          item: IDragItem
                          banModify: boolean
                      }

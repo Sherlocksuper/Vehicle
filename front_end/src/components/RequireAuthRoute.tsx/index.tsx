@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Navigate } from "react-router"
-import userUtils from "@/utils/UserUtils.ts";
+import userUtils from "@/utils/userUtils.ts";
 import { Watermark } from "antd";
 
 const RequireAuthRoute: React.FC<React.PropsWithChildren> = ({ children }) => {

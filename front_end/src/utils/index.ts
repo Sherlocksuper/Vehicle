@@ -1,3 +1,6 @@
+import {ITemplate} from "@/apis/standard/template.ts";
+import {IDragItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+
 export const debounce = (targetFunction: (...args: any[]) => void, delay?: number) => {
     let timer: any = null;
     if (!delay) delay = 500;
@@ -36,4 +39,34 @@ export async function sleep(time: number) {
     return new Promise(res => {
         setTimeout(res, time)
     })
+}
+
+export function transferToDragItems(template: ITemplate): IDragItem[] {
+    const dragItems = template.itemsConfig.map((item) => {
+        const newItem: IDragItem = {
+            id: item.id,
+            type: item.type,
+            itemConfig: {
+                requestSignalId: null,
+                requestSignals: item.requestSignals,
+                x: item.x,
+                y: item.y,
+                width: item.width,
+                height: item.height,
+                title: item.title,
+                interval: item.interval,
+                trueLabel: item.trueLabel,
+                falseLabel: item.falseLabel,
+                unit: item.unit,
+                during: item.during,
+                min: item.min,
+                max: item.max,
+                label: item.label
+            }
+        }
+        return newItem
+    })
+    console.log("转换为DragItems")
+    console.log(JSON.stringify(dragItems))
+    return dragItems
 }

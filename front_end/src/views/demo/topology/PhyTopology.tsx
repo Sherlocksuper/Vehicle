@@ -25,7 +25,7 @@ import Dragger from "antd/es/upload/Dragger";
 import {InboxOutlined} from "@ant-design/icons";
 import ExcelJs from 'exceljs'
 import {SUCCESS_CODE} from "@/constants";
-import userUtils from "@/utils/UserUtils";
+import userUtils from "@/utils/userUtils.ts";
 import {useNavigate} from "react-router-dom";
 import {createCollector, createController, getActiveCollectorList} from "@/apis/request/test.ts";
 import {createSignal} from "@/apis/request/board-signal/signal.ts";

@@ -7,11 +7,11 @@ import {
     EditOutlined,
     LoginOutlined, UserOutlined
 } from "@ant-design/icons";
-import UserUtils from "@/utils/UserUtils.ts";
+import UserUtils from "@/utils/userUtils.ts";
 import { logout } from "@/apis/request/auth.ts";
 import { changePassword } from "@/apis/request/user.ts";
 import { SUCCESS_CODE } from "@/constants";
-import userUtils from "@/utils/UserUtils.ts";
+import userUtils from "@/utils/userUtils.ts";
 
 
 const SystemTotalPage: React.FC = () => {

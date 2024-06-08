@@ -22,6 +22,7 @@ import {v4 as uuidv4} from 'uuid';
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 import {updateProcessN} from "@/apis/request/testProcessN.ts";
+import {transferToDragItems} from "@/utils";
 
 /**
  * 新建template的modal
@@ -142,36 +143,6 @@ const NewTestTemplate: React.FC = () => {
         }
     })
     drop(ref)
-
-    function transferToDragItems(template: ITemplate): IDragItem[] {
-        const dragItems = template.itemsConfig.map((item) => {
-            const newItem: IDragItem = {
-                id: item.id,
-                type: item.type,
-                itemConfig: {
-                    requestSignalId: null,
-                    requestSignals: item.requestSignals,
-                    x: item.x,
-                    y: item.y,
-                    width: item.width,
-                    height: item.height,
-                    title: item.title,
-                    interval: item.interval,
-                    trueLabel: item.trueLabel,
-                    falseLabel: item.falseLabel,
-                    unit: item.unit,
-                    during: item.during,
-                    min: item.min,
-                    max: item.max,
-                    label: item.label
-                }
-            }
-            return newItem
-        })
-        console.log("转换为DragItems")
-        console.log(JSON.stringify(dragItems))
-        return dragItems
-    }
 
     const transferToTestProcessN = (dragItems: IDragItem[]): ITestProcessN => {
         const newTestProcessN = {...testProcessN} as ITestProcessN

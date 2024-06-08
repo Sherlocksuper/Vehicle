@@ -1,4 +1,4 @@
-import {ControllerAndCollector, getCollectorFromLocal, getControllerFromLocal} from "@/utils/DataUtils.ts";
+import {ControllerAndCollector, getCollectorFromLocal, getControllerFromLocal} from "@/utils/dataUtils.ts";
 import {useContext, useEffect, useState} from "react";
 import {CollectorSignalFormat} from "@/apis/standard/test.ts";
 import './SignalSelect.css'
