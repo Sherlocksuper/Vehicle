@@ -4,26 +4,27 @@ import { TOKEN_MSG, TOKEN_NOTFOUND_CODE } from '../constants'
 
 async function AuthMiddleware(ctx: Context, next: Next) {
     const token = ctx.headers['authorization']
-    if (ctx.path === '/createTestTemplate' || ctx.path === '/register') {
-        return next()
-    }
-    if (!!token) {
-        const { err } = await tokenUtils.verify(token)
-        if (!!err) {
-            ctx.body = { ...err, data: null }
-            return
-        } else {
-            return next()
-        }
-    }
-    else {
-        ctx.body = {
-            code: TOKEN_NOTFOUND_CODE,
-            msg: TOKEN_MSG[TOKEN_NOTFOUND_CODE],
-            data: null
-        }
-        return
-    }
+    return next()
+    // if (ctx.path === '/createTestTemplate' || ctx.path === '/register') {
+    //     return next()
+    // }
+    // if (!!token) {
+    //     const { err } = await tokenUtils.verify(token)
+    //     if (!!err) {
+    //         ctx.body = { ...err, data: null }
+    //         return
+    //     } else {
+    //         return next()
+    //     }
+    // }
+    // else {
+    //     ctx.body = {
+    //         code: TOKEN_NOTFOUND_CODE,
+    //         msg: TOKEN_MSG[TOKEN_NOTFOUND_CODE],
+    //         data: null
+    //     }
+    //     return
+    // }
 }
 
 export default AuthMiddleware

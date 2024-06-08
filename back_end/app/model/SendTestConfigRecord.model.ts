@@ -1,5 +1,8 @@
-import { AllowNull, AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
-import { ITestProcessConfig } from '../../utils/turnTestProcessConfigIntoExcel'
+import {AllowNull, AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from 'sequelize-typescript'
+import {ITestProcessConfig} from '../../utils/turnTestProcessConfigIntoExcel'
+import {IControllerModel} from "./Controller.model";
+import {ICollectorModel} from "./Collector.model";
+import {ISignalModel} from "./Signal.model";
 
 export enum DragItemType {
     BOOLEAN = 'BOOLEAN',
@@ -12,6 +15,7 @@ export interface IDragItem {
     type: DragItemType,
     itemConfig: {
         requestSignalId: number | null
+        requestSignals: ISignalItem[]
         x: number
         y: number
         width: number
@@ -26,6 +30,15 @@ export interface IDragItem {
         max?: number
         label?: string
     }
+}
+
+
+export interface ISignalItem {
+    vehicleName: string
+    projectName: string
+    controller: IControllerModel
+    collector: ICollectorModel
+    signal: ISignalModel
 }
 
 interface ISendTestConfigRecordModel {

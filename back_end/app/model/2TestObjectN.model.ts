@@ -1,5 +1,5 @@
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from "sequelize-typescript";
-import Vehicle, {IVehicleModel} from "./Vehicle.model";
+import {IVehicleModel} from "./Vehicle.model";
 import {IProjectModel} from "./3Project.model";
 import {ITestTemplate} from "./TestTemplate.model";
 
@@ -7,7 +7,7 @@ export interface ITestObjectNModel {
     id: number
     title: string
     vehicle: IVehicleModel
-    project: IProjectModel
+    project: IProjectModel[]
     template: ITestTemplate
 }
 

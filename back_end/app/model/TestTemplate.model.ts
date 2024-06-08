@@ -2,6 +2,7 @@
  * 用来存放测试模板的模型
  */
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table, UpdatedAt, CreatedAt} from "sequelize-typescript";
+import {ISignalItem} from "./SendTestConfigRecord.model";
 
 export enum TestTemplateType {
     BOOLEAN = 'BOOLEAN',
@@ -18,6 +19,7 @@ export interface ITestTemplate {
     itemConfig: {
         type: TestTemplateType
         requestSignalId: number | null
+        requestSignals: ISignalItem[]
         x: number
         y: number
         width: number
@@ -63,6 +65,7 @@ export default class TestTemplate extends Model<ITestTemplate> {
     itemsConfig!: {
         type: TestTemplateType
         requestSignalId: number | null
+        requestSignals: ISignalItem[]
         x: number
         y: number
         width: number
