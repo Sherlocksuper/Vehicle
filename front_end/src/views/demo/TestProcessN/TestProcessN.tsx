@@ -1,12 +1,9 @@
 import React, {useEffect} from 'react';
 import {Button, message, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
-import {IVehicle} from "@/apis/standard/vehicle.ts";
-import {IProject} from "@/apis/standard/project.ts";
 import NewTestProcessN from "@/views/demo/TestProcessN/NewTestProcessN.tsx";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
-import {getTestProcess} from "@/apis/standard/test.ts";
-import {deleteProcessN, getProcessNById, getProcessNList} from "@/apis/request/testProcessN.ts";
+import {deleteProcessN, getProcessNList} from "@/apis/request/testProcessN.ts";
 import {DELETE, SUCCESS_CODE} from "@/constants";
 import ProcessNTree from "@/views/demo/TestProcessN/ProcessNTree.tsx";
 import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
@@ -47,7 +44,7 @@ const columns: TableProps<ITestProcessN>['columns'] = [
         title: "测试模板(名称 - ID)",
         dataIndex: "template",
         key: "template",
-        render: (value, record, index) => (
+        render: (_, record) => (
             <Space>
                 <span>{`${record.template.name} - ${record.template.id}`}</span>
             </Space>
@@ -65,26 +62,27 @@ const TestProcessN: React.FC = () => {
 
     const ActionButtons = (record: ITestProcessN) => {
         const testProcessNRecord = JSON.stringify(record)
-        const model = NewTestTemplateMode.CONFIG
+        const model = NewTestTemplateMode.SHOW
 
         return (
             <Space>
                 <Button type="link"
                         href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${model}`}
                         target={"_blank"}>前往配置采集关系</Button>
-
+                <Button type={"link"} onClick={() => {
+                    if (!confirm(PROCESS_CONFIG_HINT)) return
+                    window.open(`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${model}`)
+                }}>{DOWN}</Button>
                 <ProcessNTree record={record}/>
-                <Button type={"primary"}>{DOWN}</Button>
                 <Button type="primary" danger={true} onClick={() => {
-                    if (prompt("请输入 delete 来确认删除") === "delete") {
-                        deleteProcessN(record.id!).then(res => {
-                            if (res.code !== SUCCESS_CODE) {
-                                message.error(res.message);
-                                return;
-                            }
-                        })
-                        return
-                    }
+                    if (prompt("请输入 delete 来确认删除") !== "delete") return
+                    deleteProcessN(record.id!).then(res => {
+                        if (res.code !== SUCCESS_CODE) {
+                            message.error(res.message);
+                            return;
+                        }
+                        fetchTestProcessN()
+                    })
                     message.error("删除失败")
                 }}>{DELETE}</Button>
             </Space>

@@ -11,8 +11,14 @@ export interface ITemplate {
 }
 
 
+/**
+ * 代表每一个控件
+ * 其中requestSignals代表所需要请求的所有信息
+ * 对于只能够展示一个信号的控件
+ * requestSignals只有一个元素
+ */
 export interface ITemplateItem {
-    id: string
+    id?: string
     type: DragItemType
     requestSignalId: number | null
     requestSignals: ISignalItem[]

@@ -1,17 +1,17 @@
 import * as echarts from "echarts"
 import {useEffect, useMemo, useRef, useState} from "react"
+import {IChartInterface} from "@/components/Charts/interface.ts";
 
-const NumberGaugeChart: React.FC<{
-    min: number
-    max: number
-    startRequest: boolean
-    requestSignalId: number | null
-    unit: string
-    title: string
-    width: number
-    height: number
-    interval: number
-}> = ({startRequest, requestSignalId, unit, title, width, height, interval, min, max}) => {
+const NumberGaugeChart: React.FC<IChartInterface> = ({
+                                                         startRequest,
+                                                         requestSignals,
+                                                         sourceType,
+
+                                                         unit,
+                                                         title,
+                                                         width,
+                                                         height,
+                                                     }) => {
 
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const [value, setValue] = useState(0)
@@ -20,12 +20,12 @@ const NumberGaugeChart: React.FC<{
 
     useMemo(() => {
         timerRef.current && clearInterval(timerRef.current)
-        if (startRequest && requestSignalId !== null) {
+        if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
                 setValue(Number((Math.random() * 100).toFixed(2)))
-            }, interval)
+            }, 1000)
         }
-    }, [startRequest, interval])
+    }, [startRequest, requestSignals])
 
     useEffect(() => {
         chartRef.current?.setOption({
@@ -49,8 +49,6 @@ const NumberGaugeChart: React.FC<{
             series: [
                 {
                     type: 'gauge',
-                    min,
-                    max,
                     splitNumber: 10,
                     progress: {
                         show: true,
@@ -115,7 +113,7 @@ const NumberGaugeChart: React.FC<{
             resizeObserver.disconnect()
             chartRef.current?.dispose()
         }
-    }, [unit, title, width, height, min, max])
+    }, [unit, title, width, height])
 
     return <div ref={numberContainerRef} style={{
         width: '100%', height: '100%'

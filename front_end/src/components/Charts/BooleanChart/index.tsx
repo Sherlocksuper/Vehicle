@@ -1,35 +1,38 @@
-import { useMemo, useRef, useState } from 'react'
+import {useMemo, useRef, useState} from 'react'
 import './index.css'
+import {IChartInterface} from "@/components/Charts/interface.ts";
+import {generateRandomData} from "@/components/Charts";
 
-const BooleanChart: React.FC<{
-    startRequest: boolean
-    requestSignalId: number | null
-    trueLabel: string
-    falseLabel: string
-    title: string
-    width: number
-    height: number
-    interval: number
-}> = ({ startRequest, requestSignalId, trueLabel, falseLabel, title, width, height, interval }) => {
+const BooleanChart: React.FC<IChartInterface> = ({
+                                                     startRequest,
+                                                     requestSignals,
+                                                     sourceType,
+
+                                                     trueLabel,
+                                                     falseLabel,
+                                                     title,
+                                                 }) => {
 
     const timerRef = useRef<NodeJS.Timeout | null>(null)
 
     useMemo(() => {
         timerRef.current && clearInterval(timerRef.current)
-        if (startRequest && requestSignalId !== null) {
+        if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
-                setValue(Math.random() > 0.5)
-            }, interval)
+                const data = generateRandomData(requestSignals)
+                setValue(data.data[requestSignals[0].signal.id] > 0.5)
+            }, 1000)
         }
-    }, [startRequest, interval])
+    }, [startRequest, requestSignals])
 
     const [value, setValue] = useState(false)
+
     return <div className="bc_container" style={{
-        width:"100%",
-        height:"100%",
+        width: "100%",
+        height: "100%",
     }}>
         <div className='bc_title'>{title}</div>
-        <div className="bc_result" style={{ backgroundColor: value ? '#52c41a' : '#f5222d' }}>
+        <div className="bc_result" style={{backgroundColor: value ? '#52c41a' : '#f5222d'}}>
             {value ? trueLabel : falseLabel}
         </div>
     </div>

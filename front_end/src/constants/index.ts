@@ -37,3 +37,5 @@ export const DELETE = '删除'
 export const EDIT = '编辑'
 //查看
 export const SEE = '查看'
+
+export const DEFAULT_TITLE = '请编辑默认标题'

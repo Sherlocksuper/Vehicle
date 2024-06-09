@@ -1,91 +1,78 @@
 import * as echarts from "echarts"
-import {useEffect, useRef} from "react"
+import {useEffect, useMemo, useRef} from "react"
+import {IChartInterface, IRandomData} from "@/components/Charts/interface.ts";
+import {generateRandomData} from "@/components/Charts";
 
 interface ISeries {
+    id: number
     name: string
     type: string
     stack: string
+    symbol: string
     data: number[]
 }
 
-interface ILinesChart {
-    chartTitle: string
-    xAxisData: string[]
-    series: ISeries[]
-    startRequest: boolean
-}
-
-
-const LinesChart: React.FC<ILinesChart> = (props, context) => {
+/**
+ * 生成格式的random数据
+ * @param startRequest
+ * @param requestSignals
+ * @param sourceType
+ * @returns
+ * 格式：{
+ *     xAxis: '时间',
+ *     data: {
+ *     '信号1': 1,
+ *     '信号2': 2,
+ *     '信号3': 3,
+ * }
+ * data key的格式根据ISignalItem的id来决定
+ */
+const LinesChart: React.FC<IChartInterface> = ({
+                                                   startRequest,
+                                                   requestSignals,
+                                                   sourceType,
+                                               }) => {
     const chartRef = useRef<echarts.ECharts | null>()
     const lineContainerRef = useRef<HTMLDivElement>(null)
 
-    const interval = 1000
-    const requestSignalId = 123
 
     const timerRef = useRef<NodeJS.Timeout | null>(null)
-    const durationRef = useRef(30)
     const xAxis = useRef<string[]>([])
-    const dataRef = useRef([
-        {
-            name: "Email",
-            type: "line",
-            stack: "Total",
-            data: []
-        },
-        {
-            name: "Union Ads",
-            type: "line",
-            stack: "Total",
-            data: []
-        },
-        {
-            name: "Video Ads",
-            type: "line",
-            stack: "Total",
-            data: []
-        },
-        {
-            name: "Direct",
-            type: "line",
-            stack: "Total",
-            data: []
-        },
-        {
-            name: "Search Engine",
-            type: "line",
-            stack: "Total",
+    const dataRef = useRef<ISeries[]>(requestSignals.map((item) => {
+        return {
+            id: item.signal.id,
+            name: item.vehicleName + ' ' + item.projectName + ' ' + item.signal.signalName,
+            type: 'line',
+            stack: 'Total',
+            symbol: 'none',
             data: []
         }
-    ])
+    }))
 
-    timerRef.current && clearInterval(timerRef.current)
-    if (props.startRequest && requestSignalId !== null) {
-        timerRef.current = setInterval(() => {
-            const nowTime = new Date().toString()
-            xAxis.current.push(nowTime)
 
-            dataRef.current.forEach(i => {
-                const random = Math.random() > 0.5 ? Math.random() * 100 : null
-                // @ts-ignore
-                i.data.push(random)
-            })
+    useMemo(() => {
+        if (requestSignals.length > 0) {
+            timerRef.current = setInterval(() => {
+                const randomData: IRandomData = generateRandomData(requestSignals)
 
-            chartRef.current?.setOption({
-                xAxis: {
-                    data: xAxis.current
-                },
-                series: dataRef.current.map(i => ({
-                    name: i.name,
-                    type: 'line',
-                    stack: 'Total',
-                    symbol: 'none',
-                    data: i.data,
-                }))
-            });
+                xAxis.current.push(randomData.xAxis)
+                dataRef.current.forEach((item) => {
+                    item.data.push(randomData.data[item.id])
+                })
 
-        }, interval)
-    }
+                const option = {
+                    xAxis: {
+                        data: xAxis.current
+                    },
+                    series: dataRef.current
+                }
+                chartRef.current?.setOption(option)
+            }, 1000)
+        }
+        return () => {
+            timerRef.current && clearInterval(timerRef.current)
+        }
+    }, [requestSignals.length])
 
     useEffect(() => {
         chartRef.current = echarts.init(lineContainerRef.current)
@@ -105,14 +92,11 @@ const LinesChart: React.FC<ILinesChart> = (props, context) => {
                     end: 100
                 }
             ],
-            title: {
-                text: props.chartTitle
-            },
             tooltip: {
                 trigger: 'axis'
             },
             legend: {
-                data: props.series.map(i => i.name)
+                data: dataRef.current.map((item) => item.name)
             },
             grid: {
                 left: '3%',
@@ -128,15 +112,7 @@ const LinesChart: React.FC<ILinesChart> = (props, context) => {
             yAxis: {
                 type: 'value'
             },
-            series: props.series.map(i => ({
-                name: i.name,
-                type: 'line',
-                stack: 'Total',
-                symbol: 'none',
-                data: i.data,
-                connectNulls: true,
-                smooth: true
-            }))
+            series: []
         };
         const resizeObserver = new ResizeObserver(() => {
             chartRef.current && chartRef.current.resize()
@@ -148,7 +124,7 @@ const LinesChart: React.FC<ILinesChart> = (props, context) => {
             resizeObserver.disconnect()
             chartRef.current?.dispose()
         }
-    }, [props.chartTitle])
+    }, [])
 
     return <div ref={lineContainerRef} style={{
         width: '100%', height: '100%'

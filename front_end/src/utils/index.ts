@@ -44,7 +44,7 @@ export async function sleep(time: number) {
 export function transferToDragItems(template: ITemplate): IDragItem[] {
     const dragItems = template.itemsConfig.map((item) => {
         const newItem: IDragItem = {
-            id: item.id,
+            id: item.id!,
             type: item.type,
             itemConfig: {
                 requestSignalId: null,

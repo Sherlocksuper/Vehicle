@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Form, Input, message, Modal, Select, Table} from "antd";
+import {Button, Input, message, Modal, Select, Table} from "antd";
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {IProject} from "@/apis/standard/project.ts";
 import {ITemplate} from "@/apis/standard/template.ts";
@@ -94,7 +94,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                         message.error('创建失败');
                         setConfirmLoading(false);
                     }).catch((err) => {
-                        message.error('创建失败');
+                        message.error('创建失败', err.toString());
                         setConfirmLoading(false);
                     });
                 }}
@@ -133,7 +133,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                             title: '车辆',
                             dataIndex: 'vehicle.vehicleName',
                             key: 'vehicle.vehicleName',
-                            render: (value, record, index) => (
+                            render: (_, __, index) => (
                                 <Select onSelect={(value) => {
                                     const newTestProcess = testProcessN
                                     newTestProcess!.testObjectNs[index].vehicle = vehicleList.find((item) => item.id === value) as IVehicle
@@ -150,7 +150,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                             title: '项目',
                             dataIndex: 'project.projectName',
                             key: 'project.projectName',
-                            render: (value, record, index) => (
+                            render: (_,__, index) => (
                                 <Select mode={"multiple"}
                                         onChange={(value) => {
                                             console.log(value)
@@ -168,7 +168,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                         {
                             title: '操作',
                             key: 'action',
-                            render: (text, record) => (
+                            render: (_, record) => (
                                 <span>
                                     <a onClick={() => {
                                         setTestProcessN({
@@ -180,7 +180,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                             ),
                         }
                     ]}
-                    rowKey={(record, index) => index ?? 1}
+                    rowKey={(_, index) => index ?? 1}
                 />
                 <Button onClick={() => {
                     setTestProcessN({

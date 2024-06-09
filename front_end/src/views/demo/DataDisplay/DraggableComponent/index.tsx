@@ -3,8 +3,6 @@ import {useDrag} from 'react-dnd'
 import './index.css'
 import {DragItemType} from "../display"
 import {v4 as uuid} from "uuid"
-import {Tooltip} from "antd";
-import {BarChartOutlined, CheckCircleOutlined, LineChartOutlined, NumberOutlined} from "@ant-design/icons";
 
 export interface IBooleanChartExtra {
     defaultTrueLabel: string,
@@ -51,7 +49,6 @@ const DraggableComponent: React.FC<IDraggleComponent> = ({ type, draggleConfig }
     return <div className="dcm_container" ref={ref}>
         {{
             [DragItemType.BOOLEAN]: <div className="dcm_inner--boolean"></div>,
-            [DragItemType.LINE]: <div className="dcm_inner--line"></div>,
             [DragItemType.NUMBER]: <div className="dcm_inner--number"></div>,
             [DragItemType.LINES]: <div className="dcm_inner--lines"></div>,
         }[type]}

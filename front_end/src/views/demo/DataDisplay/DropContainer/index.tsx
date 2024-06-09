@@ -2,7 +2,6 @@ import "./index.css";
 import {DragItemType} from "../display";
 import BooleanChart from "@/components/Charts/BooleanChart";
 import NumberGaugeChart from "@/components/Charts/NumberGaugeChart";
-import LineChart from "@/components/Charts/LineChart";
 import GridLayout from 'react-grid-layout';
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -11,6 +10,8 @@ import LinesChart from "@/components/Charts/LinesChart/LinesChart.tsx";
 import {Input, Modal, Select} from "antd";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {IDragItem, ISignalItem, NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {DataSourceType} from "@/components/Charts/interface.ts";
+import {DEFAULT_TITLE} from "@/constants";
 
 const DropContainer: React.FC<{
     banModify: boolean,
@@ -144,17 +145,6 @@ const UpdateItemModal: React.FC<IUpdateItemModal> = ({
                             }</Select.Option>
                         })
                     })
-                    // return testObject.project.projectConfig.map((projectConfig) => {
-                    //     return <Select.Option value={JSON.stringify({
-                    //         vehicleName: testObject.vehicle.vehicleName,
-                    //         projectName: testObject.project.projectName,
-                    //         controller: projectConfig.controller,
-                    //         collector: projectConfig.collector,
-                    //         signal: projectConfig.signal
-                    //     } as ISignalItem)}>{
-                    //         testObject.vehicle.vehicleName + '-' + testObject.project.projectName + '-' + projectConfig.signal.signalName
-                    //     }</Select.Option>
-                    // })
                 })
             }
         </Select>
@@ -165,57 +155,66 @@ const UpdateItemModal: React.FC<IUpdateItemModal> = ({
  *
  * @param item
  * @param banModify
+ * @param iSignalItems
  * @constructor
  * 功能：根据不同的type返回不同的控件
  */
 export const SetDragItem = ({item, banModify}: {
-                         item: IDragItem
-                         banModify: boolean
-                     }
+                                item: IDragItem
+                                banModify: boolean
+                            }
 ) => {
     const {
-        id,
         type,
         itemConfig: {
             requestSignalId,
             requestSignals,
-            x,
-            y,
             width,
             height,
             title,
             trueLabel,
             falseLabel,
-            interval,
             unit,
             min,
             max,
-            during,
-            label
         }
     } = item as IDragItem
 
+    if (title === DEFAULT_TITLE && banModify) {
+    }
+
+
+
     return {
-        [DragItemType.LINES]: <LinesChart chartTitle={title} series={[]} xAxisData={[]}
-                                          startRequest={banModify}/>,
+        [DragItemType.LINES]: <LinesChart startRequest={banModify}
+                                          requestSignalId={requestSignalId}
+                                          requestSignals={requestSignals || []}
+                                          sourceType={DataSourceType.RANDOM}
+
+                                          title={title}
+                                          width={width}
+                                          height={height}
+        />,
         [DragItemType.NUMBER]: <NumberGaugeChart startRequest={banModify}
                                                  requestSignalId={requestSignalId}
-                                                 unit={unit || ''} title={title}
-                                                 width={width}
-                                                 height={height} interval={interval}
-                                                 min={min || 0} max={max || 100}/>,
+                                                 requestSignals={requestSignals || []}
+                                                 sourceType={DataSourceType.RANDOM}
+
+                                                 title={title}
+                                                 unit={unit || ''}
+                                                 min={min || 0} max={max || 100}
+                                                 width={width} height={height}
+        />,
         [DragItemType.BOOLEAN]: <BooleanChart startRequest={banModify}
                                               requestSignalId={requestSignalId}
-                                              trueLabel={trueLabel || '是'}
-                                              falseLabel={falseLabel || '否'} title={title}
-                                              width={width} height={height}
-                                              interval={interval}/>,
-        [DragItemType.LINE]: <LineChart label={label || '数值'}
-                                        startRequest={banModify}
-                                        requestSignalId={requestSignalId} title={title}
-                                        width={width} height={height} interval={interval}
-                                        during={during || 1}/>,
+                                              requestSignals={requestSignals || []}
+                                              sourceType={DataSourceType.RANDOM}
 
+                                              title={title}
+                                              trueLabel={trueLabel || '是'}
+                                              falseLabel={falseLabel || '否'}
+                                              width={width} height={height}
+        />,
     }[type]
 }
 

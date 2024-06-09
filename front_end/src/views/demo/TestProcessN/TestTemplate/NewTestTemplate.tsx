@@ -7,7 +7,6 @@ import {useDrop} from 'react-dnd';
 import DraggableComponent, {
     IBooleanChartExtra,
     IDraggleComponent,
-    ILineChartExtra,
     INumberChartExtra
 } from "@/views/demo/DataDisplay/DraggableComponent";
 import DropContainer from "@/views/demo/DataDisplay/DropContainer";
@@ -17,7 +16,7 @@ import TextArea from "antd/es/input/TextArea";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import GridLayout from "react-grid-layout";
 import {createTestTemplate} from "@/apis/request/template.ts";
-import {SUCCESS_CODE} from "@/constants";
+import {DEFAULT_TITLE, SUCCESS_CODE} from "@/constants";
 import {v4 as uuidv4} from 'uuid';
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
@@ -130,10 +129,6 @@ const NewTestTemplate: React.FC = () => {
                     itemConfig['min'] = (extra as INumberChartExtra).defaultMin
                     itemConfig['max'] = (extra as INumberChartExtra).defaultMax
                     break
-                case DragItemType.LINE:
-                    itemConfig['during'] = (extra as ILineChartExtra).defaultDuring
-                    itemConfig['label'] = (extra as ILineChartExtra).defaultLabel
-                    break
             }
             setDragItems([...dragItems, {
                 id,
@@ -148,6 +143,7 @@ const NewTestTemplate: React.FC = () => {
         const newTestProcessN = {...testProcessN} as ITestProcessN
 
         newTestProcessN.template = {
+            id: testProcessN?.template.id || undefined,
             name: name,
             description: description,
             createdAt: testProcessN?.template.createdAt || new Date(),
@@ -181,7 +177,7 @@ const NewTestTemplate: React.FC = () => {
     function renderADDModeInfo() {
         return <>
             <DraggableComponent type={DragItemType.BOOLEAN} draggleConfig={{
-                defaultTitle: '请编辑默认标题',
+                defaultTitle: DEFAULT_TITLE,
                 defaultX: 0,
                 defaultY: 0,
                 defaultWidth: 100,
@@ -193,7 +189,7 @@ const NewTestTemplate: React.FC = () => {
                 }
             }}/>
             <DraggableComponent type={DragItemType.NUMBER} draggleConfig={{
-                defaultTitle: '请编辑默认标题',
+                defaultTitle: DEFAULT_TITLE,
                 defaultX: 0,
                 defaultY: 0,
                 defaultWidth: 300,
@@ -205,20 +201,8 @@ const NewTestTemplate: React.FC = () => {
                     defaultMax: 100,
                 }
             }}/>
-            <DraggableComponent type={DragItemType.LINE} draggleConfig={{
-                defaultTitle: '请编辑默认标题',
-                defaultX: 0,
-                defaultY: 0,
-                defaultWidth: 400,
-                defaultHeight: 400,
-                defaultInterval: 1000,
-                extra: {
-                    defaultDuring: 10,  // 10s
-                    defaultLabel: '数值'
-                }
-            }}/>
             <DraggableComponent type={DragItemType.LINES} draggleConfig={{
-                defaultTitle: '请编辑默认标题',
+                defaultTitle: DEFAULT_TITLE,
                 defaultX: 0,
                 defaultY: 0,
                 defaultWidth: 400,
@@ -237,7 +221,6 @@ const NewTestTemplate: React.FC = () => {
             message.error('展示模式下不允许修改')
             return
         }
-
         setDragItems(dragItems.map((item) => {
             if (item.id === id) {
                 return {
@@ -276,6 +259,48 @@ const NewTestTemplate: React.FC = () => {
         }))
     }
 
+    const renderManageButton = () => {
+        return <>
+            {
+                mode === NewTestTemplateMode.ADD &&
+              <div className="dd_info" style={{zIndex: 100}}>
+                  {renderADDModeInfo()}
+                <ButtonModal dragItems={dragItems} name={name} description={description}
+                             updateDescription={setDescription}
+                             updateName={setName}
+                             mode={mode}
+                />
+              </div>
+            }
+            {
+                mode === NewTestTemplateMode.CONFIG &&
+              <Button onClick={() => {
+                  const newTestProcessN = transferToTestProcessN(dragItems)
+                  updateProcessN(testProcessN?.id!, newTestProcessN).then((res) => {
+                      if (res.code === SUCCESS_CODE) {
+                          message.success('更新成功')
+                      } else {
+                          message.error('更新失败')
+                      }
+                  })
+              }}>确定更改配置</Button>
+            }
+            {
+                mode === NewTestTemplateMode.SHOW &&
+              <>
+                <Button onClick={() => {
+                    if (!confirm(PROCESS_CLOSE_HINT)) return
+                    window.close()
+                }}>关闭</Button>
+                <Button onClick={() => {
+                    const newTestProcessN = transferToTestProcessN(dragItems)
+                    console.log(newTestProcessN)
+                }}>导出配置</Button>
+              </>
+            }
+        </>
+    }
+
     return (
         <div className='dd_container' style={{
             backgroundColor: '#f8f8f8',
@@ -293,31 +318,7 @@ const NewTestTemplate: React.FC = () => {
                         updateDragItem={updateDragItem}
                     />
                 </div>
-                {
-                    mode === NewTestTemplateMode.ADD && <div className="dd_info" style={{
-                        zIndex: 100
-                    }}>
-                        {renderADDModeInfo()}
-                    <ButtonModal dragItems={dragItems} name={name} description={description}
-                                 updateDescription={setDescription}
-                                 updateName={setName}
-                                 mode={mode}
-                    />
-                  </div>
-                }
-                {
-                    mode === NewTestTemplateMode.CONFIG &&
-                  <Button onClick={() => {
-                      const newTestProcessN = transferToTestProcessN(dragItems)
-                      updateProcessN(testProcessN?.id!, newTestProcessN).then((res) => {
-                          if (res.code === SUCCESS_CODE) {
-                              message.success('更新成功')
-                          } else {
-                              message.error('更新失败')
-                          }
-                      })
-                  }}>确定更改配置</Button>
-                }
+                {renderManageButton()}
             </div>
         </div>
     );

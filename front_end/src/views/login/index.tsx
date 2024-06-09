@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect} from 'react';
 import {Form, Input, Button, message} from 'antd';
 import './index.css';
 import {useNavigate} from 'react-router-dom';
@@ -23,7 +23,7 @@ const Login: React.FC = () => {
     useEffect(() => {
         if (userUtils.getToken()) {
             console.log("token:" + userUtils.getToken())
-            navigate('/process-management', {replace: true})
+            navigate('/physical-topology', {replace: true})
         }
     }, [])
 
@@ -97,7 +97,7 @@ const ToLogin = () => {
 
             const response = await loginApi(data)
             if (response.code === SUCCESS_CODE && response.data != null && !response.data.disabled) {
-                navigate('/process-management', {replace: true})
+                navigate('/physical-topology', {replace: true})
             } else {
 
                 if (response.data?.disabled) {
