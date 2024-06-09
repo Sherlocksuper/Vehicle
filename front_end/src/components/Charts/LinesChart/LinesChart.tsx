@@ -31,6 +31,7 @@ const LinesChart: React.FC<IChartInterface> = ({
                                                    startRequest,
                                                    requestSignals,
                                                    sourceType,
+                                                   onReceiveData,
                                                }) => {
     const chartRef = useRef<echarts.ECharts | null>()
     const lineContainerRef = useRef<HTMLDivElement>(null)
@@ -59,13 +60,14 @@ const LinesChart: React.FC<IChartInterface> = ({
                 dataRef.current.forEach((item) => {
                     item.data.push(randomData.data[item.id])
                 })
-
                 const option = {
                     xAxis: {
                         data: xAxis.current
                     },
                     series: dataRef.current
                 }
+
+                onReceiveData(randomData)
                 chartRef.current?.setOption(option)
             }, 1000)
         }

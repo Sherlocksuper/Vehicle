@@ -3,16 +3,17 @@ import './index.css'
 import {IChartInterface} from "@/components/Charts/interface.ts";
 import {generateRandomData} from "@/components/Charts";
 
-const BooleanChart: React.FC<IChartInterface> = ({
-                                                     startRequest,
-                                                     requestSignals,
-                                                     sourceType,
+const BooleanChart: React.FC<IChartInterface> = (props) => {
+    const {
+        startRequest,
+        requestSignals,
+        sourceType,
+        onReceiveData,
 
-                                                     trueLabel,
-                                                     falseLabel,
-                                                     title,
-                                                 }) => {
-
+        trueLabel,
+        falseLabel,
+        title,
+    } = props
     const timerRef = useRef<NodeJS.Timeout | null>(null)
 
     useMemo(() => {
@@ -20,6 +21,8 @@ const BooleanChart: React.FC<IChartInterface> = ({
         if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
                 const data = generateRandomData(requestSignals)
+
+                onReceiveData(data)
                 setValue(data.data[requestSignals[0].signal.id] > 0.5)
             }, 1000)
         }

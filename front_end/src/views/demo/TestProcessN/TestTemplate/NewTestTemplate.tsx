@@ -21,7 +21,7 @@ import {v4 as uuidv4} from 'uuid';
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 import {updateProcessN} from "@/apis/request/testProcessN.ts";
-import {transferToDragItems} from "@/utils";
+import {deleteUndefined, transferToDragItems} from "@/utils";
 import {PROCESS_CLOSE_HINT} from "@/constants/process_hint.ts";
 import {IHistory, IHistoryItemData, ITemplateData} from "@/apis/standard/history.ts";
 
@@ -87,6 +87,29 @@ const NewTestTemplate: React.FC = () => {
     const [name, setName] = useState("默认名称")
     const [description, setDescription] = useState("默认描述")
 
+    const [history, setHistory] = useState<IHistory>({
+        template: {
+            name: '默认模板',
+            description: '默认描述',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            itemsConfig: []
+        },
+        historyData: []
+    })
+
+    const initHistoryByTestProcessN = (testProcessN: ITestProcessN) => {
+        const newHistory = {...history} as IHistory
+        newHistory.template = testProcessN.template
+        testProcessN.template.itemsConfig.forEach((item) => {
+            const templateData: ITemplateData = {
+                templateItemId: item.id!,
+                data: []
+            }
+            newHistory.historyData.push(templateData)
+        })
+        setHistory(newHistory)
+    }
 
     useEffect(() => {
         const search = window.location.search
@@ -95,6 +118,9 @@ const NewTestTemplate: React.FC = () => {
 
         if (testProcessNRecord && params.get('model')) {
             const testProcess = JSON.parse(testProcessNRecord) as ITestProcessN
+            initHistoryByTestProcessN(testProcess)
+
+
             setTestProcessN(testProcess)
 
 
@@ -144,7 +170,6 @@ const NewTestTemplate: React.FC = () => {
 
     const transferToTestProcessN = (dragItems: IDragItem[]): ITestProcessN => {
         const newTestProcessN = {...testProcessN} as ITestProcessN
-
         newTestProcessN.template = {
             id: testProcessN?.template.id || undefined,
             name: name,
@@ -159,17 +184,6 @@ const NewTestTemplate: React.FC = () => {
                 }
                 return newItem
             })
-        }
-
-        //递归delete所有 值为undefined或者null的属性
-        function deleteUndefined(obj: any) {
-            for (let key in obj) {
-                if (obj[key] === undefined || obj[key] === null) {
-                    delete obj[key]
-                } else if (typeof obj[key] === 'object') {
-                    deleteUndefined(obj[key])
-                }
-            }
         }
 
         deleteUndefined(newTestProcessN)
@@ -262,49 +276,26 @@ const NewTestTemplate: React.FC = () => {
         }))
     }
 
-    const downCurrentDataFile = () => {
-        const result = transferToTestProcessN(dragItems)
-
-        const historyData: ITemplateData[] = result.template.itemsConfig.map((item) => {
-
-            const data = Array.from({length: 3000 * 60 * 6}, (v, k) => {
-                return {
-                    xAxis: new Date().toString(),
-                    data: {
-                        [item.id!]: Math.random()
-                    }
-                } as IHistoryItemData
-            })
-
-            return {
-                templateItemId: item.id,
-                data: data
-            } as ITemplateData
-        })
-
-        let historyResult: IHistory = {
-            template: {
-                id: result.template.id,
-                name: result.template.name,
-                description: result.template.description,
-                createdAt: result.template.createdAt,
-                updatedAt: result.template.updatedAt,
-                itemsConfig: []
-            },
-            historyData: historyData
-        }
-
-
-        let file = new Blob([JSON.stringify(historyResult)], {type: 'application/json'})
-        let a = document.createElement('a')
-        let url = URL.createObjectURL(file)
-        a.href = url
-        a.download = 'currentData.json'
-        a.click()
-        window.URL.revokeObjectURL(url)
-    }
-
     const renderManageButton = () => {
+        const downCurrentDataFile = () => {
+
+            const webWorker = new Worker(new URL('@/worker/generateResult.woker.ts', import.meta.url), {type: 'module'})
+            webWorker.postMessage(history)
+
+            webWorker.onmessage = (event) => {
+                const blob = event.data as Blob
+                const url = window.URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = 'data.json'
+                a.click()
+                window.URL.revokeObjectURL(url)
+
+                setOnload(false)
+            }
+        }
+        const [onload, setOnload] = useState(false)
+
         return <div style={{
             zIndex: 100,
             display: "flex",
@@ -349,11 +340,22 @@ const NewTestTemplate: React.FC = () => {
             {
                 mode === NewTestTemplateMode.SHOW &&
               <Button onClick={() => {
-                  const newTestProcessN = transferToTestProcessN(dragItems)
+                  setOnload(true)
                   downCurrentDataFile()
-              }}>导出当前记录</Button>
+              }} loading={onload}>导出当前记录</Button>
             }
         </div>
+    }
+
+    const onReceiveData = (templateId: string, data: IHistoryItemData) => {
+        const newHistory = {...history} as IHistory
+        for (let i = 0; i < history.historyData.length; i++) {
+            if (newHistory.historyData[i].templateItemId === templateId) {
+                newHistory.historyData[i].data.push(data)
+                break
+            }
+        }
+        setHistory(newHistory)
     }
 
     return (
@@ -369,6 +371,7 @@ const NewTestTemplate: React.FC = () => {
 
                         onLayoutChange={updateAllByLayout}
                         updateDragItem={updateDragItem}
+                        onReceiveData={onReceiveData}
                     />
                 </div>
                 {renderManageButton()}
@@ -388,9 +391,8 @@ interface IButtonModalProps {
     mode: NewTestTemplateMode
 }
 
-const ButtonModal: FC<IButtonModalProps> = ({
-                                                dragItems, name, description, updateName, updateDescription, mode
-                                            }) => {
+const ButtonModal: FC<IButtonModalProps> = (props) => {
+    const {dragItems, name, description, updateName, updateDescription, mode} = props
     const [visible, setVisible] = useState(false);
 
     const newTemplate = (template: ITemplate) => {

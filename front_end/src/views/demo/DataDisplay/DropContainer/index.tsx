@@ -11,14 +11,16 @@ import {Input, Modal, Select} from "antd";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {IDragItem, ISignalItem, NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
+import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 const DropContainer: React.FC<{
     banModify: boolean,
     items: IDragItem[],
     onLayoutChange: (layout: GridLayout.Layout[]) => void,
     updateDragItem: (id: string, itemConfig: IDragItem['itemConfig']) => void,
+    onReceiveData: (templateId: string, data: IHistoryItemData) => void
 
-}> = ({banModify, items, onLayoutChange, updateDragItem}) => {
+}> = ({banModify, items, onLayoutChange, updateDragItem, onReceiveData}) => {
 
 
     const search = window.location.search
@@ -28,7 +30,6 @@ const DropContainer: React.FC<{
     let testProcessN: ITestProcessN | null = null
 
     if (testProcessNRecord && mode) {
-        console.log(testProcessNRecord)
         testProcessN = (JSON.parse(testProcessNRecord) as ITestProcessN)
     }
 
@@ -58,7 +59,7 @@ const DropContainer: React.FC<{
                                          testProcessN={testProcessN}
                                          updateDragItem={updateDragItem}
                         />
-                        <SetDragItem item={item} banModify={banModify}/>
+                        <SetDragItem item={item} banModify={banModify} onReceiveData={onReceiveData}/>
                     </div>
                 })
             }
@@ -74,13 +75,15 @@ interface IUpdateItemModal {
     updateDragItem: (id: string, itemConfig: IDragItem['itemConfig']) => void
 }
 
-const UpdateItemModal: React.FC<IUpdateItemModal> = ({
-                                                         item,
-                                                         open,
-                                                         setOpenItemId,
-                                                         testProcessN,
-                                                         updateDragItem
-                                                     }) => {
+const UpdateItemModal: React.FC<IUpdateItemModal> = (props) => {
+    const {
+        item,
+        open,
+        setOpenItemId,
+        testProcessN,
+        updateDragItem
+    } = props
+
     const getDefaultValue = (dragItem: IDragItem) => {
         return dragItem.itemConfig.requestSignals.map((signal) => {
             return JSON.stringify({
@@ -155,11 +158,11 @@ const UpdateItemModal: React.FC<IUpdateItemModal> = ({
  * @constructor
  * 功能：根据不同的type返回不同的控件
  */
-export const SetDragItem = ({item, banModify}: {
-                                item: IDragItem
-                                banModify: boolean
-                            }
-) => {
+export const SetDragItem = ({item, banModify, onReceiveData}: {
+    item: IDragItem,
+    banModify: boolean,
+    onReceiveData: (templateId: string, data: IHistoryItemData) => void
+}) => {
     const {
         type,
         itemConfig: {
@@ -177,13 +180,14 @@ export const SetDragItem = ({item, banModify}: {
     } = item as IDragItem
 
 
-
-
     return {
         [DragItemType.LINES]: <LinesChart startRequest={banModify}
                                           requestSignalId={requestSignalId}
                                           requestSignals={requestSignals || []}
                                           sourceType={DataSourceType.RANDOM}
+                                          onReceiveData={(data:IHistoryItemData) => {
+                                                onReceiveData(item.id, data)
+                                          }}
 
                                           title={title}
                                           width={width}
@@ -193,6 +197,9 @@ export const SetDragItem = ({item, banModify}: {
                                                  requestSignalId={requestSignalId}
                                                  requestSignals={requestSignals || []}
                                                  sourceType={DataSourceType.RANDOM}
+                                                 onReceiveData={(data:IHistoryItemData) => {
+                                                     onReceiveData(item.id, data)
+                                                 }}
 
                                                  title={title}
                                                  unit={unit || ''}
@@ -203,6 +210,9 @@ export const SetDragItem = ({item, banModify}: {
                                               requestSignalId={requestSignalId}
                                               requestSignals={requestSignals || []}
                                               sourceType={DataSourceType.RANDOM}
+                                              onReceiveData={(data:IHistoryItemData) => {
+                                                  onReceiveData(item.id, data)
+                                              }}
 
                                               title={title}
                                               trueLabel={trueLabel || '是'}

@@ -1,5 +1,6 @@
-import {ITemplate} from "@/apis/standard/template.ts";
+import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
 import {IDragItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 
 export const debounce = (targetFunction: (...args: any[]) => void, delay?: number) => {
     let timer: any = null;
@@ -31,7 +32,6 @@ export const throttle = (fn: (...args: any[]) => void, delay: number) => {
 }//防抖
 
 export const hasDuplicate = (list: string[]) => {
-    console.log("检查 list:" + list)
     return new Set(list).size !== list.length;
 }
 
@@ -40,6 +40,17 @@ export async function sleep(time: number) {
         setTimeout(res, time)
     })
 }
+
+export function deleteUndefined(obj: any) {
+    for (let key in obj) {
+        if (obj[key] === undefined || obj[key] === null) {
+            delete obj[key]
+        } else if (typeof obj[key] === 'object') {
+            deleteUndefined(obj[key])
+        }
+    }
+}
+
 
 export function transferToDragItems(template: ITemplate): IDragItem[] {
     const dragItems = template.itemsConfig.map((item) => {
@@ -66,7 +77,5 @@ export function transferToDragItems(template: ITemplate): IDragItem[] {
         }
         return newItem
     })
-    console.log("转换为DragItems")
-    console.log(JSON.stringify(dragItems))
     return dragItems
 }

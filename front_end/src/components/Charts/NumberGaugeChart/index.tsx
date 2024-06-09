@@ -1,28 +1,34 @@
 import * as echarts from "echarts"
 import {useEffect, useMemo, useRef, useState} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
+import {generateRandomData} from "@/components/Charts";
 
-const NumberGaugeChart: React.FC<IChartInterface> = ({
-                                                         startRequest,
-                                                         requestSignals,
-                                                         sourceType,
-
-                                                         unit,
-                                                         title,
-                                                         width,
-                                                         height,
-                                                     }) => {
+const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
 
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const [value, setValue] = useState(0)
     const chartRef = useRef<echarts.ECharts | null>()
     const numberContainerRef = useRef<HTMLDivElement | null>(null)
 
+    const {
+        startRequest,
+        requestSignals,
+        sourceType,
+        onReceiveData,
+
+        unit,
+        title,
+        width,
+        height,
+    } = props
+
     useMemo(() => {
         timerRef.current && clearInterval(timerRef.current)
         if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
-                setValue(Number((Math.random() * 100).toFixed(2)))
+                const data = generateRandomData(requestSignals)
+                onReceiveData(data)
+                setValue(data.data[requestSignals[0].signal.id])
             }, 1000)
         }
     }, [startRequest, requestSignals])

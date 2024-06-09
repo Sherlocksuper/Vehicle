@@ -1,6 +1,9 @@
 import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
 import {IRandomData} from "@/components/Charts/interface.ts";
 
+/**
+ * @param requestSignals
+ */
 export const generateRandomData = (requestSignals: ISignalItem[]): IRandomData => {
     const time = new Date().toString()
 

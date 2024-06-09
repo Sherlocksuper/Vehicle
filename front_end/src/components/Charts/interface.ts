@@ -1,4 +1,5 @@
 import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 export enum DataSourceType {
     NETWORK = 'network',
@@ -10,6 +11,7 @@ export interface IChartInterface {
     startRequest: boolean
     sourceType?: DataSourceType
     requestSignals: ISignalItem[]
+    onReceiveData: (data: IHistoryItemData) => void
 
     requestSignalId: number | null
     width: number
