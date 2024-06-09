@@ -2,6 +2,7 @@ import * as echarts from "echarts"
 import {useEffect, useMemo, useRef, useState} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
 import {generateRandomData} from "@/components/Charts";
+import {TEST_INTERNAL} from "@/constants";
 
 const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
 
@@ -29,7 +30,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
                 const data = generateRandomData(requestSignals)
                 onReceiveData(data)
                 setValue(data.data[requestSignals[0].signal.id])
-            }, 1000)
+            }, TEST_INTERNAL)
         }
     }, [startRequest, requestSignals])
 

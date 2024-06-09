@@ -2,6 +2,7 @@ import {useMemo, useRef, useState} from 'react'
 import './index.css'
 import {IChartInterface} from "@/components/Charts/interface.ts";
 import {generateRandomData} from "@/components/Charts";
+import {TEST_INTERNAL} from "@/constants";
 
 const BooleanChart: React.FC<IChartInterface> = (props) => {
     const {
@@ -24,7 +25,7 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
 
                 onReceiveData(data)
                 setValue(data.data[requestSignals[0].signal.id] > 0.5)
-            }, 1000)
+            }, TEST_INTERNAL)
         }
     }, [startRequest, requestSignals])
 

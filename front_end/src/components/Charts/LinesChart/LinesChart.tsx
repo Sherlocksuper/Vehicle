@@ -2,6 +2,7 @@ import * as echarts from "echarts"
 import {useEffect, useMemo, useRef} from "react"
 import {IChartInterface, IRandomData} from "@/components/Charts/interface.ts";
 import {generateRandomData} from "@/components/Charts";
+import {TEST_INTERNAL} from "@/constants";
 
 interface ISeries {
     id: number
@@ -69,7 +70,7 @@ const LinesChart: React.FC<IChartInterface> = ({
 
                 onReceiveData(randomData)
                 chartRef.current?.setOption(option)
-            }, 1000)
+            }, TEST_INTERNAL)
         }
         return () => {
             timerRef.current && clearInterval(timerRef.current)
