@@ -6,7 +6,8 @@ import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {deleteProcessN, getProcessNList} from "@/apis/request/testProcessN.ts";
 import {DELETE, SUCCESS_CODE} from "@/constants";
 import ProcessNTree from "@/views/demo/TestProcessN/ProcessNTree.tsx";
-import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import NewTestTemplate, {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {DELETE_CONFIRM_HINT, PROCESS_CONFIG_HINT} from "@/constants/process_hint.ts";
 
 const SEE_DETAIL = "查看详情"
 const DOWN = "下发"
@@ -62,20 +63,19 @@ const TestProcessN: React.FC = () => {
 
     const ActionButtons = (record: ITestProcessN) => {
         const testProcessNRecord = JSON.stringify(record)
-        const model = NewTestTemplateMode.SHOW
 
         return (
             <Space>
                 <Button type="link"
-                        href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${model}`}
+                        href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.CONFIG}`}
                         target={"_blank"}>前往配置采集关系</Button>
                 <Button type={"link"} onClick={() => {
-                    if (!confirm(PROCESS_CONFIG_HINT)) return
-                    window.open(`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${model}`)
+                    if (!confirm("" + PROCESS_CONFIG_HINT)) return
+                    window.open(`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.SHOW}`)
                 }}>{DOWN}</Button>
                 <ProcessNTree record={record}/>
                 <Button type="primary" danger={true} onClick={() => {
-                    if (prompt("请输入 delete 来确认删除") !== "delete") return
+                    if (prompt(DELETE_CONFIRM_HINT) !== "delete") return
                     deleteProcessN(record.id!).then(res => {
                         if (res.code !== SUCCESS_CODE) {
                             message.error(res.message);

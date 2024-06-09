@@ -11,17 +11,14 @@ import {Input, Modal, Select} from "antd";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {IDragItem, ISignalItem, NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
-import {DEFAULT_TITLE} from "@/constants";
 
 const DropContainer: React.FC<{
     banModify: boolean,
     items: IDragItem[],
-    selectFunc: Function,
-    selectedItemId: string | null,
     onLayoutChange: (layout: GridLayout.Layout[]) => void,
     updateDragItem: (id: string, itemConfig: IDragItem['itemConfig']) => void,
 
-}> = ({banModify, items, selectFunc, onLayoutChange, updateDragItem}) => {
+}> = ({banModify, items, onLayoutChange, updateDragItem}) => {
 
 
     const search = window.location.search
@@ -37,7 +34,7 @@ const DropContainer: React.FC<{
 
     const [openItemId, setOpenItemId] = React.useState<string | null>(null);
 
-    return <div className="dc_container" onClick={() => selectFunc(null)}>
+    return <div className="dc_container">
         <GridLayout cols={30} rowHeight={40} width={1500} className="layout" isDraggable={!banModify}
                     isResizable={!banModify}
                     onLayoutChange={onLayoutChange}
@@ -86,7 +83,6 @@ const UpdateItemModal: React.FC<IUpdateItemModal> = ({
                                                      }) => {
     const getDefaultValue = (dragItem: IDragItem) => {
         return dragItem.itemConfig.requestSignals.map((signal) => {
-            console.log("extra")
             return JSON.stringify({
                 vehicleName: signal.vehicleName,
                 projectName: signal.projectName,
@@ -180,8 +176,6 @@ export const SetDragItem = ({item, banModify}: {
         }
     } = item as IDragItem
 
-    if (title === DEFAULT_TITLE && banModify) {
-    }
 
 
 

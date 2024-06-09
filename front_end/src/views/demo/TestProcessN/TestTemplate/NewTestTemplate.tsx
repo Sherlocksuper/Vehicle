@@ -22,6 +22,8 @@ import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 import {updateProcessN} from "@/apis/request/testProcessN.ts";
 import {transferToDragItems} from "@/utils";
+import {PROCESS_CLOSE_HINT} from "@/constants/process_hint.ts";
+import {IHistory, IHistoryItemData, ITemplateData} from "@/apis/standard/history.ts";
 
 /**
  * 新建template的modal
@@ -76,13 +78,14 @@ export interface ISignalItem {
 }
 
 const NewTestTemplate: React.FC = () => {
+    const [mode, setMode] = useState<NewTestTemplateMode>(NewTestTemplateMode.ADD)
+    const [testProcessN, setTestProcessN] = useState<ITestProcessN | null>(null)
 
     const ref = useRef<HTMLDivElement>(null)
     const [dragItems, setDragItems] = useState<IDragItem[]>([])
-    const [mode, setMode] = useState<NewTestTemplateMode>(NewTestTemplateMode.ADD)
+
     const [name, setName] = useState("默认名称")
     const [description, setDescription] = useState("默认描述")
-    const [testProcessN, setTestProcessN] = useState<ITestProcessN | null>(null)
 
 
     useEffect(() => {
@@ -259,11 +262,62 @@ const NewTestTemplate: React.FC = () => {
         }))
     }
 
+    const downCurrentDataFile = () => {
+        const result = transferToTestProcessN(dragItems)
+
+        const historyData: ITemplateData[] = result.template.itemsConfig.map((item) => {
+
+            const data = Array.from({length: 3000 * 60 * 6}, (v, k) => {
+                return {
+                    xAxis: new Date().toString(),
+                    data: {
+                        [item.id!]: Math.random()
+                    }
+                } as IHistoryItemData
+            })
+
+            return {
+                templateItemId: item.id,
+                data: data
+            } as ITemplateData
+        })
+
+        let historyResult: IHistory = {
+            template: {
+                id: result.template.id,
+                name: result.template.name,
+                description: result.template.description,
+                createdAt: result.template.createdAt,
+                updatedAt: result.template.updatedAt,
+                itemsConfig: []
+            },
+            historyData: historyData
+        }
+
+
+        let file = new Blob([JSON.stringify(historyResult)], {type: 'application/json'})
+        let a = document.createElement('a')
+        let url = URL.createObjectURL(file)
+        a.href = url
+        a.download = 'currentData.json'
+        a.click()
+        window.URL.revokeObjectURL(url)
+    }
+
     const renderManageButton = () => {
-        return <>
+        return <div style={{
+            zIndex: 100,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 10,
+            position: "absolute",
+            top: 0,
+            right: 0,
+        }}>
             {
                 mode === NewTestTemplateMode.ADD &&
-              <div className="dd_info" style={{zIndex: 100}}>
+              <div className="dd_info">
                   {renderADDModeInfo()}
                 <ButtonModal dragItems={dragItems} name={name} description={description}
                              updateDescription={setDescription}
@@ -287,18 +341,19 @@ const NewTestTemplate: React.FC = () => {
             }
             {
                 mode === NewTestTemplateMode.SHOW &&
-              <>
-                <Button onClick={() => {
-                    if (!confirm(PROCESS_CLOSE_HINT)) return
-                    window.close()
-                }}>关闭</Button>
-                <Button onClick={() => {
-                    const newTestProcessN = transferToTestProcessN(dragItems)
-                    console.log(newTestProcessN)
-                }}>导出配置</Button>
-              </>
+              <Button onClick={() => {
+                  if (!confirm(PROCESS_CLOSE_HINT)) return
+                  window.close()
+              }}>关闭</Button>
             }
-        </>
+            {
+                mode === NewTestTemplateMode.SHOW &&
+              <Button onClick={() => {
+                  const newTestProcessN = transferToTestProcessN(dragItems)
+                  downCurrentDataFile()
+              }}>导出当前记录</Button>
+            }
+        </div>
     }
 
     return (
@@ -310,10 +365,8 @@ const NewTestTemplate: React.FC = () => {
                 <div className="dd_drop_container" ref={ref}>
                     <DropContainer
                         banModify={mode === NewTestTemplateMode.SHOW || mode === NewTestTemplateMode.CONFIG}
-                        selectedItemId={null}
-                        selectFunc={() => {
-                        }}
                         items={dragItems}
+
                         onLayoutChange={updateAllByLayout}
                         updateDragItem={updateDragItem}
                     />
@@ -378,10 +431,6 @@ const ButtonModal: FC<IButtonModalProps> = ({
         }
     }
 
-    const showModal = () => {
-        setVisible(true);
-    };
-
     const handleOk = () => {
         if (name === '' || description === '') {
             message.error('请输入模板名称和描述')
@@ -396,15 +445,11 @@ const ButtonModal: FC<IButtonModalProps> = ({
         setVisible(false);
     };
 
-    const handleCancel = () => {
-        setVisible(false);
-    };
-
     return (
         <>
             {
                 mode !== NewTestTemplateMode.SHOW &&
-              <Button type="primary" onClick={showModal}>
+              <Button type="primary" onClick={() => setVisible(true)}>
                 确认
               </Button>
             }
@@ -414,7 +459,7 @@ const ButtonModal: FC<IButtonModalProps> = ({
                 title="请输入模板名称和描述"
                 open={visible}
                 onOk={handleOk}
-                onCancel={handleCancel}
+                onCancel={() => setVisible(false)}
             >
                 <Input placeholder="请输入该模板名称" value={name} onChange={(e) => {
                     updateName(e.target.value)
