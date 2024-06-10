@@ -24,6 +24,7 @@ import {updateProcessN} from "@/apis/request/testProcessN.ts";
 import {deleteUndefined, transferToDragItems} from "@/utils";
 import {PROCESS_CLOSE_HINT} from "@/constants/process_hint.ts";
 import {IHistory, IHistoryItemData, ITemplateData} from "@/apis/standard/history.ts";
+import {getFileToHistoryWorker, getHistoryToFileWorker} from "@/worker/app.ts";
 
 /**
  * 新建template的modal
@@ -77,7 +78,7 @@ export interface ISignalItem {
     signal: ISignalsConfigItem
 }
 
-const NewTestTemplate: React.FC = () => {
+const ConfigTestTemplate: React.FC = () => {
     const [mode, setMode] = useState<NewTestTemplateMode>(NewTestTemplateMode.ADD)
     const [testProcessN, setTestProcessN] = useState<ITestProcessN | null>(null)
 
@@ -88,6 +89,8 @@ const NewTestTemplate: React.FC = () => {
     const [description, setDescription] = useState("默认描述")
 
     const [history, setHistory] = useState<IHistory>({
+        startTime: Date.now(),
+        endTime: Date.now(),
         template: {
             name: '默认模板',
             description: '默认描述',
@@ -279,12 +282,12 @@ const NewTestTemplate: React.FC = () => {
     const renderManageButton = () => {
         const downCurrentDataFile = () => {
 
-            const webWorker = new Worker(new URL('@/worker/generateResult.woker.ts', import.meta.url), {type: 'module'})
+            const webWorker = getHistoryToFileWorker()
             webWorker.postMessage(history)
 
             webWorker.onmessage = (event) => {
-                const blob = event.data as Blob
-                const url = window.URL.createObjectURL(blob)
+                const file = event.data as File
+                const url = window.URL.createObjectURL(file)
                 const a = document.createElement('a')
                 a.href = url
                 a.download = 'data.json'
@@ -380,7 +383,7 @@ const NewTestTemplate: React.FC = () => {
     );
 };
 
-export default NewTestTemplate;
+export default ConfigTestTemplate;
 
 interface IButtonModalProps {
     dragItems: IDragItem[]

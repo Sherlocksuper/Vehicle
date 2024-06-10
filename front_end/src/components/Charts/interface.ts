@@ -1,4 +1,4 @@
-import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 export enum DataSourceType {
@@ -12,6 +12,7 @@ export interface IChartInterface {
     sourceType?: DataSourceType
     requestSignals: ISignalItem[]
     onReceiveData: (data: IHistoryItemData) => void
+    historyData?: IHistoryItemData[]
 
     requestSignalId: number | null
     width: number
@@ -24,11 +25,4 @@ export interface IChartInterface {
     min?: number
     max?: number
     label?: string
-}
-
-export interface IRandomData {
-    xAxis: string
-    data: {
-        [key: number]: number
-    }
 }

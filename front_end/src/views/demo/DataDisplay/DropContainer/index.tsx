@@ -9,9 +9,13 @@ import React from "react";
 import LinesChart from "@/components/Charts/LinesChart/LinesChart.tsx";
 import {Input, Modal, Select} from "antd";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
-import {IDragItem, ISignalItem, NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {
+    IDragItem,
+    ISignalItem,
+    NewTestTemplateMode
+} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
-import {IHistoryItemData} from "@/apis/standard/history.ts";
+import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
 
 const DropContainer: React.FC<{
     banModify: boolean,
@@ -19,8 +23,9 @@ const DropContainer: React.FC<{
     onLayoutChange: (layout: GridLayout.Layout[]) => void,
     updateDragItem: (id: string, itemConfig: IDragItem['itemConfig']) => void,
     onReceiveData: (templateId: string, data: IHistoryItemData) => void
+    fileHistory?: IHistory
 
-}> = ({banModify, items, onLayoutChange, updateDragItem, onReceiveData}) => {
+}> = ({banModify, items, onLayoutChange, updateDragItem, onReceiveData, fileHistory}) => {
 
 
     const search = window.location.search
@@ -59,7 +64,8 @@ const DropContainer: React.FC<{
                                          testProcessN={testProcessN}
                                          updateDragItem={updateDragItem}
                         />
-                        <SetDragItem item={item} banModify={banModify} onReceiveData={onReceiveData}/>
+                        <SetDragItem item={item} banModify={banModify} onReceiveData={onReceiveData}
+                                     fileHistory={fileHistory}/>
                     </div>
                 })
             }
@@ -154,14 +160,16 @@ const UpdateItemModal: React.FC<IUpdateItemModal> = (props) => {
  *
  * @param item
  * @param banModify
- * @param iSignalItems
+ * @param onReceiveData
+ * @param fileHistory
  * @constructor
  * 功能：根据不同的type返回不同的控件
  */
-export const SetDragItem = ({item, banModify, onReceiveData}: {
+export const SetDragItem = ({item, banModify, onReceiveData, fileHistory}: {
     item: IDragItem,
     banModify: boolean,
-    onReceiveData: (templateId: string, data: IHistoryItemData) => void
+    onReceiveData: (templateId: string, data: IHistoryItemData) => void,
+    fileHistory?: IHistory
 }) => {
     const {
         type,
@@ -179,25 +187,27 @@ export const SetDragItem = ({item, banModify, onReceiveData}: {
         }
     } = item as IDragItem
 
+    const historyData: IHistoryItemData[] | undefined = fileHistory?.historyData.find((templateItem) => templateItem.templateItemId === item.id)?.data || undefined
 
     return {
         [DragItemType.LINES]: <LinesChart startRequest={banModify}
                                           requestSignalId={requestSignalId}
                                           requestSignals={requestSignals || []}
                                           sourceType={DataSourceType.RANDOM}
-                                          onReceiveData={(data:IHistoryItemData) => {
-                                                onReceiveData(item.id, data)
+                                          onReceiveData={(data: IHistoryItemData) => {
+                                              onReceiveData(item.id, data)
                                           }}
 
                                           title={title}
                                           width={width}
                                           height={height}
+                                          historyData={historyData}
         />,
         [DragItemType.NUMBER]: <NumberGaugeChart startRequest={banModify}
                                                  requestSignalId={requestSignalId}
                                                  requestSignals={requestSignals || []}
                                                  sourceType={DataSourceType.RANDOM}
-                                                 onReceiveData={(data:IHistoryItemData) => {
+                                                 onReceiveData={(data: IHistoryItemData) => {
                                                      onReceiveData(item.id, data)
                                                  }}
 
@@ -205,12 +215,13 @@ export const SetDragItem = ({item, banModify, onReceiveData}: {
                                                  unit={unit || ''}
                                                  min={min || 0} max={max || 100}
                                                  width={width} height={height}
+                                                 historyData={historyData}
         />,
         [DragItemType.BOOLEAN]: <BooleanChart startRequest={banModify}
                                               requestSignalId={requestSignalId}
                                               requestSignals={requestSignals || []}
                                               sourceType={DataSourceType.RANDOM}
-                                              onReceiveData={(data:IHistoryItemData) => {
+                                              onReceiveData={(data: IHistoryItemData) => {
                                                   onReceiveData(item.id, data)
                                               }}
 
@@ -218,6 +229,7 @@ export const SetDragItem = ({item, banModify, onReceiveData}: {
                                               trueLabel={trueLabel || '是'}
                                               falseLabel={falseLabel || '否'}
                                               width={width} height={height}
+                                              historyData={historyData}
         />,
     }[type]
 }

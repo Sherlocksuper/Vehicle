@@ -16,6 +16,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
         requestSignals,
         sourceType,
         onReceiveData,
+        historyData,
 
         unit,
         title,
@@ -23,7 +24,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
         height,
     } = props
 
-    useMemo(() => {
+    const mockRandomData = () => {
         timerRef.current && clearInterval(timerRef.current)
         if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
@@ -32,6 +33,16 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
                 setValue(data.data[requestSignals[0].signal.id])
             }, TEST_INTERNAL)
         }
+    }
+
+    const mockHistoryData = () => {
+
+
+    }
+
+
+    useMemo(() => {
+        if (!historyData) mockRandomData()
     }, [startRequest, requestSignals])
 
     useEffect(() => {

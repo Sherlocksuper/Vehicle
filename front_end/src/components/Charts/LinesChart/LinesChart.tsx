@@ -1,6 +1,6 @@
 import * as echarts from "echarts"
 import {useEffect, useMemo, useRef} from "react"
-import {IChartInterface, IRandomData} from "@/components/Charts/interface.ts";
+import {IChartInterface } from "@/components/Charts/interface.ts";
 import {generateRandomData} from "@/components/Charts";
 import {TEST_INTERNAL} from "@/constants";
 
@@ -15,9 +15,6 @@ interface ISeries {
 
 /**
  * 生成格式的random数据
- * @param startRequest
- * @param requestSignals
- * @param sourceType
  * @returns
  * 格式：{
  *     xAxis: '时间',
@@ -27,13 +24,17 @@ interface ISeries {
  *     '信号3': 3,
  * }
  * data key的格式根据ISignalItem的id来决定
+ * @param props
  */
-const LinesChart: React.FC<IChartInterface> = ({
-                                                   startRequest,
-                                                   requestSignals,
-                                                   sourceType,
-                                                   onReceiveData,
-                                               }) => {
+const LinesChart: React.FC<IChartInterface> = (props) => {
+    const {
+        startRequest,
+        requestSignals,
+        sourceType,
+        onReceiveData,
+        historyData
+    } = props
+
     const chartRef = useRef<echarts.ECharts | null>()
     const lineContainerRef = useRef<HTMLDivElement>(null)
 
@@ -51,15 +52,15 @@ const LinesChart: React.FC<IChartInterface> = ({
         }
     }))
 
-
-    useMemo(() => {
-        if (requestSignals.length > 0) {
+    const mockRandomData = () => {
+        timerRef.current && clearInterval(timerRef.current)
+        if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
-                const randomData: IRandomData = generateRandomData(requestSignals)
+                const data = generateRandomData(requestSignals)
 
-                xAxis.current.push(randomData.xAxis)
+                xAxis.current.push(data.xAxis)
                 dataRef.current.forEach((item) => {
-                    item.data.push(randomData.data[item.id])
+                    item.data.push(data.data[item.id])
                 })
                 const option = {
                     xAxis: {
@@ -68,13 +69,21 @@ const LinesChart: React.FC<IChartInterface> = ({
                     series: dataRef.current
                 }
 
-                onReceiveData(randomData)
+                onReceiveData(data)
                 chartRef.current?.setOption(option)
             }, TEST_INTERNAL)
         }
         return () => {
             timerRef.current && clearInterval(timerRef.current)
         }
+    }
+
+    const mockHistoryData = () => {
+
+    }
+
+    useMemo(() => {
+        if (!historyData) mockRandomData()
     }, [requestSignals.length])
 
     useEffect(() => {

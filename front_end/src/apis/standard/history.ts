@@ -10,6 +10,8 @@ import {ITemplate} from "@/apis/standard/template.ts";
  *  -> json数据中包含时间和数据，即RandomData
  */
 export interface IHistory {
+    startTime: number
+    endTime: number
     template: ITemplate
     historyData: ITemplateData[]
 }

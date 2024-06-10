@@ -10,6 +10,7 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
         requestSignals,
         sourceType,
         onReceiveData,
+        historyData,
 
         trueLabel,
         falseLabel,
@@ -17,7 +18,7 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
     } = props
     const timerRef = useRef<NodeJS.Timeout | null>(null)
 
-    useMemo(() => {
+    const mockRandomData = () => {
         timerRef.current && clearInterval(timerRef.current)
         if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
@@ -27,6 +28,16 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
                 setValue(data.data[requestSignals[0].signal.id] > 0.5)
             }, TEST_INTERNAL)
         }
+    }
+
+    const mockHistoryData = () => {
+        let count = 0
+        //正向计时器
+
+    }
+
+    useMemo(() => {
+        if (!historyData) mockRandomData()
     }, [startRequest, requestSignals])
 
     const [value, setValue] = useState(false)

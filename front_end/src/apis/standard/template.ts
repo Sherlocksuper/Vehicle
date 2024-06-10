@@ -1,5 +1,5 @@
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
-import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 
 export interface ITemplate {
     id?: number

@@ -3,7 +3,7 @@ import {Button, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {ITemplate} from "@/apis/standard/template.ts";
 import {getTestTemplateList} from "@/apis/request/template.ts";
-import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 
 const columns: TableProps<ITemplate>['columns'] = [

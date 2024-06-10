@@ -6,7 +6,7 @@ import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {deleteProcessN, getProcessNList} from "@/apis/request/testProcessN.ts";
 import {DELETE, SUCCESS_CODE} from "@/constants";
 import ProcessNTree from "@/views/demo/TestProcessN/ProcessNTree.tsx";
-import NewTestTemplate, {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import ConfigTestTemplate, {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {DELETE_CONFIRM_HINT, PROCESS_CONFIG_HINT} from "@/constants/process_hint.ts";
 
 const SEE_DETAIL = "查看详情"

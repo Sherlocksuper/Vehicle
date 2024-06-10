@@ -1,10 +1,10 @@
-import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
-import {IRandomData} from "@/components/Charts/interface.ts";
+import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
+import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 /**
  * @param requestSignals
  */
-export const generateRandomData = (requestSignals: ISignalItem[]): IRandomData => {
+export const generateRandomData = (requestSignals: ISignalItem[]): IHistoryItemData => {
     const time = new Date().toString()
 
     //循环根据id生成数据

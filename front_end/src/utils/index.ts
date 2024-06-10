@@ -1,7 +1,14 @@
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
-import {IDragItem} from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import {IDragItem} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 
+
+/**
+ * @param targetFunction
+ * @param delay
+ * 防抖
+ * 功能：防抖
+ */
 export const debounce = (targetFunction: (...args: any[]) => void, delay?: number) => {
     let timer: any = null;
     if (!delay) delay = 500;
@@ -51,7 +58,6 @@ export function deleteUndefined(obj: any) {
     }
 }
 
-
 export function transferToDragItems(template: ITemplate): IDragItem[] {
     const dragItems = template.itemsConfig.map((item) => {
         const newItem: IDragItem = {
@@ -78,4 +84,30 @@ export function transferToDragItems(template: ITemplate): IDragItem[] {
         return newItem
     })
     return dragItems
+}
+
+/**
+ * 传入时间戳
+ * 返回格式化后的时间字符串
+ * YYYY-MM-DD HH:mm:ss
+ */
+export function formatTime(timeStamp: number) {
+    const date = new Date(timeStamp)
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+}
+
+/**
+ * 传入number类型的文件带线啊哦
+ */
+
+export function formatFileSize(size: number) {
+    if (size < 1024) {
+        return size + 'B'
+    } else if (size < 1024 * 1024) {
+        return (size / 1024).toFixed(2) + 'KB'
+    } else if (size < 1024 * 1024 * 1024) {
+        return (size / 1024 / 1024).toFixed(2) + 'MB'
+    } else {
+        return (size / 1024 / 1024 / 1024).toFixed(2) + 'GB'
+    }
 }

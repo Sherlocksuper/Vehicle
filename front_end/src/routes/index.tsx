@@ -11,9 +11,10 @@ import UserManage from "@/views/demo/User/UserList.tsx";
 import TestProject from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
 import TestTemplate from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.tsx";
 import TestVehicle from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
-import NewTestTemplate from "@/views/demo/TestProcessN/TestTemplate/NewTestTemplate.tsx";
+import ConfigTestTemplate from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import TestProcessN from "@/views/demo/TestProcessN/TestProcessN.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
+import OfflineShow from "@/views/demo/OffLine/OfflineShow.tsx";
 
 interface RouteItem {
     key: string
@@ -57,9 +58,9 @@ export const routeItems: RouteItem[] = [
         element: <TestProcessN/>
     },
     {
-        key:'/offline',
-        label:'离线数据展示',
-        element:<OfflineDate/>
+        key: '/offline-management',
+        label: '离线数据管理',
+        element: <OfflineDate/>
     },
     userUtils.isRootUser() ? {
         key: '/user-management',
@@ -80,7 +81,13 @@ export const my_router = createBrowserRouter([
             //测试模板配置
             path: '/test-template-config',
             element: <DndProvider backend={HTML5Backend}>
-                <NewTestTemplate/>,
+                <ConfigTestTemplate/>,
+            </DndProvider>
+        },
+        {
+            path: '/offline-show',
+            element: <DndProvider backend={HTML5Backend}>
+                <OfflineShow/>,
             </DndProvider>
         },
         {
