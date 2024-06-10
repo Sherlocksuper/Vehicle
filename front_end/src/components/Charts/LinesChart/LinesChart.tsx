@@ -1,8 +1,9 @@
 import * as echarts from "echarts"
 import {useEffect, useMemo, useRef} from "react"
-import {IChartInterface } from "@/components/Charts/interface.ts";
-import {generateRandomData} from "@/components/Charts";
+import {IChartInterface} from "@/components/Charts/interface.ts";
+import {generateRandomData, mockHistoryData} from "@/components/Charts";
 import {TEST_INTERNAL} from "@/constants";
+import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 interface ISeries {
     id: number
@@ -35,11 +36,11 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         historyData
     } = props
 
-    const chartRef = useRef<echarts.ECharts | null>()
-    const lineContainerRef = useRef<HTMLDivElement>(null)
-
-
     const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+    const chartRef = useRef<echarts.ECharts | null>()
+    const chartContainerRef = useRef<HTMLDivElement>(null)
+
     const xAxis = useRef<string[]>([])
     const dataRef = useRef<ISeries[]>(requestSignals.map((item) => {
         return {
@@ -52,25 +53,27 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         }
     }))
 
+    const pushData = (data: IHistoryItemData) => {
+        xAxis.current.push(new Date(data.xAxis).toLocaleTimeString())
+        dataRef.current.forEach((item) => {
+            item.data.push(data.data[item.id])
+        })
+        const option = {
+            xAxis: {
+                data: xAxis.current
+            },
+            series: dataRef.current
+        }
+        chartRef.current?.setOption(option)
+    }
+
     const mockRandomData = () => {
         timerRef.current && clearInterval(timerRef.current)
         if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
                 const data = generateRandomData(requestSignals)
-
-                xAxis.current.push(data.xAxis)
-                dataRef.current.forEach((item) => {
-                    item.data.push(data.data[item.id])
-                })
-                const option = {
-                    xAxis: {
-                        data: xAxis.current
-                    },
-                    series: dataRef.current
-                }
-
+                pushData(data)
                 onReceiveData(data)
-                chartRef.current?.setOption(option)
             }, TEST_INTERNAL)
         }
         return () => {
@@ -78,16 +81,15 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         }
     }
 
-    const mockHistoryData = () => {
-
-    }
 
     useMemo(() => {
         if (!historyData) mockRandomData()
+        const getFileData = mockHistoryData(0, pushData, historyData!)
+        getFileData(0)
     }, [requestSignals.length])
 
     useEffect(() => {
-        chartRef.current = echarts.init(lineContainerRef.current)
+        chartRef.current = echarts.init(chartContainerRef.current)
         const option = {
             dataZoom: [
                 {
@@ -129,7 +131,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         const resizeObserver = new ResizeObserver(() => {
             chartRef.current && chartRef.current.resize()
         })
-        lineContainerRef.current && resizeObserver.observe(lineContainerRef.current)
+        chartContainerRef.current && resizeObserver.observe(chartContainerRef.current)
         chartRef.current?.setOption(option)
 
         return () => {
@@ -138,7 +140,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         }
     }, [])
 
-    return <div ref={lineContainerRef} style={{
+    return <div ref={chartContainerRef} style={{
         width: '100%', height: '100%'
     }}></div>
 }

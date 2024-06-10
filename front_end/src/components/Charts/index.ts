@@ -5,7 +5,7 @@ import {IHistoryItemData} from "@/apis/standard/history.ts";
  * @param requestSignals
  */
 export const generateRandomData = (requestSignals: ISignalItem[]): IHistoryItemData => {
-    const time = new Date().toString()
+    const time = new Date().getTime()
 
     //循环根据id生成数据
     const timeData: { [key: number]: number } = {}
@@ -18,4 +18,25 @@ export const generateRandomData = (requestSignals: ISignalItem[]): IHistoryItemD
         xAxis: time,
         data: timeData
     })
+}
+
+
+export const mockHistoryData = (index: number, pushData: (data: IHistoryItemData) => void, historyData: IHistoryItemData[]) => {
+    function mock(index: number) {
+        if (!historyData) return
+
+        if (index < historyData.length) {
+            pushData(historyData[index])
+            // 这里可以添加实际推送数据的逻辑
+
+            const startTime = new Date(historyData[index].xAxis).getTime();
+            const endTime = new Date(historyData[index + 1].xAxis).getTime();
+
+            setTimeout(() => {
+                mock(index + 1)
+            }, endTime - startTime);
+        }
+    }
+
+    return mock
 }

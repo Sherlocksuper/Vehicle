@@ -30,7 +30,7 @@ export interface ITemplateData {
  * key是ISignalItem.signal的id
  */
 export interface IHistoryItemData {
-    xAxis: string
+    xAxis: number
     data: {
         [key: number]: number
     }

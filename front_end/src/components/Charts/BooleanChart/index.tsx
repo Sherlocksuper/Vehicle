@@ -1,8 +1,9 @@
 import {useMemo, useRef, useState} from 'react'
 import './index.css'
 import {IChartInterface} from "@/components/Charts/interface.ts";
-import {generateRandomData} from "@/components/Charts";
+import {generateRandomData, mockHistoryData} from "@/components/Charts";
 import {TEST_INTERNAL} from "@/constants";
+import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 const BooleanChart: React.FC<IChartInterface> = (props) => {
     const {
@@ -17,30 +18,30 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
         title,
     } = props
     const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const [value, setValue] = useState(false)
+
+    const pushData = (data: IHistoryItemData) => {
+        setValue(data.data[requestSignals[0].signal.id] > 0.5)
+    }
 
     const mockRandomData = () => {
         timerRef.current && clearInterval(timerRef.current)
         if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
                 const data = generateRandomData(requestSignals)
-
                 onReceiveData(data)
-                setValue(data.data[requestSignals[0].signal.id] > 0.5)
+                pushData(data)
             }, TEST_INTERNAL)
         }
     }
 
-    const mockHistoryData = () => {
-        let count = 0
-        //正向计时器
-
-    }
 
     useMemo(() => {
         if (!historyData) mockRandomData()
+        const getFileData = mockHistoryData(0, pushData, historyData!)
+        getFileData(0)
     }, [startRequest, requestSignals])
 
-    const [value, setValue] = useState(false)
 
     return <div className="bc_container" style={{
         width: "100%",

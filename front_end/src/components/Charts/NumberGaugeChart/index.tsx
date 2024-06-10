@@ -1,15 +1,18 @@
 import * as echarts from "echarts"
 import {useEffect, useMemo, useRef, useState} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
-import {generateRandomData} from "@/components/Charts";
+import {generateRandomData, mockHistoryData} from "@/components/Charts";
 import {TEST_INTERNAL} from "@/constants";
+import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
 
     const timerRef = useRef<NodeJS.Timeout | null>(null)
+
     const [value, setValue] = useState(0)
+
     const chartRef = useRef<echarts.ECharts | null>()
-    const numberContainerRef = useRef<HTMLDivElement | null>(null)
+    const chartContainerRef = useRef<HTMLDivElement | null>(null)
 
     const {
         startRequest,
@@ -24,25 +27,31 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
         height,
     } = props
 
+
+    const pushData = (data: IHistoryItemData) => {
+        setValue(data.data[requestSignals[0].signal.id])
+    }
+
     const mockRandomData = () => {
         timerRef.current && clearInterval(timerRef.current)
         if (startRequest && requestSignals.length > 0) {
             timerRef.current = setInterval(() => {
                 const data = generateRandomData(requestSignals)
                 onReceiveData(data)
-                setValue(data.data[requestSignals[0].signal.id])
+                pushData(data)
             }, TEST_INTERNAL)
         }
-    }
-
-    const mockHistoryData = () => {
-
-
     }
 
 
     useMemo(() => {
         if (!historyData) mockRandomData()
+        const getFileData = mockHistoryData(0, pushData, historyData!)
+        getFileData(0)
+
+        return () => {
+            timerRef.current && clearInterval(timerRef.current)
+        }
     }, [startRequest, requestSignals])
 
     useEffect(() => {
@@ -61,7 +70,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
     }, [value])
 
     useEffect(() => {
-        chartRef.current = echarts.init(numberContainerRef.current)
+        chartRef.current = echarts.init(chartContainerRef.current)
 
         const option = {
             series: [
@@ -124,7 +133,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
         const resizeObserver = new ResizeObserver(() => {
             chartRef.current && chartRef.current.resize()
         })
-        numberContainerRef.current && resizeObserver.observe(numberContainerRef.current)
+        chartContainerRef.current && resizeObserver.observe(chartContainerRef.current)
         chartRef.current.setOption(option)
 
         return () => {
@@ -133,7 +142,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
         }
     }, [unit, title, width, height])
 
-    return <div ref={numberContainerRef} style={{
+    return <div ref={chartContainerRef} style={{
         width: '100%', height: '100%'
     }}></div>
 }
