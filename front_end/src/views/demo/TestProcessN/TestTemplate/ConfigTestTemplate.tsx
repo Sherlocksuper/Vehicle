@@ -25,6 +25,7 @@ import {deleteUndefined, transferToDragItems} from "@/utils";
 import {PROCESS_CLOSE_HINT} from "@/constants/process_hint.ts";
 import {IHistory, IHistoryItemData, ITemplateData} from "@/apis/standard/history.ts";
 import {getFileToHistoryWorker, getHistoryToFileWorker} from "@/worker/app.ts";
+import {addTestsHistory} from "@/apis/request/testhistory.ts";
 
 /**
  * 新建template的modal
@@ -89,6 +90,8 @@ const ConfigTestTemplate: React.FC = () => {
     const [description, setDescription] = useState("默认描述")
 
     const [history, setHistory] = useState<IHistory>({
+        historyName: '默认名称',
+        configName: '默认名称',
         startTime: Date.now(),
         endTime: Date.now(),
         template: {
@@ -103,6 +106,7 @@ const ConfigTestTemplate: React.FC = () => {
 
     const initHistoryByTestProcessN = (testProcessN: ITestProcessN) => {
         const newHistory = {...history} as IHistory
+        newHistory.configName = testProcessN.testName
         newHistory.template = testProcessN.template
         testProcessN.template.itemsConfig.forEach((item) => {
             const templateData: ITemplateData = {
@@ -281,7 +285,6 @@ const ConfigTestTemplate: React.FC = () => {
 
     const renderManageButton = () => {
         const downCurrentDataFile = () => {
-
             const webWorker = getHistoryToFileWorker()
             webWorker.postMessage(history)
 
@@ -293,6 +296,13 @@ const ConfigTestTemplate: React.FC = () => {
                 a.download = 'data.json'
                 a.click()
                 window.URL.revokeObjectURL(url)
+
+                addTestsHistory({
+                    file: file,
+                    fatherConfigName: "默认"
+                }).then((res) => {
+                    if (res.code === SUCCESS_CODE) message.success("已保存历史记录")
+                });
 
                 setOnload(false)
             }

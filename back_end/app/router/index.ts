@@ -11,11 +11,15 @@ import ProjectController from "../controller/ProjectController";
 import TestTemplateController from "../controller/TestTemplateController";
 import TestObjectNController from "../controller/TestObjectNController";
 import TestProcessNController from "../controller/TestProcessNController";
+import HistoryController from "../controller/HistoryController";
 
 const router = new KoaRouter({
     prefix: ''
 })
 router.use(RequestBodyVerifyMiddleware)
+// router.use(bodyparser({
+//     multipart: true,
+// }))
 
 
 // 用户权限相关接口
@@ -127,5 +131,12 @@ router.get('/downloadPreTestConfigFile', AssetsController.downloadPreTestConfigF
 router.get('/downloadPreTestConfigFileTemp', AssetsController.downloadPreTestConfigFileTemp)
 router.get('/downloadTestProcessConfigFileById', AssetsController.downloadTestProcessConfigFileById)
 router.get('/downloadUserSendedTestProcessConfig', AssetsController.downloadUserSendedTestProcessConfig)
+
+/**
+ * history
+ */
+router.get('/getHistory', HistoryController.getAllHistory)
+router.post('/addHistory', HistoryController.addHistory)
+router.post('/deleteHistory/:id', HistoryController.deleteHistory)
 
 export default router

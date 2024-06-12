@@ -19,6 +19,7 @@ import Project from "../model/3Project.model";
 import TestObjectN from "../model/2TestObjectN.model";
 import TestTemplate from "../model/TestTemplate.model";
 import TestProcessN from "../model/1TestProcessN";
+import HistoryModel from "../model/History.model";
 
 const {DB_NAME, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT} = DB_CONFIG
 
@@ -27,7 +28,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     dialect: 'mysql',
     port: DB_PORT,
     logging: false,
-    models: [User, TokenBlackListItem, TestProcess, TestObject, CollectorSignal, Controller, Collector, Signal, SendTestConfigRecord, SendTestConfigVeriftCache, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN]
+    models: [User, TokenBlackListItem, TestProcess, TestObject, CollectorSignal, Controller, Collector, Signal, SendTestConfigRecord, SendTestConfigVeriftCache, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel]
 });
 
 const DB_OPT = {

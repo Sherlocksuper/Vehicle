@@ -4,7 +4,7 @@ import SystemTotalPage from "@/views/demo";
 import {createBrowserRouter, Outlet} from "react-router-dom";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
-import {ReactElement} from "react";
+import React, {ReactElement} from "react";
 import userUtils from "@/utils/userUtils.ts";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import UserManage from "@/views/demo/User/UserList.tsx";
@@ -15,6 +15,8 @@ import ConfigTestTemplate from "@/views/demo/TestProcessN/TestTemplate/ConfigTes
 import TestProcessN from "@/views/demo/TestProcessN/TestProcessN.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import OfflineShow from "@/views/demo/OffLine/OfflineShow.tsx";
+import History from "@/views/demo/History/history.tsx";
+import HistoryData from "@/views/demo/History/history.tsx";
 
 interface RouteItem {
     key: string
@@ -61,6 +63,11 @@ export const routeItems: RouteItem[] = [
         key: '/offline-management',
         label: '离线数据管理',
         element: <OfflineDate/>
+    },
+    {
+        key: '/history',
+        label: '历史数据管理',
+        element: <HistoryData/>
     },
     userUtils.isRootUser() ? {
         key: '/user-management',

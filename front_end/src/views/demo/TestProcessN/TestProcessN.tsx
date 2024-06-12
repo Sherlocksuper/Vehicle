@@ -68,6 +68,16 @@ const TestProcessN: React.FC = () => {
             <Space>
                 <Button type="link"
                         href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.CONFIG}`}
+                        onClick={() => {
+                            const win = window.open(`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.CONFIG}`)
+                            if (!win) return
+                            const checkClosed = setInterval(() => {
+                                if (win.closed) {
+                                    fetchTestProcessN()
+                                    clearInterval(checkClosed);
+                                }
+                            }, 1000);
+                        }}
                         target={"_blank"}>前往配置采集关系</Button>
                 <Button type={"link"} onClick={() => {
                     if (!confirm("" + PROCESS_CONFIG_HINT)) return

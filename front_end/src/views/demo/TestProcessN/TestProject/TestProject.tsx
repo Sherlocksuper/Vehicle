@@ -3,7 +3,7 @@ import {Button, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {IProject} from "@/apis/standard/project.ts";
 import CreateProject from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
-import {getProjects} from "@/apis/request/project.ts";
+import {deleteProject, getProjects} from "@/apis/request/project.ts";
 
 const TestProject: React.FC = () => {
     const [showCreateProject, setShowCreateProject] = React.useState<{
@@ -37,6 +37,12 @@ const TestProject: React.FC = () => {
                             initValue: JSON.stringify(record)
                         })
                     }}>详情</Button>
+                    <Button type="link" onClick={() => {
+                        if (!confirm("确认删除吗？")) return
+                        deleteProject(Number(record.id)).then(() => {
+                            fetchProjects()
+                        })
+                    }}>删除</Button>
                 </Space>
             )
         }
