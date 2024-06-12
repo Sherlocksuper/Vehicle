@@ -299,7 +299,7 @@ const ConfigTestTemplate: React.FC = () => {
 
                 addTestsHistory({
                     file: file,
-                    fatherConfigName: "默认"
+                    fatherConfigName: testProcessN?.testName || '默认名称'
                 }).then((res) => {
                     if (res.code === SUCCESS_CODE) message.success("已保存历史记录")
                 });

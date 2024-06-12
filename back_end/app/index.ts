@@ -6,6 +6,7 @@ import fileServer from 'koa-static'
 import path from 'node:path'
 import koaBodyParser from 'koa-bodyparser'
 import bodyparser from 'koa-body'
+import serve from "koa-static";
 
 
 const app = new Koa
@@ -15,6 +16,9 @@ app.use(bodyparser({
     multipart: true,
 }))
 app.use(router.routes())
+app.use(serve(path.join(__dirname, '../public')));
+
+
 const run = async (port: string): Promise<Server> => {
     await DB.connectDB()
     await DB.initDB()

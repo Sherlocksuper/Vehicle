@@ -10,7 +10,6 @@ import {
     WRITE_SUCCESS_MSG
 } from "../constants";
 import FileService from "../service/FileService";
-import exp from "constants";
 import {IRecordHistory} from "../model/History.model";
 
 const historyService = new HistoryService()
@@ -44,11 +43,9 @@ export class HistoryController {
      * @param context
      */
     async addHistory(context: Context) {
-        console.log(context.request.body)
         // @ts-ignore
         const fatherConfigName = context.request.body['fatherConfigName']
         const file = context.request.files!.file as any
-        console.log(file)
         const filePath = file['filepath']
         const fileName = file['originalFilename']
 

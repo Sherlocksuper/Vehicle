@@ -1,4 +1,4 @@
-import {AutoIncrement, Column, CreatedAt, DataType, Model, PrimaryKey} from "sequelize-typescript";
+import {AutoIncrement, Column, CreatedAt, DataType, Model, PrimaryKey, UpdatedAt} from "sequelize-typescript";
 
 export interface IRecordHistory {
     id?: number
@@ -24,7 +24,7 @@ export default class HistoryModel extends Model<IRecordHistory> {
     @Column(DataType.DATE)
     createdAt!: Date;
 
-    @CreatedAt
+    @UpdatedAt
     @Column(DataType.DATE)
     updatedAt!: Date;
 }

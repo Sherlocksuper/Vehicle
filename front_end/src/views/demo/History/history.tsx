@@ -1,5 +1,7 @@
 import {Space, Table, TableProps} from "antd";
-import React from "react";
+import React, {useEffect} from "react";
+import {deleteTestsHistory, getTestsHistory} from "@/apis/request/testhistory.ts";
+import {FAIL_CODE} from "@/constants";
 
 interface IHistoryList {
     id?: number
@@ -26,33 +28,52 @@ const columns: TableProps<IHistoryList>['columns'] = [
         key: "path",
     },
     {
-        title: "创建时间",
-        dataIndex: "createdAt",
-        key: "createdAt",
-    },
-    {
         title: "更新时间",
         dataIndex: "updatedAt",
         key: "updatedAt",
+        render: (text) => new Date(text).toLocaleString()
     },
     {
         title: "操作",
         key: "action",
-        render: (value, record, index) => (
-            <Space>
-                <a>查看详情</a>
-                <a>删除</a>
-            </Space>
-        )
     }
 ];
 
 const HistoryData = () => {
+    const [historyData, setHistoryData] = React.useState<IHistoryList[]>([])
+
+    columns[columns.length - 1].render = (text, record) => (
+        <Space>
+            <a onClick={() => deleteHistory(record.id!)}>删除</a>
+            <a href={record.path}
+               download={record.fatherConfigName + '.json'}
+            >下载</a>
+        </Space>
+    )
+
+    const fetchHistoryData = () => {
+        getTestsHistory().then(res => {
+            setHistoryData(res.data)
+        })
+    }
+
+    const deleteHistory = (id: number) => {
+        if (prompt("请输入 delete 删除") !== "delete") return
+        deleteTestsHistory(id).then(res => {
+            if (res.code === FAIL_CODE) return
+            fetchHistoryData()
+        })
+    }
+
+    useEffect(() => {
+        fetchHistoryData()
+    }, [])
+
     return (
         <div>
             <Table
                 columns={columns}
-                dataSource={[]}
+                dataSource={historyData}
                 rowKey="id"
             />
         </div>
