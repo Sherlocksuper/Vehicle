@@ -2,7 +2,17 @@
  * 用来存放测试模板的模型
  */
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table, UpdatedAt, CreatedAt} from "sequelize-typescript";
-import {ISignalItem} from "./SendTestConfigRecord.model";
+import {IControllerModel} from "../BoardManage/Controller.model";
+import {ICollectorModel} from "../BoardManage/Collector.model";
+import {ISignalModel} from "../BoardManage/Signal.model";
+
+export interface ISignalItem {
+    vehicleName: string
+    projectName: string
+    controller: IControllerModel
+    collector: ICollectorModel
+    signal: ISignalModel
+}
 
 export enum TestTemplateType {
     BOOLEAN = 'BOOLEAN',

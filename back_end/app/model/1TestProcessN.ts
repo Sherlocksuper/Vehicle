@@ -4,16 +4,13 @@ import {
     Column,
     DataType,
     ForeignKey,
-    HasMany,
     Model,
     PrimaryKey,
     Table
 } from 'sequelize-typescript'
-import TestObject from './2TestObject.model';
 import User from './User.model';
-import TestObjectN, {ITestObjectNModel} from "./2TestObjectN.model";
-import {Col} from "sequelize/types/utils";
-import {ITestTemplate} from "./TestTemplate.model";
+import {ITestObjectNModel} from "./2TestObjectN.model";
+import {ITestTemplate} from "./PreSet/TestTemplate.model";
 
 export interface ITestProcessNModel {
     id?: number

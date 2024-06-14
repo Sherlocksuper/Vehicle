@@ -1,7 +1,7 @@
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from "sequelize-typescript";
-import {IVehicleModel} from "./Vehicle.model";
-import {IProjectModel} from "./3Project.model";
-import {ITestTemplate} from "./TestTemplate.model";
+import {IVehicleModel} from "./PreSet/Vehicle.model";
+import {IProjectModel} from "./PreSet/3Project.model";
+import {ITestTemplate} from "./PreSet/TestTemplate.model";
 
 export interface ITestObjectNModel {
     id: number

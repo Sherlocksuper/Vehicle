@@ -7,7 +7,8 @@ import {deleteProcessN, getProcessNList} from "@/apis/request/testProcessN.ts";
 import {DELETE, SUCCESS_CODE} from "@/constants";
 import ProcessNTree from "@/views/demo/TestProcessN/ProcessNTree.tsx";
 import ConfigTestTemplate, {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
-import {DELETE_CONFIRM_HINT, PROCESS_CONFIG_HINT} from "@/constants/process_hint.ts";
+import {PROCESS_CONFIG_HINT} from "@/constants/process_hint.ts";
+import {confirmDelete} from "@/utils";
 
 const SEE_DETAIL = "查看详情"
 const DOWN = "下发"
@@ -85,8 +86,7 @@ const TestProcessN: React.FC = () => {
                 }}>{DOWN}</Button>
                 <ProcessNTree record={record}/>
                 <Button type="primary" danger={true} onClick={() => {
-                    if (prompt(DELETE_CONFIRM_HINT) !== "delete") return
-                    deleteProcessN(record.id!).then(res => {
+                    confirmDelete() && deleteProcessN(record.id!).then(res => {
                         if (res.code !== SUCCESS_CODE) {
                             message.error(res.message);
                             return;

@@ -1,9 +1,9 @@
 import {Context} from "koa";
-import {ICollectorModel} from "../model/Collector.model";
-import CollectorService from "../service/CollectorService";
-import {IResBody} from "../types";
-import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
-import {getUserIdFromCtx} from "../../utils/getUserInfoFromCtx";
+import {ICollectorModel} from "../../model/BoardManage/Collector.model";
+import CollectorService from "../../service/BoardManage/CollectorService";
+import {IResBody} from "../../types";
+import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../../constants";
+import {getUserIdFromCtx} from "../../../utils/getUserInfoFromCtx";
 
 class CollectorController {
 

@@ -1,6 +1,6 @@
 // vehicle.service.ts
 
-import Vehicle, {IVehicleModel} from "../model/Vehicle.model";
+import Vehicle, {IVehicleModel} from "../../model/PreSet/Vehicle.model";
 
 class VehicleService {
     async createVehicle(vehicleName: string): Promise<Vehicle> {

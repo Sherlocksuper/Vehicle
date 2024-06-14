@@ -1,9 +1,8 @@
-import VehicleService from "../service/VehicleService";
+import VehicleService from "../../service/PreSet/VehicleService";
 import {Context} from "koa";
-import Vehicle, {IVehicleModel} from "../model/Vehicle.model";
-import {IResBody} from "../types";
-import {LOGIN_FAIL, LOGIN_SUCCESS, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
-import tokenUtils from "../../utils/token";
+import Vehicle, {IVehicleModel} from "../../model/PreSet/Vehicle.model";
+import {IResBody} from "../../types";
+import {SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../../constants";
 
 const vehicleService = new VehicleService();
 

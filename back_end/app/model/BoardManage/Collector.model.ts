@@ -1,33 +1,37 @@
 import {
-    AllowNull,
     AutoIncrement,
     BelongsTo,
     Column,
     DataType,
     ForeignKey,
+    HasMany,
     Model,
     PrimaryKey,
     Table
 } from 'sequelize-typescript'
-import User from './User.model';
+import Signal from './Signal.model';
+import User from '../User.model';
 
-export interface IControllerModel {
+//采集板卡
+export interface ICollectorModel {
     id?: number
-    controllerName: string
-    controllerAddress: string
+    collectorName: string
+    collectorAddress: string
     userId: number | null
     isDisabled: boolean
 }
 
 @Table({
-    tableName: 'controllers',
+    tableName: 'collectors',
     timestamps: false
 })
 
 /**
- * 核心控制板卡
+ * 采集板卡
+ * 采集板卡包含
+ * 1. 采集板卡的信号
  */
-export default class Controller extends Model<IControllerModel> {
+export default class Collector extends Model<ICollectorModel> {
     @Column({
         type: DataType.BOOLEAN,
         defaultValue: false
@@ -40,10 +44,13 @@ export default class Controller extends Model<IControllerModel> {
     id!: number;
 
     @Column(DataType.STRING)
-    controllerName!: string;
+    collectorName!: string;
 
     @Column(DataType.STRING)
-    controllerAddress!: string;
+    collectorAddress!: string
+
+    @HasMany(() => Signal)
+    signals!: Signal[]
 
     @ForeignKey(() => User)
     @Column({

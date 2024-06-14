@@ -1,10 +1,10 @@
 import ExcelJs from 'exceljs'
 import { excelReader } from './excelReader'
 import { COLLECTOR_WORKSHEET, CONTROLLER_WORKSHEET, DEVICE_CONFIG_FILE_NAME, SIGNAL_WORKSHEET } from '../app/constants'
-import { ICollectorModel } from '../app/model/Collector.model'
+import { ICollectorModel } from '../app/model/BoardManage/Collector.model'
 import path from 'path'
-import { IControllerModel } from '../app/model/Controller.model'
-import { ISignalModel } from '../app/model/Signal.model'
+import { IControllerModel } from '../app/model/BoardManage/Controller.model'
+import { ISignalModel } from '../app/model/BoardManage/Signal.model'
 
 export interface ITestProcessConfig {
     testName: string

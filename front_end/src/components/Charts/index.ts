@@ -21,6 +21,7 @@ export const generateRandomData = (requestSignals: ISignalItem[]): IHistoryItemD
 }
 
 
+// @ts-ignore
 export const mockHistoryData = (index: number, pushData: (data: IHistoryItemData) => void, historyData: IHistoryItemData[]) => {
     function mock(index: number) {
         if (!historyData) return

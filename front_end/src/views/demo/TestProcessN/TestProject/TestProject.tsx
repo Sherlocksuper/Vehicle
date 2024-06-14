@@ -4,6 +4,7 @@ import type {TableProps} from 'antd';
 import {IProject} from "@/apis/standard/project.ts";
 import CreateProject from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
 import {deleteProject, getProjects} from "@/apis/request/project.ts";
+import {confirmDelete} from "@/utils";
 
 const TestProject: React.FC = () => {
     const [showCreateProject, setShowCreateProject] = React.useState<{
@@ -38,7 +39,7 @@ const TestProject: React.FC = () => {
                         })
                     }}>详情</Button>
                     <Button type="link" onClick={() => {
-                        if (!confirm("确认删除吗？")) return
+                        confirmDelete() &&
                         deleteProject(Number(record.id)).then(() => {
                             fetchProjects()
                         })

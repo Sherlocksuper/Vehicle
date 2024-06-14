@@ -1,7 +1,7 @@
 import {Context} from "koa";
-import TestTemplateService from "../service/TestTemplateService";
-import {ITestTemplate} from "../model/TestTemplate.model";
-import {FAIL_CODE, SUCCESS_CODE, WRITE_FAIL_MSG, WRITE_SUCCESS_MSG} from "../constants";
+import TestTemplateService from "../../service/PreSet/TestTemplateService";
+import {ITestTemplate} from "../../model/PreSet/TestTemplate.model";
+import {FAIL_CODE, SUCCESS_CODE, WRITE_FAIL_MSG, WRITE_SUCCESS_MSG} from "../../constants";
 
 class TestTemplateController {
 

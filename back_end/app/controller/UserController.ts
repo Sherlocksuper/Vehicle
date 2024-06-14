@@ -1,16 +1,32 @@
-import { Context } from "koa"
+import {Context} from "koa"
 import tokenUtils from "../../utils/token";
-import { BODY_INCOMPLETENESS, FAIL_CODE, HAS_BEEN_DISABLED, HAS_BEEN_START, HORIZONTAL_OVERREACH_IS_PROHIBITED, INSUFFICIENT_AUTHORITY, LOGIN_FAIL, LOGIN_SUCCESS, PLEASE_BAN_FIRST, QUERY_INCOMPLETENESS, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE, USER_EXISTED, USER_UNEXIST, WRITE_FAIL_MSG, WRITE_SUCCESS_MSG } from '../constants'
-import { IResBody } from "../types";
-import { getUserIdFromCtx, getUsernameFromCtx } from "../../utils/getUserInfoFromCtx";
+import {
+    BODY_INCOMPLETENESS,
+    FAIL_CODE,
+    HAS_BEEN_DISABLED,
+    HAS_BEEN_START,
+    HORIZONTAL_OVERREACH_IS_PROHIBITED,
+    LOGIN_FAIL,
+    LOGIN_SUCCESS,
+    PLEASE_BAN_FIRST,
+    QUERY_INCOMPLETENESS,
+    SEARCH_SUCCESS_MSG,
+    SUCCESS_CODE,
+    USER_EXISTED,
+    USER_UNEXIST,
+    WRITE_FAIL_MSG,
+    WRITE_SUCCESS_MSG
+} from '../constants'
+import {IResBody} from "../types";
+import {getUserIdFromCtx, getUsernameFromCtx} from "../../utils/getUserInfoFromCtx";
 import UserService from "../service/UserService";
 import TokenBlackListService from "../service/TokenBlackListService";
 
 class UserController {
     // 用户登录
     async login(ctx: Context) {
-        const { username, password } = ctx.request.body as any
-        const res = await UserService.findUserByUsernameAndPassword({ username, password })
+        const {username, password} = ctx.request.body as any
+        const res = await UserService.findUserByUsernameAndPassword({username, password})
 
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,
@@ -19,7 +35,7 @@ class UserController {
                 username: res.username,
                 isRootUser: res.root_user_id === null ? true : false,
                 userId: res.id,
-                token: tokenUtils.sign({ username: res.username, password: res.password, userId: res.id! }),
+                token: tokenUtils.sign({username: res.username, password: res.password, userId: res.id!}),
                 disabled: res.disabled
             }
         })
@@ -29,10 +45,11 @@ class UserController {
             data: null
         })
     }
+
     // 根据root用户id获取子用户列表
     async getUserList(ctx: Context) {
         const userId = getUserIdFromCtx(ctx)
-        const { keywords, pageNum, pageSize } = ctx.request.query as any
+        const {keywords, pageNum, pageSize} = ctx.request.query as any
         if ([userId, pageNum, pageSize].includes(undefined) || ![userId, pageNum, pageSize].every(i => /^\d+$/.test(i)) || Number(pageNum) < 1 || Number(pageSize) < 1) {
             (ctx.body as IResBody) = {
                 code: FAIL_CODE,
@@ -52,9 +69,10 @@ class UserController {
             })
         }
     }
+
     // 创建子用户 默认会添加root用户名前缀
     async createUser(ctx: Context) {
-        const { childUsername, childPassword } = ctx.request.body as any
+        const {childUsername, childPassword} = ctx.request.body as any
         if ([childUsername, childPassword].includes(undefined)) {
             (ctx.body as IResBody) = {
                 code: FAIL_CODE,
@@ -96,9 +114,10 @@ class UserController {
             })
         }
     }
+
     // 关闭子用户服务
     async closeUser(ctx: Context) {
-        const { childUserId } = ctx.request.body as any
+        const {childUserId} = ctx.request.body as any
         if (childUserId === undefined) {
             (ctx.body as IResBody) = {
                 code: FAIL_CODE,
@@ -153,9 +172,10 @@ class UserController {
         })
 
     }
+
     // 开启子用户服务
     async openUser(ctx: Context) {
-        const { childUserId } = ctx.request.body as any
+        const {childUserId} = ctx.request.body as any
         if (childUserId === undefined) {
             (ctx.body as IResBody) = {
                 code: FAIL_CODE,
@@ -210,9 +230,10 @@ class UserController {
         })
 
     }
+
     // 删除子用户
     async deleteUser(ctx: Context) {
-        const { childUserId } = ctx.request.body as any
+        const {childUserId} = ctx.request.body as any
         if (childUserId === undefined) {
             (ctx.body as IResBody) = {
                 code: FAIL_CODE,
@@ -267,15 +288,18 @@ class UserController {
         })
 
     }
+
     // 修改用户·密码
     async changePassword(ctx: Context) {
-        const { childUserId, password } = ctx.request.body as any
+        const {childUserId, password} = ctx.request.body as any
+
         // 按照有无childUserId区分，若是有的话，则视为子用户修改密码模式，否则视为管理员模式
         enum CHANGE_PASSWORD_MODE {
             ROOT_USER, // 管理员模式
             CHILD_USER, // 子用户模式
             BODY_ERROR // BODY参数不全
         }
+
         // 判断模式
         let mode = null
         if (![childUserId, password].includes(undefined)) mode = CHANGE_PASSWORD_MODE.CHILD_USER
@@ -289,7 +313,7 @@ class UserController {
                     (ctx.body as IResBody) = {
                         code: SUCCESS_CODE,
                         msg: WRITE_SUCCESS_MSG,
-                        data: { ...res }
+                        data: {...res}
                     }
                 )
                 !res && (
@@ -308,7 +332,7 @@ class UserController {
                         (ctx.body as IResBody) = {
                             code: SUCCESS_CODE,
                             msg: WRITE_SUCCESS_MSG,
-                            data: { ...res }
+                            data: {...res}
                         }
                     )
                     !res && (
@@ -335,21 +359,22 @@ class UserController {
                 }
         }
     }
+
     // 登出
     async logout(ctx: Context) {
         const token = ctx.header.authorization
         const f1 = await TokenBlackListService.addToken2BlackList(token!)
         const f2 = await TokenBlackListService.deleteExpiredToken()
-            ; (f1 && f2) && ((ctx.body as IResBody) = {
-                code: SUCCESS_CODE,
-                msg: WRITE_SUCCESS_MSG,
-                data: null
-            })
-            ; !(f1 && f2) && ((ctx.body as IResBody) = {
-                code: FAIL_CODE,
-                msg: WRITE_FAIL_MSG,
-                data: null
-            })
+        ;(f1 && f2) && ((ctx.body as IResBody) = {
+            code: SUCCESS_CODE,
+            msg: WRITE_SUCCESS_MSG,
+            data: null
+        })
+        ;!(f1 && f2) && ((ctx.body as IResBody) = {
+            code: FAIL_CODE,
+            msg: WRITE_FAIL_MSG,
+            data: null
+        })
     }
 }
 

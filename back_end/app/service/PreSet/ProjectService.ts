@@ -1,8 +1,4 @@
-import Project, {IProjectModel} from "../model/3Project.model";
-import {IControllerModel} from "../model/Controller.model";
-import {ICollectorModel} from "../model/Collector.model";
-import {ISignalModel} from "../model/Signal.model";
-
+import Project, {IProjectModel} from "../../model/PreSet/3Project.model";
 
 export default class ProjectService {
     async getProjectList() {

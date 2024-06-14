@@ -237,6 +237,18 @@ const ConfigTestTemplate: React.FC = () => {
                     defaultLabel: '数值'
                 }
             }}/>
+            <DraggableComponent type={DragItemType.PURENUMBER} draggleConfig={{
+                defaultTitle: DEFAULT_TITLE,
+                defaultX: 0,
+                defaultY: 0,
+                defaultWidth: 100,
+                defaultHeight: 100,
+                defaultInterval: 1000,
+                extra: {
+                    defaultDuring: 10,  // 10s
+                    defaultLabel: '数值'
+                }
+            }}/>
         </>
     }
 

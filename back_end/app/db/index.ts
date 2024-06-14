@@ -3,21 +3,16 @@ import DB_CONFIG from '../config/db_config'
 import User from '../model/User.model'
 import UserService from '../service/UserService'
 import TokenBlackListItem from '../model/TokenBlackListItem.model'
-import TestProcess from '../model/1TestProcess.model'
-import TestObject from '../model/2TestObject.model'
-import CollectorSignal from '../model/4CollectorSignal.model'
-import ControllerService from '../service/ControllerService'
-import CollectorService from '../service/CollectorService'
-import SignalService from '../service/SignalService'
-import Controller from '../model/Controller.model'
-import Collector from '../model/Collector.model'
-import Signal from '../model/Signal.model'
-import SendTestConfigRecord from '../model/SendTestConfigRecord.model'
-import SendTestConfigVeriftCache from '../model/SendTestConfigVerifyCache.model'
-import Vehicle from "../model/Vehicle.model";
-import Project from "../model/3Project.model";
+import ControllerService from '../service/BoardManage/ControllerService'
+import CollectorService from '../service/BoardManage/CollectorService'
+import SignalService from '../service/BoardManage/SignalService'
+import Controller from '../model/BoardManage/Controller.model'
+import Collector from '../model/BoardManage/Collector.model'
+import Signal from '../model/BoardManage/Signal.model'
+import Vehicle from "../model/PreSet/Vehicle.model";
+import Project from "../model/PreSet/3Project.model";
 import TestObjectN from "../model/2TestObjectN.model";
-import TestTemplate from "../model/TestTemplate.model";
+import TestTemplate from "../model/PreSet/TestTemplate.model";
 import TestProcessN from "../model/1TestProcessN";
 import HistoryModel from "../model/History.model";
 
@@ -28,7 +23,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     dialect: 'mysql',
     port: DB_PORT,
     logging: false,
-    models: [User, TokenBlackListItem, TestProcess, TestObject, CollectorSignal, Controller, Collector, Signal, SendTestConfigRecord, SendTestConfigVeriftCache, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel]
+    models: [User, TokenBlackListItem,  Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel]
 });
 
 const DB_OPT = {

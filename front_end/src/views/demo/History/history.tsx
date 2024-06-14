@@ -2,6 +2,7 @@ import {Space, Table, TableProps} from "antd";
 import React, {useEffect} from "react";
 import {deleteTestsHistory, getTestsHistory} from "@/apis/request/testhistory.ts";
 import {FAIL_CODE} from "@/constants";
+import {confirmDelete} from "@/utils";
 
 interface IHistoryList {
     id?: number
@@ -58,8 +59,7 @@ const HistoryData = () => {
     }
 
     const deleteHistory = (id: number) => {
-        if (prompt("请输入 delete 删除") !== "delete") return
-        deleteTestsHistory(id).then(res => {
+        confirmDelete() && deleteTestsHistory(id).then(res => {
             if (res.code === FAIL_CODE) return
             fetchHistoryData()
         })

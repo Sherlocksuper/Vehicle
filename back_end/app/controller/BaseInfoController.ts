@@ -1,13 +1,14 @@
 import {Context} from "koa";
-import ControllerService from "../service/ControllerService";
+import ControllerService from "../service/BoardManage/ControllerService";
 import {IResBody} from "../types";
 import {FAIL_CODE, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
-import CollectorService from "../service/CollectorService";
-import SignalService from "../service/SignalService";
+import CollectorService from "../service/BoardManage/CollectorService";
+import SignalService from "../service/BoardManage/SignalService";
 import {getUserIdFromCtx} from "../../utils/getUserInfoFromCtx";
-import Controller from "./ControllerController";
-import Collector from "./CollectorController";
-import SignalController from "./SignalController";
+import Controller from "./BoardManage/ControllerController";
+import Collector from "./BoardManage/CollectorController";
+import SignalController from "./BoardManage/SignalController";
+
 
 class BaseInfoController {
     /**

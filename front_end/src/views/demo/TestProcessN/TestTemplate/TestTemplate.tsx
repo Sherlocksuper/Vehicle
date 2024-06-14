@@ -1,10 +1,11 @@
 import React from 'react';
-import {Button, Row, Space, Table} from 'antd';
+import {Button, message, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {ITemplate} from "@/apis/standard/template.ts";
-import {getTestTemplateList} from "@/apis/request/template.ts";
+import {deleteTestTemplate, getTestTemplateList} from "@/apis/request/template.ts";
 import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
+import {SUCCESS_CODE} from "@/constants";
 
 const columns: TableProps<ITemplate>['columns'] = [
     {
@@ -47,7 +48,6 @@ const columns: TableProps<ITemplate>['columns'] = [
                 template: record
             }
             const testProcessNRecord = JSON.stringify(newTestProcessN)
-
             const model = NewTestTemplateMode.SHOW
 
             return <Space size="middle">
@@ -71,6 +71,32 @@ const TestTemplate: React.FC = () => {
 
     React.useEffect(() => {
         fetchTestTemplate()
+
+        columns[columns.length - 1].render = (value, record, index) => {
+            const newTestProcessN: ITestProcessN = {
+                userId: 0,
+                testName: record.name,
+                testObjectNs: [],
+                template: record
+            }
+            const testProcessNRecord = JSON.stringify(newTestProcessN)
+            const model = NewTestTemplateMode.SHOW
+
+            return <Space size="middle">
+                <Button type="link"
+                        href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${model}`}
+                        target={"_blank"}>查看</Button>
+                <Button type="link" onClick={() => {
+                    deleteTestTemplate(record.id!.toString()).then((res) => {
+                        if (res.code !== SUCCESS_CODE) {
+                            message.success("删除失败,请重试")
+                            return
+                        }
+                        fetchTestTemplate()
+                    })
+                }}>删除</Button>
+            </Space>
+        }
     }, [])
 
     return (

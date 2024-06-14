@@ -1,19 +1,14 @@
 import {
     AutoIncrement,
-    BelongsTo,
     Column,
     DataType,
-    ForeignKey,
     Model,
-    HasMany,
     PrimaryKey,
     Table
 } from "sequelize-typescript";
-import TestObject from "./2TestObject.model";
-import CollectorSignal from "./4CollectorSignal.model";
-import {ICollectorModel} from "./Collector.model";
-import {IControllerModel} from "./Controller.model";
-import {ISignalModel} from "./Signal.model";
+import {ICollectorModel} from "../BoardManage/Collector.model";
+import {IControllerModel} from "../BoardManage/Controller.model";
+import {ISignalModel} from "../BoardManage/Signal.model";
 
 /**
  * Project测试项目

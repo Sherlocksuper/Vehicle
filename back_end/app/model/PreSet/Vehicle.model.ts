@@ -1,5 +1,9 @@
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from "sequelize-typescript";
 
+/**
+ * 车辆管理
+ */
+
 export interface IVehicleModel {
     id?: number
     vehicleName: string

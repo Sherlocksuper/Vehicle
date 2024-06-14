@@ -16,6 +16,7 @@ import {
 } from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
 import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
+import PureNumberChart from "@/components/Charts/PureNumberChart/PureNumberChart.tsx";
 
 const DropContainer: React.FC<{
     banModify: boolean,
@@ -231,6 +232,21 @@ export const SetDragItem = ({item, banModify, onReceiveData, fileHistory}: {
                                               width={width} height={height}
                                               historyData={historyData}
         />,
+        [DragItemType.PURENUMBER]: <PureNumberChart startRequest={banModify}
+                                                 requestSignalId={requestSignalId}
+                                                 requestSignals={requestSignals || []}
+                                                 sourceType={DataSourceType.RANDOM}
+                                                 onReceiveData={(data: IHistoryItemData) => {
+                                                     onReceiveData(item.id, data)
+                                                 }}
+
+                                                 title={title}
+                                                 trueLabel={trueLabel || '是'}
+                                                 falseLabel={falseLabel || '否'}
+                                                 width={width} height={height}
+                                                 historyData={historyData}
+        />,
+
     }[type]
 }
 

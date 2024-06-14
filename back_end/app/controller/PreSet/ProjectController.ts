@@ -1,8 +1,8 @@
-import {SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE, WRITE_SUCCESS_MSG} from "../constants";
-import {IResBody} from "../types";
+import {SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE, WRITE_SUCCESS_MSG} from "../../constants";
+import {IResBody} from "../../types";
 import {Context} from "koa";
-import ProjectService from "../service/ProjectService";
-import Project, {IProjectModel} from "../model/3Project.model";
+import ProjectService from "../../service/PreSet/ProjectService";
+import Project, {IProjectModel} from "../../model/PreSet/3Project.model";
 
 const projectService = new ProjectService();
 

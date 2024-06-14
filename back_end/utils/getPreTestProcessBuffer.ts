@@ -1,8 +1,8 @@
 import ExcelJs from 'exceljs'
 import { writeCollectorConfig, writeControllerConfig, writeSignalConfig } from './turnTestProcessConfigIntoExcel'
-import SignalService from '../app/service/SignalService'
-import ControllerService from '../app/service/ControllerService'
-import CollectorService from '../app/service/CollectorService'
+import SignalService from '../app/service/BoardManage/SignalService'
+import ControllerService from '../app/service/BoardManage/ControllerService'
+import CollectorService from '../app/service/BoardManage/CollectorService'
 import { COLLECTOR_WORKSHEET, CONTROLLER_WORKSHEET, SIGNAL_WORKSHEET } from '../app/constants'
 
 

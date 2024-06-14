@@ -3,7 +3,7 @@ import OT_CONFIG from '../config/ot_config'
 import { Context } from 'koa';
 import tokenUtils from '../../utils/token';
 import { IResBody } from '../types';
-import { FAIL_CODE, HORIZONTAL_OVERREACH_IS_PROHIBITED, INSUFFICIENT_AUTHORITY, SEARCH_SUCCESS_MSG, SUCCESS_CODE } from '../constants';
+import { FAIL_CODE, INSUFFICIENT_AUTHORITY} from '../constants';
 import { Op } from 'sequelize';
 
 

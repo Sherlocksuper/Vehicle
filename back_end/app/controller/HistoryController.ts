@@ -2,7 +2,6 @@ import HistoryService from "../service/HistoryService";
 import {Context} from "koa";
 import {IResBody} from "../types";
 import {
-    BODY_INCOMPLETENESS,
     FAIL_CODE,
     SEARCH_SUCCESS_MSG,
     SUCCESS_CODE,

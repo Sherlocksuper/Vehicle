@@ -1,4 +1,4 @@
-import TestTemplateModel, {ITestTemplate} from '../model/TestTemplate.model';
+import TestTemplateModel, {ITestTemplate} from '../../model/PreSet/TestTemplate.model';
 
 class TestTemplateService {
     // 创建一个新的TestTemplate

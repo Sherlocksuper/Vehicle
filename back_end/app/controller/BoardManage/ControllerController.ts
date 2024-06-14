@@ -1,9 +1,9 @@
 import {Context} from "koa";
-import {IControllerModel} from "../model/Controller.model";
-import ControllerService from "../service/ControllerService";
-import {IResBody} from "../types";
-import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
-import {getUserIdFromCtx} from "../../utils/getUserInfoFromCtx";
+import {IControllerModel} from "../../model/BoardManage/Controller.model";
+import ControllerService from "../../service/BoardManage/ControllerService";
+import {IResBody} from "../../types";
+import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../../constants";
+import {getUserIdFromCtx} from "../../../utils/getUserInfoFromCtx";
 
 class ControllerController {
 

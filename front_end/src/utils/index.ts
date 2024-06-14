@@ -111,3 +111,11 @@ export function formatFileSize(size: number) {
         return (size / 1024 / 1024 / 1024).toFixed(2) + 'GB'
     }
 }
+
+/**
+ * 确认删除
+ */
+
+export function confirmDelete() {
+    return (prompt('请输入 delete 以删除') === "delete")
+}

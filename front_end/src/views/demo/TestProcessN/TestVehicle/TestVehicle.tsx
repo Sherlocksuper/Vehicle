@@ -2,8 +2,10 @@ import React, {useEffect} from 'react';
 import {Button, Form, Input, message, Modal, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {IVehicle} from "@/apis/standard/vehicle.ts";
-import {createVehicle, getVehicles, updateVehicle} from "@/apis/request/vehicle.ts";
+import {createVehicle, deleteVehicle, getVehicles, updateVehicle} from "@/apis/request/vehicle.ts";
 import {SUCCESS_CODE} from "@/constants";
+import {useLoaderData} from "react-router-dom";
+import {confirmDelete} from "@/utils";
 
 
 const columns: TableProps<IVehicle>['columns'] = [
@@ -40,22 +42,31 @@ const TestVehicle: React.FC = () => {
 
                 columns[columns.length - 1].render = (_, record) => (
                     <Space size="middle">
-                        <Button type="primary" danger={true} onClick={
-                            () => {
-                                record.isDisabled = !record.isDisabled
-                                updateVehicle(Number(record.id), record).then((res) => {
-                                    if (res.code === SUCCESS_CODE) {
-                                        fetchVehicles()
-                                    } else {
-                                        message.error("操作失败")
-                                    }
-                                })
-                            }
+                        <Button type="primary" danger={!record.isDisabled} onClick={() => {
+                            record.isDisabled = !record.isDisabled
+                            updateVehicle(Number(record.id), record).then((res) => {
+                                if (res.code === SUCCESS_CODE) {
+                                    fetchVehicles()
+                                } else {
+                                    message.error("操作失败")
+                                }
+                            })
+                        }
                         }>{record.isDisabled ? "启用" : "禁用"}</Button>
+                        <Button type="primary" disabled={!record.isDisabled} danger={true} onClick={() => {
+                            confirmDelete() &&
+                            deleteVehicle(Number(record.id)).then((res) => {
+                                if (res.code === SUCCESS_CODE) {
+                                    fetchVehicles()
+                                } else {
+                                    message.error("操作失败")
+                                }
+                            })
+                        }
+                        }>{"删除"}</Button>
                     </Space>
                 )
-            }, []
-        )
+            }, [])
 
 
         return (
@@ -77,8 +88,7 @@ const TestVehicle: React.FC = () => {
                 }} key={new Date().getTime()}/>
             </div>
         );
-    }
-;
+    };
 
 export default TestVehicle;
 

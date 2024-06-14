@@ -31,7 +31,6 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     const {
         startRequest,
         requestSignals,
-        sourceType,
         onReceiveData,
         historyData
     } = props

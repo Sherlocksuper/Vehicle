@@ -1,35 +1,3 @@
-//import {UrlMap} from "@/apis/url/myUrl.ts";
-// import {ContentType, Method} from "@/apis/standard/all.ts";
-//
-// export const VEHICLE_API: UrlMap = {
-//     getVehicleList: {
-//         url: '/getVehicleList',
-//         method: Method.GET,
-//         format: ContentType.JSON
-//     },
-//     createVehicle: {
-//         url: '/createVehicle',
-//         method: Method.POST,
-//         format: ContentType.JSON
-//     },
-//     getVehicleById: {
-//         url: '/getVehicleById/:id',
-//         method: Method.GET,
-//         format: ContentType.JSON
-//     },
-//     updateVehicle: {
-//         url: '/updateVehicle/:id',
-//         method: Method.POST,
-//         format: ContentType.JSON
-//     },
-//     deleteVehicle: {
-//         url: '/deleteVehicle/:id',
-//         method: Method.POST,
-//         format: ContentType.JSON
-//     }
-// }
-
-//增删改查
 //获取车辆列表
 import {request} from "@/utils/request.ts";
 import {VEHICLE_API} from "@/apis/url/vehicle.ts";

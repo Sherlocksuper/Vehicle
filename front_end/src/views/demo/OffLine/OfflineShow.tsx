@@ -19,6 +19,7 @@ const OfflineShow: React.FC = () => {
     const [dragItems, setDragItems] = useState<IDragItem[]>([])
 
     const [history, setHistory] = useState<IHistory>({
+        historyName: "默认名称",
         configName: '默认配置',
         startTime: Date.now(),
         endTime: Date.now(),

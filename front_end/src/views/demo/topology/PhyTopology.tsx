@@ -18,8 +18,9 @@ import CollectorInfoTable from "./CollectorInfoTable";
 import SignalInfoTable from "./SignalInfoTable";
 import './PhyTopology.css'
 import {SUCCESS_CODE} from "@/constants";
-import {createCollector, createController, getActiveCollectorList} from "@/apis/request/test.ts";
 import {createSignal} from "@/apis/request/board-signal/signal.ts";
+import {createCollector, getActiveCollectorList} from "@/apis/request/board-signal/collector.ts";
+import {createController} from "@/apis/request/board-signal/controller.ts";
 
 export interface IControllersConfigItem {
     id: number

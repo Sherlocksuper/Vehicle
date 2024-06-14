@@ -1,10 +1,8 @@
 import path from "node:path";
-import {excelReader} from "../../utils/excelReader";
-import {COLLECTOR_WORKSHEET, DEVICE_CONFIG_FILE_NAME} from "../constants";
-import Collector, {ICollectorModel} from "../model/Collector.model";
-import {sequelize} from "../db";
-import TestProcess from "../model/1TestProcess.model";
-import SendTestConfigRecord from "../model/SendTestConfigRecord.model";
+import {excelReader} from "../../../utils/excelReader";
+import {COLLECTOR_WORKSHEET, DEVICE_CONFIG_FILE_NAME} from "../../constants";
+import Collector, {ICollectorModel} from "../../model/BoardManage/Collector.model";
+import {sequelize} from "../../db";
 
 class CollectorService {
     async initCollectors(config?: { userId: number, data: ICollectorModel[] }): Promise<boolean> {
@@ -19,16 +17,8 @@ class CollectorService {
                 })) as ICollectorModel[]
             else {
                 const {userId, data: srcData} = config!
-                // 删除所有用户id所对应的测试流程
-                TestProcess.destroy({
-                    where: {userId}
-                })
                 // 删除所有userId对应的配置
                 Collector.destroy({
-                    where: {userId}
-                })
-                // 删除所有用户id所对应的下发记录
-                SendTestConfigRecord.destroy({
                     where: {userId}
                 })
                 data = srcData

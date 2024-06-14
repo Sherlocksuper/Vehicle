@@ -1,8 +1,8 @@
-import Signal, {ISignalModel} from "../model/Signal.model";
+import {ISignalModel} from "../../model/BoardManage/Signal.model";
 import {Context} from "koa";
-import {FAIL_CODE, QUERY_INCOMPLETENESS, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
-import SignalService from "../service/SignalService";
-import {IResBody} from "../types";
+import {FAIL_CODE, QUERY_INCOMPLETENESS, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../../constants";
+import SignalService from "../../service/BoardManage/SignalService";
+import {IResBody} from "../../types";
 
 class SignalController {
     async createSignal(ct:Context) {

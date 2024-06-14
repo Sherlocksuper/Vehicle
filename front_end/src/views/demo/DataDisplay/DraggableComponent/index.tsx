@@ -33,7 +33,7 @@ export interface IDraggleComponent {
     }
 }
 
-const DraggableComponent: React.FC<IDraggleComponent> = ({ type, draggleConfig }) => {
+const DraggableComponent: React.FC<IDraggleComponent> = ({type, draggleConfig}) => {
     const ref = useRef<HTMLDivElement>(null)
 
     const [, drag] = useDrag<{ id: string } & IDraggleComponent>({
@@ -51,6 +51,7 @@ const DraggableComponent: React.FC<IDraggleComponent> = ({ type, draggleConfig }
             [DragItemType.BOOLEAN]: <div className="dcm_inner--boolean"></div>,
             [DragItemType.NUMBER]: <div className="dcm_inner--number"></div>,
             [DragItemType.LINES]: <div className="dcm_inner--lines"></div>,
+            [DragItemType.PURENUMBER]: <div className="dcm_inner--purenumber"></div>,
         }[type]}
     </div>
 }

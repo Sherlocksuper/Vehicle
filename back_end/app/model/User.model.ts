@@ -1,5 +1,4 @@
-import { AutoIncrement, Column, DataType, HasMany, Model, PrimaryKey, Table } from 'sequelize-typescript'
-import TestProcess from './1TestProcess.model'
+import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript'
 
 interface IUserModel {
     id?: number
@@ -38,7 +37,4 @@ export default class User extends Model<IUserModel> {
         allowNull: true
     })
     root_user_id?: number | null
-
-    @HasMany(() => TestProcess)
-    testProcesse!: TestProcess[]
 }

@@ -1,10 +1,10 @@
 import path from "node:path";
-import { excelReader } from "../../utils/excelReader";
-import { DEVICE_CONFIG_FILE_NAME, SIGNAL_WORKSHEET } from "../constants";
-import Signal, { ISignalModel } from "../model/Signal.model";
+import { excelReader } from "../../../utils/excelReader";
+import { DEVICE_CONFIG_FILE_NAME, SIGNAL_WORKSHEET } from "../../constants";
+import Signal, { ISignalModel } from "../../model/BoardManage/Signal.model";
 import CollectorService from "./CollectorService";
-import Collector from "../model/Collector.model";
-import { sequelize } from "../db";
+import Collector from "../../model/BoardManage/Collector.model";
+import { sequelize } from "../../db";
 
 class SignalService {
     async getSignalListByCollectorId(collectorId: number) {
