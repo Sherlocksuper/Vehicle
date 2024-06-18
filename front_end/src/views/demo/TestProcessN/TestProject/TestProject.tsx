@@ -2,7 +2,10 @@ import React from 'react';
 import {Button, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {IProject} from "@/apis/standard/project.ts";
-import CreateProject from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
+import ProjectManage, {
+    CreateProjectButton,
+    ShowProjectButton
+} from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
 import {deleteProject, getProjects} from "@/apis/request/project.ts";
 import {confirmDelete} from "@/utils";
 
@@ -30,14 +33,7 @@ const TestProject: React.FC = () => {
             key: "action",
             render: (_, record) => (
                 <Space>
-                    <Button type="link" onClick={() => {
-                        console.log(record)
-                        setShowCreateProject({
-                            disabled: true,
-                            open: true,
-                            initValue: JSON.stringify(record)
-                        })
-                    }}>详情</Button>
+                    <ShowProjectButton initValue={JSON.stringify(record)}/>
                     <Button type="link" onClick={() => {
                         confirmDelete() &&
                         deleteProject(Number(record.id)).then(() => {
@@ -63,25 +59,12 @@ const TestProject: React.FC = () => {
         <div style={{
             padding: 20
         }}>
-            <Row justify="end" style={{marginBottom: 20}}>
-                <Button type="primary" onClick={() => {
-                    setShowCreateProject({
-                        disabled: false,
-                        open: true,
-                        initValue: ""
-                    })
-                }}>New</Button>
-            </Row>
-            <CreateProject open={showCreateProject.open} mode={"create"} onFinished={() => {
-                setShowCreateProject({
-                    disabled: false,
-                    open: false,
-                    initValue: ""
-                })
+            <CreateProjectButton onFinished={() => {
                 fetchProjects()
-
-            }} disable={showCreateProject.disabled} initValue={showCreateProject.initValue} key={new Date().getTime()}/>
-            <Table columns={columns} dataSource={projects} key={projects?.length ?? 0} rowKey={"id"}/>
+            }}/>
+            <Table style={{
+                marginTop: 20
+            }} columns={columns} dataSource={projects} key={projects?.length ?? 0} rowKey={"id"}/>
         </div>
     );
 };

@@ -107,9 +107,9 @@ const PreTestManager: React.FC = () => {
         <Col>
             <Button type="primary" onClick={reloadData}>刷新</Button>
         </Col>
-        <AddConOrCollect reloadData={reloadData} type="controller"/>
-        <AddConOrCollect reloadData={reloadData} type="collector"/>
-        <AddSignal reloadData={reloadData}/>
+        <AddConOrCollectButton reloadData={reloadData} type="controller"/>
+        <AddConOrCollectButton reloadData={reloadData} type="collector"/>
+        <AddSignalButton reloadData={reloadData}/>
     </Row>}>
         <Tabs className="tm_tabs" defaultActiveKey="1" items={items}/>
     </Card>
@@ -124,7 +124,7 @@ interface AddManagerProps {
 }
 
 //添加核心板卡
-const AddConOrCollect = ({reloadData, type}: AddManagerProps) => {
+const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
     const [open, setOpen] = useState(false)
     const [name, setName] = useState('')
     const [address, setAddress] = useState('')
@@ -227,7 +227,7 @@ interface AddSignalProps {
     reloadData: () => void
 }
 
-const AddSignal = ({reloadData}: AddSignalProps) => {
+const AddSignalButton = ({reloadData}: AddSignalProps) => {
     const [open, setOpen] = useState(false)
     const [single, setSingle] = useState<ISignalsConfigItem>({
         signalName: '',

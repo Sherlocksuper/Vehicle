@@ -32,8 +32,7 @@ interface CreateProjectProps {
  * @constructor
  */
 
-const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, disable, initValue}) => {
-    const [form] = Form.useForm<IProject>();
+const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, disable, initValue}) => { const [form] = Form.useForm<IProject>();
 
     const [controllerList, setControllerList] = React.useState<IControllersConfigItem[]>([])
     const [collectorList, setCollectorList] = React.useState<ICollectorsConfigItem[]>([])
@@ -240,4 +239,33 @@ function generateTitle(mode: 'create' | 'edit' | 'show') {
     }
 }
 
-export default CreateProject;
+export default ProjectManage;
+
+export const CreateProjectButton: React.FC<{ onFinished: () => void }> = ({onFinished}) => {
+    const [open, setOpen] = React.useState<boolean>(false)
+
+    return <>
+        <Button type="primary" onClick={() => {
+            setOpen(true)
+        }}>新建测试项目</Button>
+        <ProjectManage open={open} mode={"create"} onFinished={() => {
+            onFinished()
+            setOpen(false)
+        }} disable={false} initValue={""} key={new Date().getTime()}/>
+    </>
+}
+
+export const ShowProjectButton: React.FC<{ initValue: string }> = ({initValue}) => {
+    const [open, setOpen] = React.useState<boolean>(false)
+    let mode: "create" | "edit" | "show" = "show"
+    if (initValue) mode = "show"
+
+    return <>
+        <Button type="link" onClick={() => {
+            setOpen(true)
+        }}>查看测试项目</Button>
+        <ProjectManage open={open} mode={"show"} onFinished={() => {
+            setOpen(false)
+        }} disable={mode === "show"} initValue={initValue} key={new Date().getTime()}/>
+    </>
+}

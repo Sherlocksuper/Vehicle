@@ -27,78 +27,71 @@ const columns: TableProps<IVehicle>['columns'] = [
 ];
 
 const TestVehicle: React.FC = () => {
-        const [vehicles, setVehicles] = React.useState<IVehicle[]>([])
-        const [showCreateTestVehicle, setShowCreateTestVehicle] = React.useState<boolean>(false)
+    const [vehicles, setVehicles] = React.useState<IVehicle[]>([])
 
-        const fetchVehicles = async () => {
-            getVehicles().then((res) => {
-                console.log("vehicle:" + res.data)
-                setVehicles(res.data)
-            })
-        }
+    const fetchVehicles = async () => {
+        getVehicles().then((res) => {
+            console.log("vehicle:" + res.data)
+            setVehicles(res.data)
+        })
+    }
 
-        useEffect(() => {
-                fetchVehicles()
+    useEffect(() => {
+        fetchVehicles()
 
-                columns[columns.length - 1].render = (_, record) => (
-                    <Space size="middle">
-                        <Button type="primary" danger={!record.isDisabled} onClick={() => {
-                            record.isDisabled = !record.isDisabled
-                            updateVehicle(Number(record.id), record).then((res) => {
-                                if (res.code === SUCCESS_CODE) {
-                                    fetchVehicles()
-                                } else {
-                                    message.error("操作失败")
-                                }
-                            })
+        columns[columns.length - 1].render = (_, record) => (
+            <Space size="middle">
+                <Button type="primary" danger={!record.isDisabled} onClick={() => {
+                    record.isDisabled = !record.isDisabled
+                    updateVehicle(Number(record.id), record).then((res) => {
+                        if (res.code === SUCCESS_CODE) {
+                            fetchVehicles()
+                        } else {
+                            message.error("操作失败")
                         }
-                        }>{record.isDisabled ? "启用" : "禁用"}</Button>
-                        <Button type="primary" disabled={!record.isDisabled} danger={true} onClick={() => {
-                            confirmDelete() &&
-                            deleteVehicle(Number(record.id)).then((res) => {
-                                if (res.code === SUCCESS_CODE) {
-                                    fetchVehicles()
-                                } else {
-                                    message.error("操作失败")
-                                }
-                            })
-                        }
-                        }>{"删除"}</Button>
-                    </Space>
-                )
-            }, [])
-
-
-        return (
-            <div style={{
-                padding: 20
-            }}>
-                <Row justify="end" style={{marginBottom: 20}}>
-                    <Button type="primary" onClick={() => {
-                        setShowCreateTestVehicle(true)
-                    }}>New</Button>
-                </Row>
-                <Table columns={columns} dataSource={vehicles}/>
-                <CreateTestVehicle open={showCreateTestVehicle} onFinished={() => {
-                    setShowCreateTestVehicle(false)
-                    getVehicles().then((res) => {
-                        console.log(res)
-                        setVehicles(res.data)
                     })
-                }} key={new Date().getTime()}/>
-            </div>
-        );
-    };
+                }
+                }>{record.isDisabled ? "启用" : "禁用"}</Button>
+                <Button type="primary" disabled={!record.isDisabled} danger={true} onClick={() => {
+                    confirmDelete() &&
+                    deleteVehicle(Number(record.id)).then((res) => {
+                        if (res.code === SUCCESS_CODE) {
+                            fetchVehicles()
+                        } else {
+                            message.error("操作失败")
+                        }
+                    })
+                }
+                }>{"删除"}</Button>
+            </Space>
+        )
+    }, [])
+
+
+    return (
+        <div style={{
+            padding: 20
+        }}>
+            <CreateTestVehicleButton onFinished={() => {
+                getVehicles().then((res) => {
+                    console.log(res)
+                    setVehicles(res.data)
+                })
+            }} key={new Date().getTime()}/>
+            <Table style={{
+                marginTop: 20
+            }} columns={columns} dataSource={vehicles}/>
+        </div>
+    );
+};
 
 export default TestVehicle;
 
-interface ICreateTestVehicleProps {
-    open: boolean
-    onFinished: () => void
-}
 
-const CreateTestVehicle: React.FC<ICreateTestVehicleProps> = ({open, onFinished}) => {
+export const CreateTestVehicleButton: React.FC<{ onFinished: () => void }> = ({onFinished}) => {
+    const title = "新建车辆"
     const [form] = Form.useForm<IVehicle>()
+    const [open, setOpen] = React.useState<boolean>(false)
 
     useEffect(() => {
         if (open) {
@@ -117,27 +110,32 @@ const CreateTestVehicle: React.FC<ICreateTestVehicleProps> = ({open, onFinished}
     }
 
     return (
-        <Modal
-            title="新建车辆"
-            open={open}
-            onOk={() => {
-                form.validateFields().then((values) => {
-                    newVehicle(values)
-                })
-            }}
-            onCancel={() => {
-                onFinished()
-            }}
-        >
-            <Form form={form}>
-                <Form.Item
-                    label="车辆名称"
-                    name="vehicleName"
-                    rules={[{required: true, message: '请输入车辆名称!'}]}
-                >
-                    <Input/>
-                </Form.Item>
-            </Form>
-        </Modal>
+        <>
+            <Button type="primary" onClick={() => {
+                setOpen(true)
+            }}>{title}</Button>
+            <Modal
+                title={title}
+                open={open}
+                onOk={() => {
+                    form.validateFields().then((values) => {
+                        newVehicle(values)
+                    })
+                }}
+                onCancel={() => {
+                    onFinished()
+                }}
+            >
+                <Form form={form}>
+                    <Form.Item
+                        label="车辆名称"
+                        name="vehicleName"
+                        rules={[{required: true, message: '请输入车辆名称!'}]}
+                    >
+                        <Input/>
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </>
     );
 }
