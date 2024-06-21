@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Input, message, Modal, Row, Select, Table} from "antd";
+import {Button, Input, message, Modal, Row, Select, Table, Tree} from "antd";
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {IProject} from "@/apis/standard/project.ts";
 import {ITemplate} from "@/apis/standard/template.ts";
@@ -11,7 +11,9 @@ import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {createProcessN} from "@/apis/request/testProcessN.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {CreateTestVehicleButton} from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
-import ProjectManage, {CreateProjectButton} from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
+import {CreateProjectButton} from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
+import {TEMPLATE} from "@/constants/process_hint.ts";
+import {generateTreeData} from "@/views/demo/TestProcessN/ProcessNTree.tsx";
 
 interface INewTestProcessNProps {
     onFinish: () => void;
@@ -24,6 +26,12 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
         testObjectNs: [],
         template: {} as ITemplate
     })
+    const [treeShowData, setTreeShowData] = useState<ITestProcessN>({
+        userId: 1,
+        testName: '',
+        testObjectNs: [],
+        template: {} as ITemplate
+    });
 
     const [visible, setVisible] = useState(false);
     const [modalType, setModalType] = useState<'show' | 'edit'>('edit');
@@ -56,7 +64,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
         }
 
         if (!testProcessN?.template) {
-            message.error('测试模板不能为空');
+            message.error(TEMPLATE + '不能为空');
             return false;
         }
 
@@ -78,7 +86,8 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                         return <Row align={"middle"} justify={"center"}>
                             <div style={{
                                 marginRight: 20
-                            }}>车辆</div>
+                            }}>车辆
+                            </div>
                             <CreateTestVehicleButton onFinished={
                                 () => {
                                     getVehicles().then((res) => {
@@ -104,11 +113,12 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                     )
                 },
                 {
-                    title: ()=>{
+                    title: () => {
                         return <Row align={"middle"} justify={"center"}>
                             <div style={{
                                 marginRight: 20
-                            }}>项目</div>
+                            }}>项目
+                            </div>
                             <CreateProjectButton onFinished={
                                 () => {
                                     getProjects().then((res) => {
@@ -127,6 +137,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                                     const newTestProcess = testProcessN
                                     newTestProcess!.testObjectNs[index].project = value.map((item: number) => projectList.find((project) => project.id === Number(item)) as IProject)
                                     setTestProcessN(newTestProcess)
+
                                 }}
                                 size={"middle"} style={{width: "100%"}}>
                             {projectList.map((item) => (
@@ -154,6 +165,26 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
         />
     }
 
+    const updateTreeShowData = () => {
+        if (!check()) return;
+        setTreeShowData(testProcessN);
+    }
+
+    const refresh = () => {
+        setTestProcessN({
+            userId: 1,
+            testName: '',
+            testObjectNs: [],
+            template: {} as ITemplate
+        });
+        setTreeShowData({
+            userId: 1,
+            testName: '',
+            testObjectNs: [],
+            template: {} as ITemplate
+        });
+    }
+
     return (
         <div>
             <div>
@@ -163,7 +194,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                 }}>新建</Button>
             </div>
             <Modal
-                width={800}
+                width={1200}
                 title={modalType === 'show' ? '展示' : '编辑'}
                 open={visible}
                 onOk={() => {
@@ -187,19 +218,19 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                 }}
                 onCancel={() => {
                     setVisible(false);
-                    setTestProcessN({} as ITestProcessN);
+                    refresh();
                 }}
                 confirmLoading={confirmLoading}
             >
                 <Input
                     prefix="测试配置名称："
-                    value={testProcessN?.testName} disabled={modalType === 'show'}
+                    defaultValue={testProcessN?.testName} disabled={modalType === 'show'}
                     onChange={(e) => {
                         setTestProcessN({...testProcessN, testName: e.target.value} as ITestProcessN);
                     }} placeholder="请输入测试配置名称"/>
-                测试模板：
+                {TEMPLATE}：
                 <Select
-                    placeholder={'请选择测试模板'}
+                    placeholder={'请选择' + TEMPLATE}
                     onSelect={(value) => {
                         const newTestProcess = testProcessN
                         newTestProcess!.template = testTemplateList.find((item) => item.id === value) as ITemplate
@@ -213,7 +244,20 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                         <Select.Option key={item.id} value={item.id}>{item.name}-{item.id}</Select.Option>
                     ))}
                 </Select>
-                {renderCreateConfigTable()}
+                <Button onClick={updateTreeShowData}>更新树</Button>
+                <Row>
+                    <div style={{marginBottom: 20,flex: 1}}>
+                        {renderCreateConfigTable()}
+                    </div>
+                    <div style={{flex: 0.6}}>
+                        <Tree
+                            className="draggable-tree"
+                            blockNode
+                            treeData={generateTreeData(treeShowData)}
+                            draggable={false}
+                        />
+                    </div>
+                </Row>
                 <Button onClick={() => {
                     setTestProcessN({
                         ...testProcessN,

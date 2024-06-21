@@ -1,13 +1,19 @@
 import React, {useEffect} from 'react';
-import {Button, message, Space, Table} from 'antd';
+import {Button, message, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import NewTestProcessN from "@/views/demo/TestProcessN/NewTestProcessN.tsx";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
-import {deleteProcessN, getProcessNList} from "@/apis/request/testProcessN.ts";
+import {
+    checkCurrentProcessN,
+    deleteProcessN,
+    downProcessN,
+    getCurrentProcessN,
+    getProcessNList, stopCurrentProcessN
+} from "@/apis/request/testProcessN.ts";
 import {DELETE, SUCCESS_CODE} from "@/constants";
 import ProcessNTree from "@/views/demo/TestProcessN/ProcessNTree.tsx";
 import ConfigTestTemplate, {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
-import {PROCESS_CONFIG_HINT} from "@/constants/process_hint.ts";
+import {PROCESS_CONFIG_HINT, TEMPLATE} from "@/constants/process_hint.ts";
 import {confirmDelete} from "@/utils";
 
 const SEE_DETAIL = "查看详情"
@@ -43,7 +49,7 @@ const columns: TableProps<ITestProcessN>['columns'] = [
         )
     },
     {
-        title: "测试模板(名称 - ID)",
+        title: TEMPLATE + "(名称 - ID)",
         dataIndex: "template",
         key: "template",
         render: (_, record) => (
@@ -61,6 +67,11 @@ const columns: TableProps<ITestProcessN>['columns'] = [
 
 const TestProcessN: React.FC = () => {
     const [processNList, setProcessNList] = React.useState<ITestProcessN[]>([]);
+    const [currentDownProcessN, setCurrentDownProcessN] = React.useState<ITestProcessN | null>(null);
+
+    useEffect(() => {
+        setCurrentDownProcessN(getCurrentProcessN());
+    }, []);
 
     const ActionButtons = (record: ITestProcessN) => {
         const testProcessNRecord = JSON.stringify(record)
@@ -81,8 +92,9 @@ const TestProcessN: React.FC = () => {
                         }}
                         target={"_blank"}>前往配置采集关系</Button>
                 <Button type={"link"} onClick={() => {
-                    if (!confirm("" + PROCESS_CONFIG_HINT)) return
-                    window.open(`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.SHOW}`)
+                    downProcessN(record).then(() => {
+                        setCurrentDownProcessN(record)
+                    })
                 }}>{DOWN}</Button>
                 <ProcessNTree record={record}/>
                 <Button type="primary" danger={true} onClick={() => {
@@ -127,8 +139,9 @@ const TestProcessN: React.FC = () => {
             <div style={{
                 marginBottom: 20,
                 display: 'flex',
-                justifyContent: 'flex-end'
+                justifyContent: 'space-between'
             }}>
+                <CheckCurrentProcessN currentProcessN={currentDownProcessN}/>
                 <NewTestProcessN onFinish={fetchTestProcessN}/>
             </div>
             <Table columns={newColumns} dataSource={processNList} rowKey={(value) => {
@@ -139,3 +152,29 @@ const TestProcessN: React.FC = () => {
 }
 
 export default TestProcessN;
+
+const CheckCurrentProcessN: React.FC<{ currentProcessN: ITestProcessN | null }> = ({currentProcessN}) => {
+    return (
+        <Row gutter={[16, 8]} align={"middle"}>
+            <Button
+                style={{marginRight: 20}}
+                onClick={() => {
+                    if (!currentProcessN) {
+                        message.error("当前无下发配置")
+                        return;
+                    }
+                    stopCurrentProcessN()
+                }}>停止当前下发配置</Button>
+            <Button
+                style={{marginRight: 20}}
+                onClick={() => {
+                    if (!currentProcessN) {
+                        message.error("当前无下发配置")
+                        return;
+                    }
+                    checkCurrentProcessN(currentProcessN!)
+                }}>前往查看当前采集信息</Button>
+            {currentProcessN?.testName ?? "暂无下发配置"}
+        </Row>
+    )
+}

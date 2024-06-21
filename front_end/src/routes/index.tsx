@@ -17,6 +17,7 @@ import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import OfflineShow from "@/views/demo/OffLine/OfflineShow.tsx";
 import History from "@/views/demo/History/history.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
+import {TEMPLATE} from "@/constants/process_hint.ts";
 
 interface RouteItem {
     key: string
@@ -49,7 +50,7 @@ export const routeItems: RouteItem[] = [
             },
             {
                 key: '/test-config/test-object',
-                label: '测试模板',
+                label: TEMPLATE,
                 element: <TestTemplate/>
             },
         ]
