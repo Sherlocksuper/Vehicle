@@ -3,8 +3,8 @@ import {IResBody} from "../../types";
 import {Context} from "koa";
 import ProjectService from "../../service/PreSet/ProjectService";
 import Project, {IProjectModel} from "../../model/PreSet/3Project.model";
+import projectService from "../../service/PreSet/ProjectService";
 
-const projectService = new ProjectService();
 
 class ProjectController {
     //获取所有Project

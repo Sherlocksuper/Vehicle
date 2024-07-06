@@ -37,6 +37,27 @@ class VehicleService {
         }
         return 0;
     }
+
+
+    //初始化车辆
+    async initVehicle(num: number) {
+        for (let i = 0; i < num; i++) {
+            const name = `测试车辆车辆${i}`
+            const vehicle = await Vehicle.findOne({
+                where: {
+                    vehicleName: name
+                }
+            });
+            if (!vehicle) {
+                await Vehicle.create({
+                    vehicleName: name,
+                    isDisabled: false
+                });
+            }
+        }
+
+    }
+
 }
 
-export default VehicleService;
+export default new VehicleService;

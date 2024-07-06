@@ -3,8 +3,7 @@ import {Context} from "koa";
 import Vehicle, {IVehicleModel} from "../../model/PreSet/Vehicle.model";
 import {IResBody} from "../../types";
 import {SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../../constants";
-
-const vehicleService = new VehicleService();
+import vehicleService from "../../service/PreSet/VehicleService";
 
 class VehicleController {
 

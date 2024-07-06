@@ -12,8 +12,8 @@ import {
 } from "@/apis/request/testProcessN.ts";
 import {DELETE, SUCCESS_CODE} from "@/constants";
 import ProcessNTree from "@/views/demo/TestProcessN/ProcessNTree.tsx";
-import ConfigTestTemplate, {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
-import {PROCESS_CONFIG_HINT, TEMPLATE} from "@/constants/process_hint.ts";
+import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
+import {TEMPLATE} from "@/constants/process_hint.ts";
 import {confirmDelete} from "@/utils";
 
 const SEE_DETAIL = "查看详情"
@@ -70,7 +70,13 @@ const TestProcessN: React.FC = () => {
     const [currentDownProcessN, setCurrentDownProcessN] = React.useState<ITestProcessN | null>(null);
 
     useEffect(() => {
-        setCurrentDownProcessN(getCurrentProcessN());
+        getCurrentProcessN().then(res => {
+            if (res.code === SUCCESS_CODE) {
+                setCurrentDownProcessN(res.data)
+            } else {
+                setCurrentDownProcessN(null)
+            }
+        })
     }, []);
 
     const ActionButtons = (record: ITestProcessN) => {
@@ -141,7 +147,7 @@ const TestProcessN: React.FC = () => {
                 display: 'flex',
                 justifyContent: 'space-between'
             }}>
-                <CheckCurrentProcessN currentProcessN={currentDownProcessN} onStop={()=>{
+                <CheckCurrentProcessN currentProcessN={currentDownProcessN} onStop={() => {
                     setCurrentDownProcessN(null)
                 }}/>
                 <NewTestProcessN onFinish={fetchTestProcessN}/>
@@ -158,7 +164,7 @@ export default TestProcessN;
 const CheckCurrentProcessN: React.FC<{
     currentProcessN: ITestProcessN | null,
     onStop: () => void
-}> = ({currentProcessN,onStop}) => {
+}> = ({currentProcessN, onStop}) => {
     return (
         <Row gutter={[16, 8]} align={"middle"}>
             <Button

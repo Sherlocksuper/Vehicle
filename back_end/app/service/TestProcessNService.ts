@@ -96,6 +96,7 @@ class TestProcessNService {
      * 下发测试流程，设置当前的测试流程为testPrdcessN
      */
     async downTestProcessN(testProcessN: ITestProcessNModel) {
+        if (this.currentTestProcessN) return false
         this.currentTestProcessN = testProcessN
         return true
     }

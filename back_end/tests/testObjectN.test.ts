@@ -35,7 +35,7 @@ describe('测试测试对象（新）', () => {
                     userId: 1,
                     isDisabled: false
                 },
-                single: {
+                signal: {
                     signalName: 'signal',
                     signalUnit: 'unit',
                     signalType: 'type',
@@ -78,7 +78,7 @@ describe('测试测试对象（新）', () => {
                         userId: 1,
                         isDisabled: false
                     },
-                    single: {
+                    signal: {
                         signalName: 'signal',
                         signalUnit: 'unit',
                         signalType: 'type',

@@ -21,7 +21,7 @@ export interface IProjectModel {
     projectConfig: {
         controller: IControllerModel
         collector: ICollectorModel
-        single: ISignalModel
+        signal: ISignalModel
     }[]
 }
 
@@ -48,6 +48,6 @@ export default class Project extends Model<IProjectModel> {
     projectConfig!: {
         controller: IControllerModel
         collector: ICollectorModel
-        single: ISignalModel
+        signal: ISignalModel
     }[]
 }

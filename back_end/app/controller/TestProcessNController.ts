@@ -134,7 +134,7 @@ class TestProcessNController {
             (ctx.body as IResBody) = {
                 code: FAIL_CODE,
                 msg: SEARCH_FAIL_MSG,
-                data: null
+                data: "下发失败,请检查配置是否正确或者是否有正在进行的测试流程"
             }
         }
     }
@@ -144,7 +144,7 @@ class TestProcessNController {
      */
     async getCurrentTestProcessN(ctx: Context) {
         const currentProcessN = testProcessNService.currentTestProcessN
-        if (!currentProcessN) {
+        if (currentProcessN) {
             (ctx.body as IResBody) = {
                 code: SUCCESS_CODE,
                 msg: WRITE_SUCCESS_MSG,

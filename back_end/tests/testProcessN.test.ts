@@ -30,7 +30,7 @@ describe('Test processN', () => {
                     userId: 1,
                     isDisabled: false
                 },
-                single: {
+                signal: {
                     signalName: 'signal',
                     signalUnit: 'unit',
                     signalType: 'type',

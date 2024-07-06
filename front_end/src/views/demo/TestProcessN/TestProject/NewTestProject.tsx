@@ -120,6 +120,7 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
             }}
             onCancel={() => {
                 onFinished()
+                clear()
             }}
         >
             <Form form={form} disabled={disable} initialValues={disable ? JSON.parse(initValue) : undefined}

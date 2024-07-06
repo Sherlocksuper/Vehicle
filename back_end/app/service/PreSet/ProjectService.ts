@@ -1,6 +1,6 @@
 import Project, {IProjectModel} from "../../model/PreSet/3Project.model";
 
-export default class ProjectService {
+class ProjectService {
     async getProjectList() {
         return await Project.findAll();
     }
@@ -36,4 +36,51 @@ export default class ProjectService {
         }
         return 0;
     }
+
+
+    // 初始化项目
+    async initProject(num: number) {
+        for (let i = 0; i < num; i++) {
+            const name = `测试项目${i}`
+            const project = await Project.findOne({
+                where: {
+                    projectName: name
+                }
+            });
+            if (!project) {
+                await Project.create({
+                    projectName: name,
+                    projectConfig: [
+                        {
+                            "signal": {
+                                "id": 1,
+                                "remark": "测试信号备注",
+                                "innerIndex": 1,
+                                "signalName": "行驶速度",
+                                "signalType": "测试信号类型0",
+                                "signalUnit": "测试信号单位0",
+                                "collectorId": 1
+                            },
+                            "collector": {
+                                "isDisabled": false,
+                                "id": 1,
+                                "collectorName": "zx-04A-1",
+                                "collectorAddress": "1",
+                                "userId": null
+                            },
+                            "controller": {
+                                "isDisabled": false,
+                                "id": 1,
+                                "controllerName": "hx-04A-1",
+                                "controllerAddress": "192.168.0.101",
+                                "userId": null
+                            },
+                        }
+                    ]
+                });
+            }
+        }
+    }
 }
+
+export default new ProjectService()
