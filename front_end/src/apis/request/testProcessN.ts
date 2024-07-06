@@ -51,35 +51,30 @@ export const deleteProcessN = (id: number) => {
     });
 }
 
+//加载三秒
 export const downProcessN = (processN: ITestProcessN) => {
-    //加载三秒
-    return new Promise((resolve, reject) => {
-        message.loading({content: "加载中...", key: 'processN', duration: 0})
-        setTimeout(() => {
-            localStorage.setItem('processN', JSON.stringify(processN));
-            message.success({content: "下发成功", key: 'processN', duration: 2})
-            resolve(processN);
-        }, 3000);
+    const api = TEST_PROCESSN_API.downTestProcessN;
+    return request({
+        api: api,
+        params: processN
     });
 }
 
 export const stopCurrentProcessN = () => {
-    return new Promise((resolve, reject) => {
-        message.loading({content: "加载中...", key: 'processN', duration: 0})
-        setTimeout(() => {
-            localStorage.removeItem('processN');
-            message.success({content: "停止成功", key: 'processN', duration: 2})
-            resolve(true);
-        }, 3000);
-    })
+    const api = TEST_PROCESSN_API.stopCurrentTestProcessN;
+    return request({
+        api: api
+    });
 }
 
 export const getCurrentProcessN = () => {
-    const processN = localStorage.getItem('processN');
-    return processN ? JSON.parse(processN) : null;
+    const api = TEST_PROCESSN_API.getCurrentTestProcessN
+    return request({
+        api: api
+    })
 }
 
-export const checkCurrentProcessN = (record:ITestProcessN) => {
+export const checkCurrentProcessN = (record: ITestProcessN) => {
     const testProcessNRecord = JSON.stringify(record)
     if (!confirm("" + PROCESS_CONFIG_HINT)) return
     window.open(`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.SHOW}`)

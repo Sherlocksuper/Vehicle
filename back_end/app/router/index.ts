@@ -108,6 +108,13 @@ router.get('/getTestProcessNById/:id', TestProcessNController.getTestProcessN)
 router.post('/updateTestProcessN/:id', TestProcessNController.updateTestProcessN)
 router.post('/deleteTestProcessN/:id', TestProcessNController.deleteTestProcessN)
 
+/**
+ * 下发测试流程、获取当前测试流程、停止当前测试流程
+ */
+router.post('/downTestProcessN', TestProcessNController.downTestProcessN)
+router.get('/getCurrentTestProcessN', TestProcessNController.getCurrentTestProcessN)
+router.get('/stopCurrentTestProcessN', TestProcessNController.stopCurrentTestProcessN)
+
 
 /**
  * history

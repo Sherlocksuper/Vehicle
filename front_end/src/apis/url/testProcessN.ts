@@ -6,8 +6,21 @@
 
 import {UrlMap} from "@/apis/url/myUrl.ts";
 import {ContentType, Method} from "@/apis/standard/all.ts";
+import {APIStandard} from "@/apis/standard/all.ts";
 
-export const TEST_PROCESSN_API: UrlMap = {
+interface TestProcessNApi {
+    getTestProcessNList: APIStandard;
+    createTestProcessN: APIStandard;
+    getTestProcessNById: APIStandard;
+    updateTestProcessN: APIStandard;
+    deleteTestProcessN: APIStandard;
+    downTestProcessN: APIStandard;
+    getCurrentTestProcessN: APIStandard;
+    stopCurrentTestProcessN: APIStandard;
+    // 其他可能的键...
+}
+
+export const TEST_PROCESSN_API:  TestProcessNApi = {
     getTestProcessNList: {
         url: '/getTestProcessNList',
         method: Method.GET,
@@ -31,6 +44,21 @@ export const TEST_PROCESSN_API: UrlMap = {
     deleteTestProcessN: {
         url: '/deleteTestProcessN/:id',
         method: Method.POST,
+        format: ContentType.JSON
+    },
+    downTestProcessN: {
+        url: '/downTestProcessN',
+        method: Method.POST,
+        format: ContentType.JSON
+    },
+    getCurrentTestProcessN: {
+        url: '/getCurrentTestProcessN',
+        method: Method.GET,
+        format: ContentType.JSON
+    },
+    stopCurrentTestProcessN: {
+        url: '/stopCurrentTestProcessN',
+        method: Method.GET,
         format: ContentType.JSON
     }
 }

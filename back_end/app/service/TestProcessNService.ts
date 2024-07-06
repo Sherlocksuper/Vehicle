@@ -1,6 +1,13 @@
 import TestProcessN, {ITestProcessNModel} from "../model/1TestProcessN";
+import testProcessNController from "../controller/TestProcessNController";
 
 class TestProcessNService {
+    /**
+     * testProcessN,存到内存里
+     * 保存当前正在测试的流程
+     */
+    currentTestProcessN: ITestProcessNModel | null = null
+
 
     /**
      * 创建一个新的TestProcess
@@ -83,6 +90,22 @@ class TestProcessNService {
             console.log(error);
             return null
         }
+    }
+
+    /**
+     * 下发测试流程，设置当前的测试流程为testPrdcessN
+     */
+    async downTestProcessN(testProcessN: ITestProcessNModel) {
+        this.currentTestProcessN = testProcessN
+        return true
+    }
+
+    /**
+     * 停止当前下发
+     */
+    async stopCurrentTestProcessN() {
+        this.currentTestProcessN = null
+        return "success"
     }
 }
 

@@ -1,8 +1,9 @@
 import {Context} from "koa";
 import TestProcessNService from "../service/TestProcessNService";
-import {ITestProcessNModel} from "../model/1TestProcessN";
+import TestProcessN, {ITestProcessNModel} from "../model/1TestProcessN";
 import {IResBody} from "../types";
 import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE, WRITE_SUCCESS_MSG} from "../constants";
+import testProcessNService from "../service/TestProcessNService";
 
 class TestProcessNController {
     /**
@@ -112,6 +113,61 @@ class TestProcessNController {
                 msg: SEARCH_FAIL_MSG,
                 data: null
             }
+        }
+    }
+
+    /**
+     * 下发测试流程
+     */
+    async downTestProcessN(ctx: Context) {
+        const processN = ctx.request.body as ITestProcessNModel
+        const res = await TestProcessNService.downTestProcessN(processN)
+
+
+        if (res) {
+            (ctx.body as IResBody) = {
+                code: SUCCESS_CODE,
+                msg: WRITE_SUCCESS_MSG,
+                data: res
+            }
+        } else {
+            (ctx.body as IResBody) = {
+                code: FAIL_CODE,
+                msg: SEARCH_FAIL_MSG,
+                data: null
+            }
+        }
+    }
+
+    /**
+     * 获取当前测试流程
+     */
+    async getCurrentTestProcessN(ctx: Context) {
+        const currentProcessN = testProcessNService.currentTestProcessN
+        if (!currentProcessN) {
+            (ctx.body as IResBody) = {
+                code: SUCCESS_CODE,
+                msg: WRITE_SUCCESS_MSG,
+                data: currentProcessN
+            }
+        } else {
+            (ctx.body as IResBody) = {
+                code: FAIL_CODE,
+                msg: SEARCH_FAIL_MSG,
+                data: null
+            }
+        }
+    }
+
+    /**
+     * 停止测试流程
+     */
+    async stopCurrentTestProcessN(ctx: Context) {
+        const res = await testProcessNService.stopCurrentTestProcessN();
+        (ctx.body as IResBody) = {
+            code: SUCCESS_CODE,
+            msg: WRITE_SUCCESS_MSG,
+            data: res
         }
     }
 }

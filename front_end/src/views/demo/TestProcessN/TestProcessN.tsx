@@ -141,7 +141,9 @@ const TestProcessN: React.FC = () => {
                 display: 'flex',
                 justifyContent: 'space-between'
             }}>
-                <CheckCurrentProcessN currentProcessN={currentDownProcessN}/>
+                <CheckCurrentProcessN currentProcessN={currentDownProcessN} onStop={()=>{
+                    setCurrentDownProcessN(null)
+                }}/>
                 <NewTestProcessN onFinish={fetchTestProcessN}/>
             </div>
             <Table columns={newColumns} dataSource={processNList} rowKey={(value) => {
@@ -153,7 +155,10 @@ const TestProcessN: React.FC = () => {
 
 export default TestProcessN;
 
-const CheckCurrentProcessN: React.FC<{ currentProcessN: ITestProcessN | null }> = ({currentProcessN}) => {
+const CheckCurrentProcessN: React.FC<{
+    currentProcessN: ITestProcessN | null,
+    onStop: () => void
+}> = ({currentProcessN,onStop}) => {
     return (
         <Row gutter={[16, 8]} align={"middle"}>
             <Button
@@ -163,7 +168,11 @@ const CheckCurrentProcessN: React.FC<{ currentProcessN: ITestProcessN | null }> 
                         message.error("当前无下发配置")
                         return;
                     }
-                    stopCurrentProcessN()
+                    stopCurrentProcessN().then(() => {
+                        message.success("停止成功")
+                        onStop()
+
+                    })
                 }}>停止当前下发配置</Button>
             <Button
                 style={{marginRight: 20}}

@@ -44,6 +44,8 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
     const [singleKey, setSingleKey] = React.useState<string | null>(null);
     const [projectResult, setProjectResult] = React.useState<IProject | null>(null)
 
+    const ref = React.useRef(null)
+
 
     const getController = async () => {
         const res = await getActiveControllerList()
@@ -124,9 +126,14 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
                   name="projectForm">
                 <Button type="primary" onClick={() => {
                     clear()
+                    if (ref.current) {
+                        // @ts-ignore
+                        ref.current!.value = null
+                    }
                 }}>清空选择</Button>
                 <Select
-                    value={null}
+                    defaultValue={null}
+                    ref={ref}
                     placeholder={"选择以从现有项目拷贝"}
                     onChange={(value) => {
                         const newProjectResult = {...projectList.find(item => item.id === value) as IProject}
