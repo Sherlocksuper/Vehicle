@@ -33,7 +33,7 @@ const TestProject: React.FC = () => {
             key: "action",
             render: (_, record) => (
                 <Space>
-                    <ShowProjectButton initValue={JSON.stringify(record)}/>
+                    <ShowProjectButton projects={projects} initValue={JSON.stringify(record)}/>
                     <Button type="link" onClick={() => {
                         confirmDelete() &&
                         deleteProject(Number(record.id)).then(() => {
@@ -59,7 +59,7 @@ const TestProject: React.FC = () => {
         <div style={{
             padding: 20
         }}>
-            <CreateProjectButton onFinished={() => {
+            <CreateProjectButton projects={projects} onFinished={() => {
                 fetchProjects()
             }}/>
             <Table style={{
