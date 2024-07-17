@@ -78,60 +78,42 @@ const PreTestManager: React.FC = () => {
     })();
   }
 
-  useMemo(() => {
-    reloadData();
-  }, []);
+    useMemo(() => {
+        reloadData()
+    }, [])
 
-  const items: TabsProps["items"] = [
-    {
-      key: "1",
-      label: "核心板卡描述",
-      children: (
-        <ControllerInfoTable
-          dataSource={testData?.controllersConfig || []}
-          reload={reloadData}
-        />
-      ),
-    },
-    {
-      key: "2",
-      label: "采集板卡描述",
-      children: (
-        <CollectorInfoTable
-          dataSource={testData?.collectorsConfig || []}
-          reload={reloadData}
-        />
-      ),
-    },
-    {
-      key: "3",
-      label: "信号描述",
-      children: <SignalInfoTable dataSource={testData?.signalsConfig || []} />,
-    },
-  ];
 
-  return (
-    <Card
-      title="当前板卡配置情况"
-      className="tm_card"
-      style={{
-        height: "100%",
-        overflowY: "scroll",
-      }}
-      extra={
-        <Row gutter={[10, 10]}>
-          <Col>
-            <Button type="primary" onClick={reloadData}>
-              刷新
-            </Button>
-          </Col>
-          <AddConOrCollect reloadData={reloadData} type="controller" />
-          <AddConOrCollect reloadData={reloadData} type="collector" />
-          <AddSignal reloadData={reloadData} />
-        </Row>
-      }
-    >
-      <Tabs className="tm_tabs" defaultActiveKey="1" items={items} />
+    const items: TabsProps['items'] = [
+        {
+            key: '1',
+            label: '核心板卡描述',
+            children: <ControllerInfoTable dataSource={testData?.controllersConfig || []} reload={reloadData}/>,
+        },
+        {
+            key: '2',
+            label: '采集板卡描述',
+            children: <CollectorInfoTable dataSource={testData?.collectorsConfig || []} reload={reloadData}/>
+        },
+        {
+            key: '3',
+            label: '信号描述',
+            children: <SignalInfoTable dataSource={testData?.signalsConfig || []}/>,
+        },
+    ]
+
+
+    return <Card title='当前板卡配置情况' className="tm_card" style={{
+        height: '100%',
+        overflowY: 'scroll'
+    }} extra={<Row gutter={[10, 10]}>
+        <Col>
+            <Button type="primary" onClick={reloadData}>刷新</Button>
+        </Col>
+        <AddConOrCollectButton reloadData={reloadData} type="controller"/>
+        <AddConOrCollectButton reloadData={reloadData} type="collector"/>
+        <AddSignalButton reloadData={reloadData}/>
+    </Row>}>
+        <Tabs className="tm_tabs" defaultActiveKey="1" items={items}/>
     </Card>
   );
 };
@@ -144,12 +126,12 @@ interface AddManagerProps {
 }
 
 //添加核心板卡
-const AddConOrCollect = ({ reloadData, type }: AddManagerProps) => {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
+const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
+    const [open, setOpen] = useState(false)
+    const [name, setName] = useState('')
+    const [address, setAddress] = useState('')
 
-  const boardType = type === "controller" ? "核心板卡" : "采集板卡";
+    const boardType = type === 'controller' ? '核心板卡' : '采集板卡'
 
   const checkValid = () => {
     const addresses = address.split(".");
@@ -256,16 +238,16 @@ interface AddSignalProps {
   reloadData: () => void;
 }
 
-const AddSignal = ({ reloadData }: AddSignalProps) => {
-  const [open, setOpen] = useState(false);
-  const [single, setSingle] = useState<ISignalsConfigItem>({
-    signalName: "",
-    signalUnit: "",
-    signalType: "",
-    remark: "",
-    innerIndex: 0,
-    collectorId: 0,
-  } as ISignalsConfigItem);
+const AddSignalButton = ({reloadData}: AddSignalProps) => {
+    const [open, setOpen] = useState(false)
+    const [single, setSingle] = useState<ISignalsConfigItem>({
+        signalName: '',
+        signalUnit: '',
+        signalType: '',
+        remark: '',
+        innerIndex: 0,
+        collectorId: 0
+    } as ISignalsConfigItem)
 
   //获取采集板卡列表
   const [collectors, setCollectors] = useState<any[]>([]);
@@ -402,5 +384,4 @@ const AddSignal = ({ reloadData }: AddSignalProps) => {
         </Select>
       </Modal>
     </>
-  );
-};
+}

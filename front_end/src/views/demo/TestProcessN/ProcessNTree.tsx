@@ -6,7 +6,7 @@ import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 //查看配置树
 const SEE_PROCESS_TREE = '查看配置树';
 
-const generateData = (record: ITestProcessN) => {
+export const generateTreeData = (record: ITestProcessN) => {
     const data: TreeDataNode[] = [];
     for (let i = 0; i < record.testObjectNs.length; i++) {
         const key = `${i}`;
@@ -15,13 +15,21 @@ const generateData = (record: ITestProcessN) => {
             key: key,
             children: [] as TreeDataNode[]
         }
-
-        vehicleLeaf.children = record.testObjectNs[i].project.map((project, index) => {
+        const projects = record.testObjectNs[i].project;
+        const projectLeafs = projects.map((project, index) => {
             return {
                 title: `项目 ${project.projectName}`,
-                key: `${key}-${index}`
+                key: `${key}-${index}`,
+                children: project.projectConfig.map((config, index) => {
+                    return {
+                        title: `${config.controller.controllerName} - ${config.collector.collectorName} - ${config.signal.signalName}`,
+                        key: `${key}-${index}-${index}`,
+                    }
+                })
             }
         });
+
+        vehicleLeaf.children = projectLeafs;
         data.push(vehicleLeaf);
     }
     return data;
@@ -32,7 +40,7 @@ interface IProcessTreeProps {
 }
 
 const ProcessTree: React.FC<IProcessTreeProps> = ({record}) => {
-    const data = generateData(record);
+    const data = generateTreeData(record);
 
     const [open, setOpen] = useState(false);
 

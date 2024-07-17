@@ -4,11 +4,12 @@ import {ITestProcess} from "@/apis/standard/test.ts";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {IProject} from "@/apis/standard/project.ts";
 import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
-import {createProject} from "@/apis/request/project.ts";
+import {createProject, getProjects} from "@/apis/request/project.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {getSignalListByCollectorId} from "@/apis/request/board-signal/signal.ts";
 import {getActiveControllerList} from "@/apis/request/board-signal/controller.ts";
 import {getActiveCollectorList} from "@/apis/request/board-signal/collector.ts";
+import { RuleObject } from "antd/es/form";
 
 interface CreateProjectProps {
     open: boolean,
@@ -16,6 +17,7 @@ interface CreateProjectProps {
     onFinished: (newTest?: ITestProcess) => void
     disable: boolean
     initValue: string
+    projects:IProject[]
 }
 
 /**
@@ -32,17 +34,18 @@ interface CreateProjectProps {
  * @constructor
  */
 
-const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, disable, initValue}) => {
+const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, disable, initValue, projects}) => {
     const [form] = Form.useForm<IProject>();
-
     const [controllerList, setControllerList] = React.useState<IControllersConfigItem[]>([])
     const [collectorList, setCollectorList] = React.useState<ICollectorsConfigItem[]>([])
     const [signalList, setSignalList] = React.useState<ISignalsConfigItem[]>([])
+    const [projectList, setProjectList] = React.useState<IProject[]>([])
 
 
     const [selectedCollector, setSelectedCollector] = React.useState<boolean>(false);
     const [singleKey, setSingleKey] = React.useState<string | null>(null);
     const [projectResult, setProjectResult] = React.useState<IProject | null>(null)
+
 
     const getController = async () => {
         const res = await getActiveControllerList()
@@ -57,6 +60,18 @@ const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
     const getSignalList = async (collectorId: number) => {
         const res = await getSignalListByCollectorId(collectorId)
         setSignalList(res.data)
+    }
+
+    const getProjectList = async () => {
+        const res = await getProjects()
+        setProjectList(res.data)
+    }
+
+    const clear = () => {
+        setSelectedCollector(false)
+        setSingleKey(null)
+        setProjectResult(null)
+        form.resetFields()
     }
 
     const newProject = async (value: IProject) => {
@@ -77,9 +92,9 @@ const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
             setSingleKey(Math.random().toString(36).slice(-8))
             getController()
             getCollector()
+            getProjectList()
         }
     }, [disable])
-
 
     const handleSubmit = () => {
         if (disable) {
@@ -88,22 +103,63 @@ const CreateProject: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
         }
 
         form.validateFields().then(() => {
-            newProject(projectResult as IProject)
+            newProject(projectResult as IProject).then(() => {
+                onFinished()
+                clear()
+                form.resetFields()
+            })
         });
     };
 
+    const isSameName = (projects: IProject[], thisProject: string) => {
+      for (const value of projects)
+        if (value.projectName == thisProject) return true;
+      return false;
+    };
+  
+    const validateProjectData = async (_: RuleObject, value: string) => {
+      if (!value) {
+        return Promise.reject(new Error("请输入项目名称!"));
+      } else if (isSameName(projects, value)) {
+        return Promise.reject(new Error("不能与列表内已有项目重名!"));
+      } else {
+        return Promise.resolve();
+      }
+    };
+  
     return (
         <Modal
             open={open}
             title={generateTitle(mode)}
-            onOk={handleSubmit}
+            onOk={() => {
+                handleSubmit()
+            }}
             onCancel={() => {
                 onFinished()
             }}
         >
             <Form form={form} disabled={disable} initialValues={disable ? JSON.parse(initValue) : undefined}
                   name="projectForm">
-                <Form.Item name="projectName" label="项目名称" rules={[{required: true}]}>
+                <Button type="primary" onClick={() => {
+                    clear()
+                }}>清空选择</Button>
+                <Select
+                    value={null}
+                    placeholder={"选择以从现有项目拷贝"}
+                    onChange={(value) => {
+                        const newProjectResult = {...projectList.find(item => item.id === value) as IProject}
+                        newProjectResult.id = undefined
+                        setProjectResult(newProjectResult)
+                        form.setFieldsValue(newProjectResult)
+                    }}
+                    size={"middle"} style={{
+                    width: "100%", marginTop: 10, marginBottom: 10
+                }}>
+                    {projectList.map((item) => (
+                        <Select.Option key={item.id} value={item.id}>{item.projectName}</Select.Option>
+                    ))}
+                </Select>
+                <Form.Item name="projectName" label="项目名称" rules={[{ validator: validateProjectData }]}>
                     <Input onChange={(e) => {
                         const newProjectResult = {...projectResult} as IProject
                         newProjectResult.projectName = e.target.value
@@ -240,4 +296,33 @@ function generateTitle(mode: 'create' | 'edit' | 'show') {
     }
 }
 
-export default CreateProject;
+export default ProjectManage;
+
+export const CreateProjectButton: React.FC<{ onFinished: () => void,projects:IProject[] }> = ({onFinished,projects}) => {
+    const [open, setOpen] = React.useState<boolean>(false)
+
+    return <>
+        <Button type="primary" onClick={() => {
+            setOpen(true)
+        }}>新建测试项目</Button>
+        <ProjectManage open={open} mode={"create"} onFinished={() => {
+            onFinished()
+            setOpen(false)
+        }} disable={false} initValue={""} projects={projects}/>
+    </>
+}
+
+export const ShowProjectButton: React.FC<{ initValue: string,projects:IProject[]}> = ({initValue,projects}) => {
+    const [open, setOpen] = React.useState<boolean>(false)
+    let mode: "create" | "edit" | "show" = "show"
+    if (initValue) mode = "show"
+
+    return <>
+        <Button type="link" onClick={() => {
+            setOpen(true)
+        }}>查看测试项目</Button>
+        <ProjectManage open={open} mode={"show"} projects={projects} onFinished={() => {
+            setOpen(false) 
+        }} disable={mode === "show"} initValue={initValue} key={new Date().getTime()}/>
+    </>
+}

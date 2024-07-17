@@ -1,6 +1,6 @@
 export const VEHICLE = '车辆';
 export const PROJECT = '项目';
-export const TEMPLATE = '模板';
+export const TEMPLATE = '可视化配置';
 
 
 export const PROCESS_CONFIG_HINT = '请确认是否已经配置好需要展示的信息';
