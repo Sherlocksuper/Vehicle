@@ -6,7 +6,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import React, { ReactElement } from "react";
 import userUtils from "@/utils/userUtils.ts";
-import PhyTopology from "@/views/demo/topology/PhyTopology.tsx";
+import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import UserManage from "@/views/demo/User/UserList.tsx";
 import TestProject from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
 import TestTemplate from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.tsx";

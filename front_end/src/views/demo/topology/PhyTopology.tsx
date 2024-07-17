@@ -102,7 +102,7 @@ const PreTestManager: React.FC = () => {
     ]
 
 
-    return <Card title='当前板卡配置情况' className="tm_card" style={{
+    return (<Card title='当前板卡配置情况' className="tm_card" style={{
         height: '100%',
         overflowY: 'scroll'
     }} extra={<Row gutter={[10, 10]}>
@@ -384,4 +384,4 @@ const AddSignalButton = ({reloadData}: AddSignalProps) => {
         </Select>
       </Modal>
     </>
-}
+)}
