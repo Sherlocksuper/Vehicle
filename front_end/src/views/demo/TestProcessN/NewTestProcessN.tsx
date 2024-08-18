@@ -94,7 +94,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                                         setVehicleList(res.data.filter((item: IVehicle) => !item.isDisabled));
                                     });
                                 }
-                            } key={new Date().getTime()}/>
+                            } key={new Date().getTime()} vehicles={vehicleList}/>
                         </Row>
                     },
                     dataIndex: 'vehicle.vehicleName',
@@ -125,7 +125,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                                         setProjectList(res.data);
                                     });
                                 }
-                            }/>
+                            } projects={projectList} key={new Date().getTime()}/>
                         </Row>
                     },
                     dataIndex: 'project.projectName',
