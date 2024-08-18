@@ -22,6 +22,7 @@ describe('测试模板', () => {
                 {
                     type: TestTemplateType.NUMBER,
                     requestSignalId: 1,
+                    requestSignals:[],
                     x: 0,
                     y: 0,
                     width: 100,

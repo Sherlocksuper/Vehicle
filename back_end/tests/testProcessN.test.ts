@@ -15,31 +15,34 @@ describe('Test processN', () => {
             vehicleName: 'vehicle',
             isDisabled: false
         },
-        project: {
-            projectName: 'project',
-            projectConfig: [{
-                controller: {
-                    controllerName: 'controller',
-                    controllerAddress: 'address',
-                    userId: 1,
-                    isDisabled: false
-                },
-                collector: {
-                    collectorName: 'collector',
-                    collectorAddress: 'address',
-                    userId: 1,
-                    isDisabled: false
-                },
-                signal: {
-                    signalName: 'signal',
-                    signalUnit: 'unit',
-                    signalType: 'type',
-                    remark: 'remark',
-                    collectorId: 1,
-                    innerIndex: 1
-                }
-            }]
-        },
+        project: [
+            {
+                projectName: 'project',
+                projectConfig: [{
+                    controller: {
+                        controllerName: 'controller',
+                        controllerAddress: 'address',
+                        userId: 1,
+                        isDisabled: false
+                    },
+                    collector: {
+                        collectorName: 'collector',
+                        collectorAddress: 'address',
+                        userId: 1,
+                        isDisabled: false
+                    },
+                    signal: {
+                        signalName: 'signal',
+                        signalUnit: 'unit',
+                        signalType: 'type',
+                        signalAttribute: 'attribute',
+                        remark: 'remark',
+                        collectorId: 1,
+                        innerIndex: 1
+                    }
+                }]
+            },
+        ],
         template: {
             name: 'template',
             description: 'description',
@@ -55,7 +58,14 @@ describe('Test processN', () => {
         testName: 'testName',
         testObjectNs: [
             testObj
-        ]
+        ],
+        template: {
+            name: 'template',
+            description: 'description',
+            createdAt: new Date('2021-01-01'),
+            updatedAt: new Date('2021-01-01'),
+            itemConfig: []
+        }
     }
 
     let backendServer: Server
