@@ -6,6 +6,7 @@ export interface ISignalModel {
     signalName: string
     signalUnit: string
     signalType: string
+    signalAttribute: string;
     remark: string
     collectorId: number
     innerIndex: number
@@ -30,6 +31,9 @@ export default class Signal extends Model<ISignalModel> {
 
     @Column(DataType.STRING)
     signalType!: string;
+
+    @Column(DataType.STRING)
+    signalAttribute!: string;
 
     @Column(DataType.STRING)
     remark!: string;

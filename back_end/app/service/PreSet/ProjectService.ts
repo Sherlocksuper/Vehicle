@@ -58,6 +58,7 @@ class ProjectService {
                                 "innerIndex": 1,
                                 "signalName": "行驶速度",
                                 "signalType": "测试信号类型0",
+                                "signalAttribute": "测试信号属性0",
                                 "signalUnit": "测试信号单位0",
                                 "collectorId": 1
                             },

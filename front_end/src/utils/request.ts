@@ -29,9 +29,6 @@ export const request = ({api, params}: {
     const responseType = api.responseType || ResponseType.JSON
 
     const axiosConfig = getAxiosConfig(url, method, params, format || ContentType.WWW_FORM, responseType)
-    console.log("正在通过", method + "方法\n", "向", url, "发送请求\n，请求参数为:")
-    console.table(params)
-    console.log("\n格式为", format)
 
 
     return axiosInstance(axiosConfig).then(response => {

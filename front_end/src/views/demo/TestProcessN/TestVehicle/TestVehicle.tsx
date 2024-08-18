@@ -6,24 +6,25 @@ import {createVehicle, deleteVehicle, getVehicles, updateVehicle} from "@/apis/r
 import {SUCCESS_CODE} from "@/constants";
 import {useLoaderData} from "react-router-dom";
 import {confirmDelete} from "@/utils";
+import { RuleObject } from 'antd/es/form';
 
 
-const columns: TableProps<IVehicle>['columns'] = [
-    {
-        title: '车辆名称',
-        dataIndex: 'vehicleName',
-        key: 'vehicleName',
-    },
-    {
-        title: '是否启用',
-        dataIndex: 'isDisabled',
-        key: 'isDisabled',
-        render: (text) => !text ? "是" : "否"
-    },
-    {
-        title: '操作',
-        key: 'action',
-    },
+const columns: TableProps<IVehicle>["columns"] = [
+  {
+    title: "车辆名称",
+    dataIndex: "vehicleName",
+    key: "vehicleName",
+  },
+  {
+    title: "是否启用",
+    dataIndex: "isDisabled",
+    key: "isDisabled",
+    render: (text) => (!text ? "是" : "否"),
+  },
+  {
+    title: "操作",
+    key: "action",
+  },
 ];
 
 const TestVehicle: React.FC = () => {
@@ -72,7 +73,9 @@ const TestVehicle: React.FC = () => {
         <div style={{
             padding: 20
         }}>
-            <CreateTestVehicleButton onFinished={() => {
+            <CreateTestVehicleButton 
+            vehicles={vehicles}
+            onFinished={() => {
                 getVehicles().then((res) => {
                     console.log(res)
                     setVehicles(res.data)
@@ -88,7 +91,7 @@ const TestVehicle: React.FC = () => {
 export default TestVehicle;
 
 
-export const CreateTestVehicleButton: React.FC<{ onFinished: () => void }> = ({onFinished}) => {
+export const CreateTestVehicleButton: React.FC<{ onFinished: () => void,vehicles:IVehicle[] }> = ({onFinished,vehicles}) => {
     const title = "新建车辆"
     const [form] = Form.useForm<IVehicle>()
     const [open, setOpen] = React.useState<boolean>(false)
@@ -108,6 +111,23 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void }> = ({o
             onFinished()
         })
     }
+
+    const isSameName = (vehicles: IVehicle[], thisVehicle: string) => {
+      for (const value of vehicles)
+        if (value.vehicleName == thisVehicle) return true;
+      return false;
+    };
+  
+    const validateVehicleData = async (_: RuleObject, value: string) => {
+      if (!value) {
+        return Promise.reject(new Error("请输入车辆名称!"));
+      } else if (isSameName(vehicles, value)) {
+        return Promise.reject(new Error("不能与列表内已有汽车重名!"));
+      } else {
+        return Promise.resolve();
+      }
+    };
+  
 
     return (
         <>
@@ -130,8 +150,8 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void }> = ({o
                     <Form.Item
                         label="车辆名称"
                         name="vehicleName"
-                        rules={[{required: true, message: '请输入车辆名称!'}]}
-                    >
+                        rules={[{ validator: validateVehicleData }]}
+                        >
                         <Input/>
                     </Form.Item>
                 </Form>

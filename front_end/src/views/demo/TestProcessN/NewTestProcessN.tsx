@@ -16,7 +16,7 @@ import {TEMPLATE} from "@/constants/process_hint.ts";
 import {generateTreeData} from "@/views/demo/TestProcessN/ProcessNTree.tsx";
 
 interface INewTestProcessNProps {
-    onFinish: () => void;
+  onFinish: () => void;
 }
 
 const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
@@ -33,35 +33,35 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
         template: {} as ITemplate
     });
 
-    const [visible, setVisible] = useState(false);
-    const [modalType, setModalType] = useState<'show' | 'edit'>('edit');
-    const [confirmLoading, setConfirmLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [modalType, setModalType] = useState<"show" | "edit">("edit");
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
-    const [vehicleList, setVehicleList] = useState<IVehicle[]>([]);
-    const [projectList, setProjectList] = useState<IProject[]>([]);
-    const [testTemplateList, setTestTemplateList] = useState<ITemplate[]>([]);
+  const [vehicleList, setVehicleList] = useState<IVehicle[]>([]);
+  const [projectList, setProjectList] = useState<IProject[]>([]);
+  const [testTemplateList, setTestTemplateList] = useState<ITemplate[]>([]);
 
-    useEffect(() => {
-        getVehicles().then((res) => {
-            setVehicleList(res.data.filter((item: IVehicle) => !item.isDisabled));
-        });
-        getProjects().then((res) => {
-            setProjectList(res.data);
-        });
-        getTestTemplateList().then((res) => {
-            setTestTemplateList(res.data);
-        });
-    }, []);
+  useEffect(() => {
+    getVehicles().then((res) => {
+      setVehicleList(res.data.filter((item: IVehicle) => !item.isDisabled));
+    });
+    getProjects().then((res) => {
+      setProjectList(res.data);
+    });
+    getTestTemplateList().then((res) => {
+      setTestTemplateList(res.data);
+    });
+  }, []);
 
-    const check = () => {
-        if (!testProcessN?.testName) {
-            message.error('测试流程名称不能为空');
-            return false;
-        }
-        if (!testProcessN?.testObjectNs) {
-            message.error('测试对象不能为空');
-            return false;
-        }
+  const check = () => {
+    if (!testProcessN?.testName) {
+      message.error("测试流程名称不能为空");
+      return false;
+    }
+    if (!testProcessN?.testObjectNs) {
+      message.error("测试对象不能为空");
+      return false;
+    }
 
         if (!testProcessN?.template) {
             message.error(TEMPLATE + '不能为空');

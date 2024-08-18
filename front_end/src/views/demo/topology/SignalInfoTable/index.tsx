@@ -31,6 +31,11 @@ const SignalInfoTable: React.FC<{
             key: 'signalType',
         },
         {
+            title: '信号属性',
+            dataIndex: 'signalAttribute',
+            key: 'signalAttribute',
+        },
+        {
             title: '备注',
             dataIndex: 'remark',
             key: 'remark',
@@ -42,4 +47,4 @@ const SignalInfoTable: React.FC<{
                   dataSource={dataSource} columns={columns}/>
 }
 
-export default SignalInfoTable  
+export default SignalInfoTable

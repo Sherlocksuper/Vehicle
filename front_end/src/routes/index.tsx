@@ -1,10 +1,10 @@
-import Login from "@/views/login"
-import RequirAuthRoute from "../components/RequireAuthRoute.tsx/index.tsx"
+import Login from "@/views/login";
+import RequirAuthRoute from "../components/RequireAuthRoute.tsx/index.tsx";
 import SystemTotalPage from "@/views/demo";
-import {createBrowserRouter, Outlet} from "react-router-dom";
-import {DndProvider} from "react-dnd";
-import {HTML5Backend} from "react-dnd-html5-backend";
-import React, {ReactElement} from "react";
+import { createBrowserRouter, Outlet } from "react-router-dom";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import React, { ReactElement } from "react";
 import userUtils from "@/utils/userUtils.ts";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import UserManage from "@/views/demo/User/UserList.tsx";
@@ -17,13 +17,12 @@ import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import OfflineShow from "@/views/demo/OffLine/OfflineShow.tsx";
 import History from "@/views/demo/History/history.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
-import {TEMPLATE} from "@/constants/process_hint.ts";
 
 interface RouteItem {
-    key: string
-    label: string
-    element?: ReactElement,
-    children?: RouteItem[]
+  key: string;
+  label: string;
+  element?: ReactElement;
+  children?: RouteItem[];
 }
 
 export const routeItems: RouteItem[] = [
@@ -50,7 +49,7 @@ export const routeItems: RouteItem[] = [
             },
             {
                 key: '/test-config/test-object',
-                label: TEMPLATE,
+                label: '测试模板',
                 element: <TestTemplate/>
             },
         ]
