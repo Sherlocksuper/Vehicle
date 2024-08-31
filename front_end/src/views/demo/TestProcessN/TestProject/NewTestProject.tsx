@@ -1,4 +1,4 @@
-import {Button, Form, Input, Modal, Select, Space} from "antd";
+import {Button, Form, Input, message, Modal, Select, Space} from "antd";
 import React, {useEffect} from "react";
 import {ITestProcess} from "@/apis/standard/test.ts";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
@@ -77,13 +77,21 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
     }
 
     const newProject = async (value: IProject) => {
+        const checkMap = value.projectConfig.map((item) => item.signal.signalAttribute)
+        if (new Set(checkMap).size !== checkMap.length) {
+            message.error("测试指标属性不可重复")
+            return false
+        }
+
         createProject(value).then(res => {
             if (res.code === SUCCESS_CODE) {
+                message.success("创建成功")
                 onFinished()
             } else {
                 console.log(res)
             }
         })
+        return true
     }
 
     useEffect(() => {
@@ -105,10 +113,12 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
         }
 
         form.validateFields().then(() => {
-            newProject(projectResult as IProject).then(() => {
-                onFinished()
-                clear()
-                form.resetFields()
+            newProject(projectResult as IProject).then((value) => {
+                if (value){
+                    onFinished()
+                    clear()
+                    form.resetFields()
+                }
             })
         });
     };
