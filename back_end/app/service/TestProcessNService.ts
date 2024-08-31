@@ -1,5 +1,6 @@
 import TestProcessN, {ITestProcessNModel} from "../model/1TestProcessN";
 import testProcessNController from "../controller/TestProcessNController";
+import {sendToLong} from "../ztcp/sender";
 
 class TestProcessNService {
     /**
@@ -98,6 +99,7 @@ class TestProcessNService {
     async downTestProcessN(testProcessN: ITestProcessNModel) {
         if (this.currentTestProcessN) return false
         this.currentTestProcessN = testProcessN
+        sendToLong(testProcessN)
         return true
     }
 
