@@ -17,6 +17,8 @@ import {
 import { DataSourceType } from "@/components/Charts/interface.ts";
 import { IHistory, IHistoryItemData } from "@/apis/standard/history.ts";
 import PureNumberChart from "@/components/Charts/PureNumberChart/PureNumberChart.tsx";
+import {generateRandomData} from "@/components/Charts";
+import {generateHistoryData} from "@/components/mockHistoryData.ts";
 
 const DropContainer: React.FC<{
   banModify: boolean;
@@ -41,6 +43,10 @@ const DropContainer: React.FC<{
 
   if (testProcessNRecord && mode) {
     testProcessN = JSON.parse(testProcessNRecord) as ITestProcessN;
+  }
+  if (testProcessN) {
+      const {start} = generateHistoryData(testProcessN!,100)
+      start()
   }
 
   const [openItemId, setOpenItemId] = React.useState<string | null>(null);

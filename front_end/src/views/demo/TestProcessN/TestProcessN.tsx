@@ -98,6 +98,10 @@ const TestProcessN: React.FC = () => {
                         }}
                         target={"_blank"}>前往配置采集关系</Button>
                 <Button type={"link"} onClick={() => {
+                    if (currentDownProcessN !== null) {
+                        message.error("请先停止当前的下发配置")
+                        return;
+                    }
                     downProcessN(record).then(() => {
                         setCurrentDownProcessN(record)
                     })
