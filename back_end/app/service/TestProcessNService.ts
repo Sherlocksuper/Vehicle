@@ -1,6 +1,6 @@
 import TestProcessN, {ITestProcessNModel} from "../model/1TestProcessN";
-import testProcessNController from "../controller/TestProcessNController";
 import {sendToLong} from "../ztcp/sender";
+import {ILongMessageType, LongMessage} from "../ztcp/type";
 
 class TestProcessNService {
     /**
@@ -99,7 +99,11 @@ class TestProcessNService {
     async downTestProcessN(testProcessN: ITestProcessNModel) {
         if (this.currentTestProcessN) return false
         this.currentTestProcessN = testProcessN
-        sendToLong(testProcessN)
+        const message: ILongMessageType = {
+            type: LongMessage.STARTCOLLECT,
+            body: testProcessN
+        }
+        sendToLong(message)
         return true
     }
 

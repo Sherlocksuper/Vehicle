@@ -1,16 +1,10 @@
 import {createServer,} from "net";
 import {boardPort, comPort, longServerPort} from "./config.js";
+import {handleReceiveComMessage} from "../tocom/computerMessageHandler.js";
+import {clientBoard, clientComputer} from "./index.js";
+import {handleReceiveBoardMessage} from "../toboard/boardMessageHandler.js";
 
-// 存储两个客户端的套接字
-// 上位机
-let clientComputer = null;
-// 下位机
-let clientBoard = null;
-
-// 创建TCP服务器
-const server = createServer((socket) => {
-  console.log(`新连接: ${socket.remoteAddress}:${socket.remotePort}`);
-
+function setSocket(socket) {
   if (socket.remotePort === comPort) {
     if (clientComputer) {
       clientComputer.destroy(); // 关闭之前的连接
@@ -23,24 +17,36 @@ const server = createServer((socket) => {
     }
     clientBoard = socket;
     console.log('下位机 Board 已连接');
-  } else {
+  }
+}
+
+// 创建TCP服务器
+const server = createServer((socket) => {
+  console.log(`新连接: ${socket.remoteAddress}:${socket.remotePort}`);
+
+  if (socket.remotePort !== comPort && socket.remotePort !== boardPort) {
     console.log("未识别的客户端，来自:", socket.remoteAddress, socket.remotePort);
+    socket.write("未识别的客户端，请断开连接\n");
     return;
   }
 
+  setSocket(socket);
+
   // 确定客户端是 Computer 还是 Board
   socket.on('data', (data) => {
+    if (!clientBoard || !clientComputer) {
+      socket.write("程序连接不完备，缺少Board或Computer\n");
+      return;
+    }
     const message = data.toString().trim();
-    console.log(message)
-    // 转发消息
+    // 处理消息
     if (socket === clientComputer && clientBoard) {
       console.log(`上位机 Computer 发来消息: ${message}`);
-      clientBoard.write(`Computer: ${message}\n`);
+      handleReceiveComMessage(socket, message)
     } else if (socket === clientBoard && clientComputer) {
       console.log(`下位机 Board 发来消息: ${message}`);
-      clientComputer.write(`Board: ${message}\n`);
+      handleReceiveBoardMessage(socket, message)
     }
-
   });
 
   // 处理客户端断开连接

@@ -1,3 +1,6 @@
+// 此文件用来解析下位机传来的数据
+// 比如 CD EF 02 01 FF FF 00 00 00 05 01 FF 00 10 00 00 A1 5E
+
 import {parseToXlsxData, saveDataToXlsx} from "../file.js";
 
 class ParseClass {

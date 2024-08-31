@@ -43,7 +43,7 @@ export function createConnectionToLong() {
 export function attemptReconnect() {
     console.log(`将在 ${reconnectDelay / 1000} 秒后尝试重新连接...`);
     setTimeout(() => {
-        reconnectDelay = Math.min(reconnectDelay * 2, 30000); // 指数级增长，最大延迟30秒
+        reconnectDelay = Math.min(reconnectDelay * 2, 10000); // 指数级增长，最大延迟10秒
         createConnectionToLong();
     }, reconnectDelay);
 }
