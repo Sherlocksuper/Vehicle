@@ -2,7 +2,6 @@ import * as echarts from "echarts"
 import {useEffect, useMemo, useRef} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
 import {generateRandomData, mockHistoryData} from "@/components/Charts";
-import {TEST_INTERNAL} from "@/constants";
 import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 interface ISeries {
@@ -31,8 +30,9 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     const {
         startRequest,
         requestSignals,
-        onReceiveData,
-        historyData
+
+        historyData,
+        currentTestChartData
     } = props
 
     const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -66,26 +66,23 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         chartRef.current?.setOption(option)
     }
 
-    const mockRandomData = () => {
-        timerRef.current && clearInterval(timerRef.current)
-        if (startRequest && requestSignals.length > 0) {
-            timerRef.current = setInterval(() => {
-                const data = generateRandomData(requestSignals)
-                pushData(data)
-                onReceiveData(data)
-            }, TEST_INTERNAL)
+    // 同步historyData
+    useEffect(() => {
+        if (!historyData) {
+            return;
         }
-        return () => {
-            timerRef.current && clearInterval(timerRef.current)
-        }
-    }
-
-
-    useMemo(() => {
-        if (!historyData) mockRandomData()
         const getFileData = mockHistoryData(0, pushData, historyData!)
         getFileData(0)
     }, [requestSignals.length])
+
+    // 同步netWorkData
+    useEffect(() => {
+        if (!currentTestChartData || currentTestChartData.length === 0) {
+            console.log("here")
+            return
+        }
+        pushData(currentTestChartData[currentTestChartData.length - 1])
+    }, [currentTestChartData?.length])
 
     useEffect(() => {
         chartRef.current = echarts.init(chartContainerRef.current)

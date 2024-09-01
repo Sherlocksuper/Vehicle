@@ -137,6 +137,7 @@ const OfflineShow: React.FC = () => {
                         }}
                         onReceiveData={onReceiveData}
                         fileHistory={history}
+                        netHistory={undefined}
                     />
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import {useMemo, useRef, useState} from 'react'
+import {useEffect, useMemo, useRef, useState} from 'react'
 import './index.css'
 import {IChartInterface} from "@/components/Charts/interface.ts";
 import {generateRandomData, mockHistoryData} from "@/components/Charts";
@@ -10,8 +10,9 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
         startRequest,
         requestSignals,
         sourceType,
-        onReceiveData,
+
         historyData,
+        currentTestChartData,
 
         trueLabel,
         falseLabel,
@@ -24,23 +25,22 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
         setValue(data.data[requestSignals[0].signal.id] > 0.5)
     }
 
-    const mockRandomData = () => {
-        timerRef.current && clearInterval(timerRef.current)
-        if (startRequest && requestSignals.length > 0) {
-            timerRef.current = setInterval(() => {
-                const data = generateRandomData(requestSignals)
-                onReceiveData(data)
-                pushData(data)
-            }, TEST_INTERNAL)
+    useEffect(() => {
+        if (!historyData) {
+            return
         }
-    }
-
-
-    useMemo(() => {
-        if (!historyData) mockRandomData()
-        const getFileData = mockHistoryData(0, pushData, historyData!)
+        const getFileData = mockHistoryData(0, pushData, historyData)
         getFileData(0)
     }, [startRequest, requestSignals])
+
+
+    // 同步netWorkData
+    useEffect(() => {
+        if (!currentTestChartData || currentTestChartData.length === 0) {
+            return
+        }
+        pushData(currentTestChartData[currentTestChartData.length - 1])
+    }, [currentTestChartData?.length])
 
 
     return <div className="bc_container" style={{

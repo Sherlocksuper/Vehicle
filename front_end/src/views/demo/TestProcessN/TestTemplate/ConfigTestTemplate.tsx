@@ -397,6 +397,8 @@ const ConfigTestTemplate: React.FC = () => {
                         onLayoutChange={updateAllByLayout}
                         updateDragItem={updateDragItem}
                         onReceiveData={onReceiveData}
+                        fileHistory={undefined}
+                        netHistory={history}
                     />
                 </div>
                 {renderManageButton()}

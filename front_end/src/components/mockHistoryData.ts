@@ -1,10 +1,13 @@
-// 假设已经导入了必要的接口类型
+import { IHistory, IHistoryItemData } from "@/apis/standard/history.ts";
+import { ITestProcessN } from "@/apis/standard/testProcessN.ts";
 
-import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
-import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
-
-export function generateHistoryData(testProcess: ITestProcessN, interval: number): { start: () => void; stop: () => void; getHistory: () => IHistory } {
-    // 初始化 IHistory 对象
+// 改进后的generateHistoryData函数
+export function generateHistoryData(
+    testProcess: ITestProcessN,
+    minInterval: number,
+    maxInterval: number,
+    onReceiveData: (templateId: string, data: IHistoryItemData) => void
+): { start: () => void; stop: () => void; getHistory: () => IHistory } {
     const history: IHistory = {
         historyName: testProcess.testName,
         configName: testProcess.template.name,
@@ -14,62 +17,54 @@ export function generateHistoryData(testProcess: ITestProcessN, interval: number
         historyData: [],
     };
 
-    let timer: NodeJS.Timer | null = null;
+    let timers: { [key: string]: NodeJS.Timer } = {};
 
-
-    // 根据 template 创建 initial historyData
     history.historyData = testProcess.template.itemsConfig.map((templateItem) => ({
         templateItemId: templateItem.id!.toString(),
         data: [],
     }));
 
-    // 定义生成随机数的函数（可根据需要调整生成逻辑）
     const generateRandomValue = () => Math.random() * 100;
+    const generateRandomInterval = () => Math.random() * (maxInterval - minInterval) + minInterval;
 
-    // 定义定时生成数据的函数
     const start = () => {
-        if (timer) return; // 防止重复启动
-
-        timer = setInterval(() => {
-            const timestamp = Date.now();
-
-            testProcess.template.itemsConfig.forEach((item)=>{
+        testProcess.template.itemsConfig.forEach((item) => {
+            const generateData = () => {
+                const timestamp = Date.now();
                 const historyItemData: IHistoryItemData = {
                     xAxis: timestamp,
                     data: {},
                 };
-                item.requestSignals.forEach((item)=>{
-                    historyItemData.data[item.signal.id] = generateRandomValue();
-                })
 
-                // 推送到id为item.id的数据
+                item.requestSignals.forEach((signal) => {
+                    historyItemData.data[signal.signal.id] = generateRandomValue();
+                });
+
                 const index = history.historyData.findIndex((historyItem) => historyItem.templateItemId === item.id);
                 if (index !== -1) {
                     history.historyData[index].data.push(historyItemData);
+                    onReceiveData(item.id!, historyItemData); // 实时反馈新数据
                 }
-            })
 
-            console.log(`在 ${new Date(timestamp).toLocaleString()} 生成了一条数据`);
-            console.log(JSON.stringify(history))
-        }, interval);
+                // 继续为该 templateId 设置随机间隔的定时器
+                timers[item.id!] = setTimeout(generateData, generateRandomInterval());
+            };
+
+            // 初始启动数据生成
+            timers[item.id!] = setTimeout(generateData, generateRandomInterval());
+        });
     };
 
-    // 停止生成数据
     const stop = () => {
-        if (timer) {
-            // @ts-ignore
-            clearInterval(timer)
-            timer = null;
-            history.endTime = Date.now();
-            console.log(`数据采集已停止，结束时间：${new Date(history.endTime).toLocaleString()}`);
-        }
+
+        // @ts-ignore
+        Object.values(timers).forEach(clearTimeout);
+        timers = {};
+        history.endTime = Date.now();
+        console.log(`数据采集已停止，结束时间：${new Date(history.endTime).toLocaleString()}`);
     };
 
-    // 获取当前的 history 数据
     const getHistory = () => history;
 
     return { start, stop, getHistory };
 }
-
-
-

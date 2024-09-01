@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {IChartInterface} from "@/components/Charts/interface.ts";
 import {generateRandomData, mockHistoryData} from "@/components/Charts";
 import {TEST_INTERNAL} from "@/constants";
@@ -9,8 +9,9 @@ const PureNumberChart: React.FC<IChartInterface> = (props) => {
         startRequest,
         requestSignals,
         sourceType,
-        onReceiveData,
+
         historyData,
+        currentTestChartData,
 
         title,
     } = props
@@ -18,30 +19,30 @@ const PureNumberChart: React.FC<IChartInterface> = (props) => {
     const [value, setValue] = useState<number>(0)
 
     const pushData = (data: IHistoryItemData) => {
-        console.log(data.data[requestSignals[0].signal.id])
+        if (!data) {
+            setValue(-1)
+            return
+        }
         setValue(data.data[requestSignals[0].signal.id])
     }
 
-    const mockRandomData = () => {
-        timerRef.current && clearInterval(timerRef.current)
-        if (startRequest && requestSignals.length > 0) {
-            timerRef.current = setInterval(() => {
-                const data = generateRandomData(requestSignals)
-                onReceiveData(data)
-                pushData(data)
-            }, TEST_INTERNAL)
-        }
-    }
 
-
-    useMemo(() => {
+    useEffect(() => {
         if (!historyData) {
-            mockRandomData()
             return
         }
         const getFileData = mockHistoryData(0, pushData, historyData!)
         getFileData(0)
     }, [startRequest, requestSignals])
+
+
+    // 同步netWorkData
+    useEffect(() => {
+        if (!currentTestChartData || currentTestChartData.length === 0) {
+            return
+        }
+        pushData(currentTestChartData[currentTestChartData.length - 1])
+    }, [currentTestChartData?.length])
 
 
     return (

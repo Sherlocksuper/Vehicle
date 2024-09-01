@@ -11,8 +11,9 @@ export interface IChartInterface {
     startRequest: boolean
     sourceType?: DataSourceType
     requestSignals: ISignalItem[]
-    onReceiveData: (data: IHistoryItemData) => void
+
     historyData?: IHistoryItemData[]
+    currentTestChartData?: IHistoryItemData[]
 
     requestSignalId: number | null
     width: number

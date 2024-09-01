@@ -18,8 +18,8 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
         startRequest,
         requestSignals,
         sourceType,
-        onReceiveData,
         historyData,
+        currentTestChartData,
 
         unit,
         title,
@@ -32,20 +32,11 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
         setValue(data.data[requestSignals[0].signal.id])
     }
 
-    const mockRandomData = () => {
-        timerRef.current && clearInterval(timerRef.current)
-        if (startRequest && requestSignals.length > 0) {
-            timerRef.current = setInterval(() => {
-                const data = generateRandomData(requestSignals)
-                onReceiveData(data)
-                pushData(data)
-            }, TEST_INTERNAL)
+    // 历史记录
+    useEffect(() => {
+        if (!historyData) {
+            return
         }
-    }
-
-
-    useMemo(() => {
-        if (!historyData) mockRandomData()
         const getFileData = mockHistoryData(0, pushData, historyData!)
         getFileData(0)
 
@@ -53,6 +44,15 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
             timerRef.current && clearInterval(timerRef.current)
         }
     }, [startRequest, requestSignals])
+
+    // 同步netWorkData
+    useEffect(() => {
+        if (!currentTestChartData || currentTestChartData.length === 0) {
+            return
+        }
+        pushData(currentTestChartData[currentTestChartData.length - 1])
+    }, [currentTestChartData?.length])
+
 
     useEffect(() => {
         chartRef.current?.setOption({

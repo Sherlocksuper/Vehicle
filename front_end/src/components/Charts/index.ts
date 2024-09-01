@@ -21,6 +21,7 @@ export const generateRandomData = (requestSignals: ISignalItem[]): IHistoryItemD
 }
 
 
+// 用来展示history,并非模拟
 // @ts-ignore
 export const mockHistoryData = (index: number, pushData: (data: IHistoryItemData) => void, historyData: IHistoryItemData[]) => {
     function mock(index: number) {
