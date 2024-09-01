@@ -110,18 +110,6 @@ const OfflineShow: React.FC = () => {
         }))
     }
 
-    const onReceiveData = (templateId: string, data: IHistoryItemData) => {
-        console.log("templateId 收到数据:", JSON.stringify(data))
-        const newHistory = {...history} as IHistory
-        for (let i = 0; i < history.historyData.length; i++) {
-            if (newHistory.historyData[i].templateItemId === templateId) {
-                newHistory.historyData[i].data.push(data)
-                break
-            }
-        }
-        setHistory(newHistory)
-    }
-
     return (
         <div className='dd_container' style={{
             backgroundColor: '#f8f8f8',
@@ -136,7 +124,8 @@ const OfflineShow: React.FC = () => {
                         onLayoutChange={updateAllByLayout}
                         updateDragItem={(newItem) => {
                         }}
-                        onReceiveData={onReceiveData}
+                        onReceiveData={(data: IHistoryItemData) => {
+                        }}
                         fileHistory={history}
                         netHistory={undefined}
                     />

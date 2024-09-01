@@ -372,13 +372,10 @@ const ConfigTestTemplate: React.FC = () => {
         </div>
     }
 
-    const onReceiveData = (templateId: string, data: IHistoryItemData) => {
+    const onReceiveData = (data: IHistoryItemData) => {
         const newHistory = {...history} as IHistory
         for (let i = 0; i < history.historyData.length; i++) {
-            if (newHistory.historyData[i].templateItemId === templateId) {
-                newHistory.historyData[i].data.push(data)
-                break
-            }
+            newHistory.historyData[i].data.push(data)
         }
         setHistory(newHistory)
     }

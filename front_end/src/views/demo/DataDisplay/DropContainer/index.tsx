@@ -24,7 +24,7 @@ const DropContainer: React.FC<{
     items: IDragItem[];
     onLayoutChange: (layout: GridLayout.Layout[]) => void;
     updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
-    onReceiveData: (templateId: string, data: IHistoryItemData) => void;
+    onReceiveData: (data: IHistoryItemData) => void;
     fileHistory?: IHistory;
     netHistory?: IHistory
 }> = ({
@@ -52,6 +52,14 @@ const DropContainer: React.FC<{
             return
         }
 
+        if (!testProcessN) {
+            return
+        }
+
+        if (fileHistory !== undefined) {
+            return
+        }
+
         const signalTemplateMap: Map<number, string[]> = new Map()
         items.forEach(item => {
             console.log("ute,", item.id)
@@ -64,8 +72,12 @@ const DropContainer: React.FC<{
 
         console.log(Object.keys(signalTemplateMap))
 
-        const {start} = generateHistoryData(testProcessN!, 1000, 1500, onReceiveData, signalTemplateMap)
+        const {start, stop} = generateHistoryData(testProcessN!, 1000, 1500, onReceiveData, signalTemplateMap)
         start()
+
+        return () => {
+            stop()
+        }
     }, [items.length])
 
 

@@ -7,7 +7,7 @@ export function generateHistoryData(
     testProcess: ITestProcessN,
     minInterval: number,
     maxInterval: number,
-    onReceiveData: (templateId: string, data: IHistoryItemData) => void,
+    onReceiveData: (data: IHistoryItemData) => void,
     signalTemplateMap: Map<number, string[]>
 ): { start: () => void; stop: () => void; getHistory: () => IHistory } {
     // 初始化 IHistory 对象
@@ -20,6 +20,7 @@ export function generateHistoryData(
         historyData: [],
     };
 
+    let hasStart = false
     let timers: NodeJS.Timeout[] = [];  // 使用多个定时器以支持每个 templateItem 独立的时间间隔
 
     // 提取所有的 ISignalsConfigItem
@@ -46,7 +47,8 @@ export function generateHistoryData(
 
     // 定义随机时间间隔生成数据的函数
     const start = (): void => {
-        if (timers.length > 0) return; // 防止重复启动
+        if (hasStart) return;
+        hasStart = true
 
         const createData = () => {
             const timestamp = Date.now();
@@ -58,18 +60,16 @@ export function generateHistoryData(
 
             signalItems.forEach((signal) => {
                 historyItemData.data[signal.id] = generateRandomValue();
-                // 调用 onReceiveData 回调
-                if (onReceiveData) {
-                    signalTemplateMap.get(signal.id)?.forEach(templateItemId => {
-                        onReceiveData(templateItemId, historyItemData);
-                    })
-                }
             });
+
+            if (onReceiveData){
+                onReceiveData(historyItemData)
+            }
 
             console.log(`在 ${new Date(timestamp).toLocaleString()} 生成了一条数据`);
 
             const nextInterval = Math.random() * (maxInterval - minInterval) + minInterval;
-            timers.push(setTimeout(createData, nextInterval));
+            timers.push(setTimeout(createData, 1000));
         };
 
         // 初始化时立即生成一条数据
@@ -80,6 +80,7 @@ export function generateHistoryData(
     const stop = (): void => {
         timers.forEach((timer) => clearTimeout(timer));
         timers = [];
+        hasStart = false
         history.endTime = Date.now();
         console.log(`数据采集已停止，结束时间：${new Date(history.endTime).toLocaleString()}`);
     };

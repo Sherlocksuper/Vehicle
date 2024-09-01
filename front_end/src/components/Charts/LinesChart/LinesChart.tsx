@@ -5,7 +5,7 @@ import {generateRandomData, mockHistoryData} from "@/components/Charts";
 import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 interface ISeries {
-    id: number
+    id: string
     name: string
     type: string
     stack: string
@@ -43,7 +43,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     const xAxis = useRef<string[]>([])
     const dataRef = useRef<ISeries[]>(requestSignals.map((item, index) => {
         return {
-            id: (item.signal.id + index),
+            id: JSON.stringify(item),
             name: item.vehicleName + ' ' + item.projectName + ' ' + item.signal.signalName,
             type: 'line',
             stack: 'Total',
@@ -55,7 +55,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     const pushData = (data: IHistoryItemData) => {
         xAxis.current.push(new Date(data.xAxis).toLocaleTimeString())
         dataRef.current.forEach((item) => {
-            item.data.push(data.data[item.id])
+            item.data.push(data.data[JSON.parse(item.id).signal.id])
         })
         const option = {
             xAxis: {
@@ -77,7 +77,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
 
     // 同步netWorkData
     useEffect(() => {
-        if (!currentTestChartData || currentTestChartData.length === 0) {
+        if (!currentTestChartData || currentTestChartData.length === 0 || historyData !== undefined) {
             return
         }
         pushData(currentTestChartData[currentTestChartData.length - 1])
