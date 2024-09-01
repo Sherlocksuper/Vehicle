@@ -16,7 +16,7 @@ import {TEMPLATE} from "@/constants/process_hint.ts";
 import {generateTreeData} from "@/views/demo/TestProcessN/ProcessNTree.tsx";
 
 interface INewTestProcessNProps {
-  onFinish: () => void;
+    onFinish: () => void;
 }
 
 const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
@@ -33,35 +33,35 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
         template: {} as ITemplate
     });
 
-  const [visible, setVisible] = useState(false);
-  const [modalType, setModalType] = useState<"show" | "edit">("edit");
-  const [confirmLoading, setConfirmLoading] = useState(false);
+    const [visible, setVisible] = useState(false);
+    const [modalType, setModalType] = useState<"show" | "edit">("edit");
+    const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const [vehicleList, setVehicleList] = useState<IVehicle[]>([]);
-  const [projectList, setProjectList] = useState<IProject[]>([]);
-  const [testTemplateList, setTestTemplateList] = useState<ITemplate[]>([]);
+    const [vehicleList, setVehicleList] = useState<IVehicle[]>([]);
+    const [projectList, setProjectList] = useState<IProject[]>([]);
+    const [testTemplateList, setTestTemplateList] = useState<ITemplate[]>([]);
 
-  useEffect(() => {
-    getVehicles().then((res) => {
-      setVehicleList(res.data.filter((item: IVehicle) => !item.isDisabled));
-    });
-    getProjects().then((res) => {
-      setProjectList(res.data);
-    });
-    getTestTemplateList().then((res) => {
-      setTestTemplateList(res.data);
-    });
-  }, []);
+    useEffect(() => {
+        getVehicles().then((res) => {
+            setVehicleList(res.data.filter((item: IVehicle) => !item.isDisabled));
+        });
+        getProjects().then((res) => {
+            setProjectList(res.data);
+        });
+        getTestTemplateList().then((res) => {
+            setTestTemplateList(res.data);
+        });
+    }, []);
 
-  const check = () => {
-    if (!testProcessN?.testName) {
-      message.error("测试流程名称不能为空");
-      return false;
-    }
-    if (!testProcessN?.testObjectNs) {
-      message.error("测试对象不能为空");
-      return false;
-    }
+    const check = () => {
+        if (!testProcessN?.testName) {
+            message.error("测试流程名称不能为空");
+            return false;
+        }
+        if (!testProcessN?.testObjectNs) {
+            message.error("测试对象不能为空");
+            return false;
+        }
 
         if (!testProcessN?.template) {
             message.error(TEMPLATE + '不能为空');
@@ -133,7 +133,6 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                     render: (_, __, index) => (
                         <Select mode={"multiple"}
                                 onChange={(value) => {
-                                    console.log(value)
                                     const newTestProcess = testProcessN
                                     newTestProcess!.testObjectNs[index].project = value.map((item: number) => projectList.find((project) => project.id === Number(item)) as IProject)
                                     setTestProcessN(newTestProcess)
@@ -185,6 +184,35 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
         });
     }
 
+    const filterProcessNSignalId = (testProcessN: ITestProcessN): ITestProcessN => {
+        const signalIds: number[] = []
+
+        // 生成独一无二的id，如果原来的id为1有重复，那么之后的id就是1.2342类似的
+        const getUniqueId = (pre: number): number => {
+            const randomFourNumber = (Math.floor(Math.random() * 9000) + 1000) / 10000;
+            const resultId = pre + randomFourNumber
+
+            if (!signalIds.includes(resultId)) {
+                return resultId
+            } else {
+                return getUniqueId(pre)
+            }
+        }
+
+        testProcessN.testObjectNs.forEach((item) => {
+            item.project.forEach(projectItem => {
+                projectItem.projectConfig.forEach(projectConfigItem => {
+                    if (signalIds.includes(projectConfigItem.signal.id)) {
+                        projectConfigItem.signal.id = getUniqueId(projectConfigItem.signal.id)
+                    }
+                    signalIds.push(projectConfigItem.signal.id)
+                })
+            })
+        })
+        console.log("result:" ,JSON.stringify(testProcessN))
+        return testProcessN
+    }
+
     return (
         <div>
             <div>
@@ -200,7 +228,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                 onOk={() => {
                     if (!check()) return;
                     setConfirmLoading(true);
-                    createProcessN(testProcessN!).then((res) => {
+                    createProcessN(filterProcessNSignalId(testProcessN)).then((res) => {
                         if (res.code === SUCCESS_CODE) {
                             message.success('创建成功');
                             setVisible(false);
@@ -246,7 +274,7 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
                 </Select>
                 <Button onClick={updateTreeShowData}>更新树</Button>
                 <Row>
-                    <div style={{marginBottom: 20,flex: 1}}>
+                    <div style={{marginBottom: 20, flex: 1}}>
                         {renderCreateConfigTable()}
                     </div>
                     <div style={{flex: 0.6}}>
