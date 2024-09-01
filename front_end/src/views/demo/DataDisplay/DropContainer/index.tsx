@@ -40,6 +40,7 @@ const DropContainer: React.FC<{
     const params = new URLSearchParams(search);
     const testProcessNRecord = params.get("testProcessNRecord");
     const mode: NewTestTemplateMode = params.get("model") as NewTestTemplateMode;
+    const [openItemId, setOpenItemId] = React.useState<string | null>(null);
     let testProcessN: ITestProcessN | null = null;
 
     if (testProcessNRecord && mode) {
@@ -47,17 +48,26 @@ const DropContainer: React.FC<{
     }
 
     useEffect(() => {
-        if (mode === NewTestTemplateMode.CONFIG){
-            console.log("here")
+        if (mode === NewTestTemplateMode.CONFIG) {
             return
         }
-        const {start} = generateHistoryData(testProcessN!, 100, 500, onReceiveData)
+
+        const signalTemplateMap: Map<number, string[]> = new Map()
+        items.forEach(item => {
+            console.log("ute,", item.id)
+            item.itemConfig.requestSignals.forEach(signal => {
+                const currentTemplateIds = signalTemplateMap.get(signal.signal.id) ?? []
+                currentTemplateIds.push(item.id)
+                signalTemplateMap.set(signal.signal.id, currentTemplateIds)
+            })
+        })
+
+        console.log(Object.keys(signalTemplateMap))
+
+        const {start} = generateHistoryData(testProcessN!, 1000, 1500, onReceiveData, signalTemplateMap)
         start()
-    }, [])
+    }, [items.length])
 
-    const [openItemId, setOpenItemId] = React.useState<string | null>(null);
-
-    console.log(netHistory)
 
     return (
         <div className="dc_container">

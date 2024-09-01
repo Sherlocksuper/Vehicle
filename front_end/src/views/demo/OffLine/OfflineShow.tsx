@@ -111,6 +111,7 @@ const OfflineShow: React.FC = () => {
     }
 
     const onReceiveData = (templateId: string, data: IHistoryItemData) => {
+        console.log("templateId 收到数据:", JSON.stringify(data))
         const newHistory = {...history} as IHistory
         for (let i = 0; i < history.historyData.length; i++) {
             if (newHistory.historyData[i].templateItemId === templateId) {

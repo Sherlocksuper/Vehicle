@@ -41,9 +41,9 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     const chartContainerRef = useRef<HTMLDivElement>(null)
 
     const xAxis = useRef<string[]>([])
-    const dataRef = useRef<ISeries[]>(requestSignals.map((item) => {
+    const dataRef = useRef<ISeries[]>(requestSignals.map((item, index) => {
         return {
-            id: item.signal.id,
+            id: (item.signal.id + index),
             name: item.vehicleName + ' ' + item.projectName + ' ' + item.signal.signalName,
             type: 'line',
             stack: 'Total',
@@ -78,7 +78,6 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     // 同步netWorkData
     useEffect(() => {
         if (!currentTestChartData || currentTestChartData.length === 0) {
-            console.log("here")
             return
         }
         pushData(currentTestChartData[currentTestChartData.length - 1])
