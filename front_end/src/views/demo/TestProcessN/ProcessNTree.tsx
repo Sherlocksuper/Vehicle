@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import type {TreeDataNode} from 'antd';
 import {Button, Modal, Tree} from 'antd';
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
@@ -16,14 +16,14 @@ export const generateTreeData = (record: ITestProcessN) => {
             children: [] as TreeDataNode[]
         }
         const projects = record.testObjectNs[i].project;
-        const projectLeafs = projects.map((project, index) => {
+        const projectLeafs = projects.map((project, projectIndex) => {
             return {
                 title: `项目 ${project.projectName}`,
-                key: `${key}-${index}`,
+                key: `${key}-${projectIndex}`,
                 children: project.projectConfig.map((config, index) => {
                     return {
                         title: `${config.controller.controllerName} - ${config.collector.collectorName} - ${config.signal.signalName}`,
-                        key: `${key}-${index}-${index}`,
+                        key: `${key}-${projectIndex}-${index}`,
                     }
                 })
             }
@@ -41,7 +41,6 @@ interface IProcessTreeProps {
 
 const ProcessTree: React.FC<IProcessTreeProps> = ({record}) => {
     const data = generateTreeData(record);
-
     const [open, setOpen] = useState(false);
 
     return (
@@ -49,6 +48,7 @@ const ProcessTree: React.FC<IProcessTreeProps> = ({record}) => {
             <Button onClick={() => setOpen(true)}>{SEE_PROCESS_TREE}</Button>
             <Modal title={SEE_PROCESS_TREE} open={open} onOk={() => setOpen(false)} onCancel={() => setOpen(false)}>
                 <Tree
+                    key={record.id}
                     className="draggable-tree"
                     blockNode
                     treeData={data}
