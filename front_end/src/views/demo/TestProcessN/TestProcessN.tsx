@@ -101,8 +101,13 @@ const TestProcessN: React.FC = () => {
                         message.error("请先停止当前的下发配置")
                         return;
                     }
-                    downProcessN(record).then(() => {
-                        setCurrentDownProcessN(record)
+                    downProcessN(record).then((res) => {
+                        if (res.code !== SUCCESS_CODE) {
+                            message.error("下发失败:" + res.data);
+                            return;
+                        } else {
+                            setCurrentDownProcessN(record)
+                        }
                     })
                 }}>{DOWN}</Button>
                 <ProcessNTree record={record}/>
@@ -178,10 +183,13 @@ const CheckCurrentProcessN: React.FC<{
                         message.error("当前无下发配置")
                         return;
                     }
-                    stopCurrentProcessN().then(() => {
-                        message.success("停止成功")
-                        onStop()
-
+                    stopCurrentProcessN().then((res) => {
+                        if (res.code !== SUCCESS_CODE) {
+                            message.error("停止失败:", res.data)
+                        } else {
+                            message.success("停止成功")
+                            onStop()
+                        }
                     })
                 }}>停止当前下发配置</Button>
             <Button

@@ -103,16 +103,27 @@ class TestProcessNService {
             type: LongMessage.STARTCOLLECT,
             body: testProcessN
         }
-        sendToLong(message)
-        return true
+        const result = sendToLong(message)
+        if (result !== undefined) {
+            this.currentTestProcessN = null
+        }
+        return result === undefined ? true : result
     }
 
     /**
      * 停止当前下发
      */
     async stopCurrentTestProcessN() {
+        const message: ILongMessageType = {
+            type: LongMessage.STOPCOLLECT,
+            body: null
+        }
+        const result = sendToLong(message)
+        if (result !== undefined) {
+            return result
+        }
         this.currentTestProcessN = null
-        return "success"
+        return result
     }
 }
 

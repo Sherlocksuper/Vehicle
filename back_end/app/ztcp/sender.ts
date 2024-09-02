@@ -53,6 +53,6 @@ export function sendToLong(data: any) {
     if (client && !client.destroyed) {
         client.write(JSON.stringify(data));
     } else {
-        console.log('客户端未连接，无法发送数据');
+        return "龙芯服务器未启动"
     }
 }

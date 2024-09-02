@@ -2,8 +2,16 @@ import {Context} from "koa";
 import TestProcessNService from "../service/TestProcessNService";
 import TestProcessN, {ITestProcessNModel} from "../model/1TestProcessN";
 import {IResBody} from "../types";
-import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE, WRITE_SUCCESS_MSG} from "../constants";
+import {
+    FAIL_CODE,
+    SEARCH_FAIL_MSG,
+    SEARCH_SUCCESS_MSG,
+    SUCCESS_CODE,
+    WRITE_FAIL_MSG,
+    WRITE_SUCCESS_MSG
+} from "../constants";
 import testProcessNService from "../service/TestProcessNService";
+import {ifError} from "assert";
 
 class TestProcessNController {
     /**
@@ -124,7 +132,7 @@ class TestProcessNController {
         const res = await TestProcessNService.downTestProcessN(processN)
 
 
-        if (res) {
+        if (res === true) {
             (ctx.body as IResBody) = {
                 code: SUCCESS_CODE,
                 msg: WRITE_SUCCESS_MSG,
@@ -134,7 +142,7 @@ class TestProcessNController {
             (ctx.body as IResBody) = {
                 code: FAIL_CODE,
                 msg: SEARCH_FAIL_MSG,
-                data: "下发失败,请检查配置是否正确或者是否有正在进行的测试流程"
+                data: res
             }
         }
     }
@@ -164,10 +172,18 @@ class TestProcessNController {
      */
     async stopCurrentTestProcessN(ctx: Context) {
         const res = await testProcessNService.stopCurrentTestProcessN();
-        (ctx.body as IResBody) = {
-            code: SUCCESS_CODE,
-            msg: WRITE_SUCCESS_MSG,
-            data: res
+        if (res === undefined){
+            (ctx.body as IResBody) = {
+                code: SUCCESS_CODE,
+                msg: WRITE_SUCCESS_MSG,
+                data: "success"
+            }
+        } else {
+            (ctx.body as IResBody) = {
+                code: FAIL_CODE,
+                msg: WRITE_FAIL_MSG,
+                data: res
+            }
         }
     }
 }
