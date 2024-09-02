@@ -29,6 +29,9 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
 
 
     const pushData = (data: IHistoryItemData) => {
+        if (!requestSignals || requestSignals.length === 0) {
+            return;
+        }
         setValue(data.data[requestSignals[0].signal.id])
     }
 

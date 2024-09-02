@@ -53,6 +53,9 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     }))
 
     const pushData = (data: IHistoryItemData) => {
+        if (!requestSignals || requestSignals.length === 0) {
+            return;
+        }
         xAxis.current.push(new Date(data.xAxis).toLocaleTimeString())
         dataRef.current.forEach((item) => {
             item.data.push(data.data[JSON.parse(item.id).signal.id])

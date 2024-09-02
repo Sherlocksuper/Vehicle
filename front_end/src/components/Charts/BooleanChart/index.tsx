@@ -22,6 +22,9 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
     const [value, setValue] = useState(false)
 
     const pushData = (data: IHistoryItemData) => {
+        if (!requestSignals || requestSignals.length === 0) {
+            return;
+        }
         setValue(data.data[requestSignals[0].signal.id] > 0.5)
     }
 

@@ -23,6 +23,9 @@ const PureNumberChart: React.FC<IChartInterface> = (props) => {
             setValue(-1)
             return
         }
+        if (!requestSignals || requestSignals.length === 0) {
+            return;
+        }
         setValue(data.data[requestSignals[0].signal.id])
     }
 
