@@ -3,7 +3,7 @@
  * 分为start_collect开始采集和stop_collect停止采集
  */
 
-import {currentCollectConfig} from "../public/index.js";
+import {currentCollectConfig, setCurrentCollectConfig} from "../public/index.js";
 
 // 定义消息类型枚举
 const LongMessage = {
@@ -13,6 +13,7 @@ const LongMessage = {
 
 // 处理上位机传来的消息
 function handleReceiveComMessage(socket, message) {
+  message = JSON.parse(message)
   switch (message.type) {
     case LongMessage.STARTCOLLECT:
       // 处理开始采集的逻辑
@@ -33,8 +34,11 @@ function handleReceiveComMessage(socket, message) {
 
 // 开始采集的处理函数
 function startCollect(socket, body) {
+  if (typeof body !== "object") {
+    body = JSON.parse(body)
+  }
   // 处理 body 内容
-  currentCollectConfig = JSON.parse(body)
+  setCurrentCollectConfig(body)
   // 发送确认或其他响应给上位机
   socket.write('开始采集已接收\n');
 }
@@ -42,7 +46,7 @@ function startCollect(socket, body) {
 // 停止采集的处理函数
 function stopCollect(socket, body) {
   // 处理 body 内容
-  currentCollectConfig = null
+  setCurrentCollectConfig(null)
   // 发送确认或其他响应给上位机
   socket.write('停止采集已接收\n');
 }
