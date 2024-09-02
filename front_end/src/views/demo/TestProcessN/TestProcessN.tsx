@@ -40,13 +40,12 @@ const columns: TableProps<ITestProcessN>['columns'] = [
         title: "测试车辆(名称)",
         dataIndex: "vehicle",
         key: "vehicle",
-        render: (value, record, index) => (
-            <Space>
-                {record.testObjectNs.slice(0, 4).map((testObject, idnex) => (
-                    <span key={index}>{`${testObject.vehicle.vehicleName} `}</span>
-                ))}
+        render: (value, record, index) => {
+            const vehicleName = record.testObjectNs.map((testObject) => testObject.vehicle.vehicleName).join(",")
+            return <Space>
+                <span>{vehicleName}</span>
             </Space>
-        )
+        }
     },
     {
         title: TEMPLATE + "(名称 - ID)",
@@ -109,13 +108,13 @@ const TestProcessN: React.FC = () => {
                 <ProcessNTree record={record}/>
                 <Button type="primary" danger={true} onClick={() => {
                     confirmDelete() && deleteProcessN(record.id!).then(res => {
+                        console.log(record.id)
                         if (res.code !== SUCCESS_CODE) {
-                            message.error(res.message);
+                            message.error("删除失败:", res.message);
                             return;
                         }
                         fetchTestProcessN()
                     })
-                    message.error("删除失败")
                 }}>{DELETE}</Button>
             </Space>
         )
@@ -135,8 +134,9 @@ const TestProcessN: React.FC = () => {
             if (res.code !== SUCCESS_CODE) {
                 message.error(res.message);
                 return;
+            } else {
+                setProcessNList(res.data);
             }
-            setProcessNList(res.data);
         })
     }
 

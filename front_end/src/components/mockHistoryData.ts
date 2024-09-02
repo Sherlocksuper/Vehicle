@@ -62,6 +62,7 @@ export function generateHistoryData(
                 historyItemData.data[signal.id] = generateRandomValue();
             });
 
+            console.log(JSON.stringify(historyItemData))
             if (onReceiveData){
                 onReceiveData(historyItemData)
             }

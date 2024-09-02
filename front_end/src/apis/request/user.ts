@@ -32,7 +32,6 @@ interface createProps {
 //创建子用户
 export const createUser = async (data: createProps) => {
     const api = MyUrl.USER.createUser;
-    console.log(data)
     return request({
         api: api,
         params: data
@@ -57,7 +56,6 @@ export const closeUser = async (data: ocdUserProps) => {
 //开启子用户服务
 export const openUser = async (data: ocdUserProps) => {
     const api = MyUrl.USER.openUser;
-    console.log(data)
     return request({
         api: api,
         params: data

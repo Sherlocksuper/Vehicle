@@ -36,8 +36,6 @@ export const HomeMenu = () => {
         const newPass = form.getFieldValue("newPassword")
         const confirmPass = form.getFieldValue("confirmPassword")
 
-        console.log(newPass, confirmPass)
-
         if (newPass !== confirmPass) {
             alert("两次输入密码不一致")
             return

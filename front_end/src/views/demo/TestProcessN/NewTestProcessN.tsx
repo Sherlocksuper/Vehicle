@@ -185,32 +185,42 @@ const NewTestProcessN: React.FC<INewTestProcessNProps> = ({onFinish}) => {
     }
 
     const filterProcessNSignalId = (testProcessN: ITestProcessN): ITestProcessN => {
-        const signalIds: number[] = []
-
+        const signalIds: Set<number> = new Set();
         // 生成独一无二的id，如果原来的id为1有重复，那么之后的id就是1.2342类似的
         const getUniqueId = (pre: number): number => {
-            const randomFourNumber = (Math.floor(Math.random() * 9000) + 1000) / 10000;
-            const resultId = pre + randomFourNumber
-
-            if (!signalIds.includes(resultId)) {
-                return resultId
-            } else {
-                return getUniqueId(pre)
+            let resultId = pre;
+            while (signalIds.has(resultId)) {
+                const randomFourNumber = (Math.floor(Math.random() * 9000) + 1000) / 10000;
+                resultId = pre + randomFourNumber;
             }
+            return resultId;
         }
 
-        testProcessN.testObjectNs.forEach((item) => {
-            item.project.forEach(projectItem => {
-                projectItem.projectConfig.forEach(projectConfigItem => {
-                    if (signalIds.includes(projectConfigItem.signal.id)) {
-                        projectConfigItem.signal.id = getUniqueId(projectConfigItem.signal.id)
+        testProcessN.testObjectNs = testProcessN.testObjectNs.map(item => {
+            const newItem = JSON.parse(JSON.stringify(item))
+
+            newItem.project = item.project.map(projectItem => {
+                const newProjectItem = JSON.parse(JSON.stringify(projectItem))
+
+                newProjectItem.projectConfig = projectItem.projectConfig.map(projectConfigItem => {
+                    const newProjectConfigItem = JSON.parse(JSON.stringify(projectConfigItem));
+
+                    const originalId = projectConfigItem.signal.id;
+                    if (signalIds.has(originalId)) {
+                        newProjectConfigItem.signal.id = getUniqueId(originalId);
                     }
-                    signalIds.push(projectConfigItem.signal.id)
-                })
-            })
-        })
-        console.log("result:" ,JSON.stringify(testProcessN))
-        return testProcessN
+                    signalIds.add(projectConfigItem.signal.id);
+
+                    return newProjectConfigItem;
+                });
+
+                return newProjectItem;
+            });
+
+            return newItem;
+        });
+
+        return testProcessN;
     }
 
     return (

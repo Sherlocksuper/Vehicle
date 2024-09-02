@@ -32,7 +32,6 @@ export const request = ({api, params}: {
 
 
     return axiosInstance(axiosConfig).then(response => {
-        console.log(method, "     response.data", JSON.stringify(response.data))
         return response.data;
     }).catch(error => {
         console.error('There was an error with the request:', error);
@@ -60,10 +59,8 @@ function getFormatData(format: ContentType, params: any) {
             return JSON.stringify(params)
         case ContentType.FORM_DATA: {
             const formData = new FormData()
-            console.log(params)
 
             for (const key in params) {
-                console.log(key)
                 formData.append(key, params[key])
             }
             return formData

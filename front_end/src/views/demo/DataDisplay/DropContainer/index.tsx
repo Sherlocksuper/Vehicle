@@ -62,15 +62,12 @@ const DropContainer: React.FC<{
 
         const signalTemplateMap: Map<number, string[]> = new Map()
         items.forEach(item => {
-            console.log("ute,", item.id)
             item.itemConfig.requestSignals.forEach(signal => {
                 const currentTemplateIds = signalTemplateMap.get(signal.signal.id) ?? []
                 currentTemplateIds.push(item.id)
                 signalTemplateMap.set(signal.signal.id, currentTemplateIds)
             })
         })
-
-        console.log(Object.keys(signalTemplateMap))
 
         const {start, stop} = generateHistoryData(testProcessN!, 1000, 1500, onReceiveData, signalTemplateMap)
         start()
@@ -192,7 +189,6 @@ const UpdateItemModal: React.FC<IUpdateItemModal> = (props) => {
                         ...item.itemConfig,
                         requestSignals,
                     });
-                    console.log(requestSignals);
                 }}
             >
                 {testProcessN?.testObjectNs.map((testObject) => {

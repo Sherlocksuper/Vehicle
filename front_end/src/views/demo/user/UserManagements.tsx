@@ -22,7 +22,6 @@ const Managements: React.FC<ManagementsProps> = ({user, onDelete, onReset}) => {
                 onDelete(user)
             },
             onCancel: () => {
-                console.log('Cancel delete user');
             },
         });
     }

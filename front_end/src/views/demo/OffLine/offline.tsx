@@ -14,7 +14,6 @@ const OfflineDate = () => {
     const [name, setName] = useState<string>('')
     const [period, setPeriod] = useState<number[]>([0, 0])
     const debounceSetPeriod = debounce((value) => {
-        console.log(value)
         setPeriod(value as number[])
     })
 

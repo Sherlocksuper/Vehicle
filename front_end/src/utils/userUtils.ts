@@ -9,7 +9,6 @@ interface UserInfo {
 
 
 const saveUserInfo = (userInfo: UserInfo) => {
-    console.log("在sessionStorage中保存用户信息", userInfo)
     sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
 }
 
