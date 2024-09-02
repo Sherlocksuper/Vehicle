@@ -84,7 +84,7 @@ const TestProcessN: React.FC = () => {
         return (
             <Space>
                 <Button type="link"
-                        href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.CONFIG}`}
+                        // href={`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.CONFIG}`}
                         onClick={() => {
                             const win = window.open(`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.CONFIG}`)
                             if (!win) return
@@ -94,8 +94,7 @@ const TestProcessN: React.FC = () => {
                                     clearInterval(checkClosed);
                                 }
                             }, 1000);
-                        }}
-                        target={"_blank"}>前往配置采集关系</Button>
+                        }} >前往配置采集关系</Button>
                 <Button type={"link"} onClick={() => {
                     if (currentDownProcessN !== null) {
                         message.error("请先停止当前的下发配置")
