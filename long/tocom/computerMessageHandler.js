@@ -4,6 +4,7 @@
  */
 
 import {currentCollectConfig, setCurrentCollectConfig} from "../public/index.js";
+import {generateHistoryData} from "../public/mockBoardData.js";
 
 // 定义消息类型枚举
 const LongMessage = {
@@ -32,6 +33,15 @@ function handleReceiveComMessage(socket, message) {
   }
 }
 
+let historyDataFunction = {
+  start: () => {
+  },
+  stop: () => {
+  },
+  getHistory: () => {
+  },
+}
+
 // 开始采集的处理函数
 function startCollect(socket, body) {
   if (typeof body !== "object") {
@@ -39,16 +49,28 @@ function startCollect(socket, body) {
   }
   // 处理 body 内容
   setCurrentCollectConfig(body)
+
+  historyDataFunction = generateHistoryData(currentCollectConfig, 2000, 2000, (data) => {
+    socket.write(JSON.stringify(data) + '\n');
+  })
+
   // 发送确认或其他响应给上位机
   socket.write('开始采集已接收\n');
+
+  // 开始采集
+  historyDataFunction.start()
 }
 
 // 停止采集的处理函数
 function stopCollect(socket, body) {
   // 处理 body 内容
   setCurrentCollectConfig(null)
+
   // 发送确认或其他响应给上位机
   socket.write('停止采集已接收\n');
+
+  // 停止采集
+  historyDataFunction.stop()
 }
 
 // 处理未知类型的消息

@@ -1,5 +1,8 @@
 export const longServerPort = 9001
-export const comPort = 89
+export const comBackPort = 89
+
+export const comFrontPort = 2999
+
 export const boardPort = 66
 
 //目标ip和端口号

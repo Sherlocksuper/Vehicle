@@ -26,6 +26,8 @@ export function generateHistoryData(
     // 提取所有的 ISignalsConfigItem
     const signalItems: ISignalsConfigItem[] = [];
 
+    console.log(JSON.stringify(testProcess))
+
     testProcess.testObjectNs.forEach((testObject) => {
         testObject.project.forEach((proj) => {
             proj.projectConfig.forEach((config) => {
@@ -70,7 +72,7 @@ export function generateHistoryData(
             console.log(`在 ${new Date(timestamp).toLocaleString()} 生成了一条数据`);
 
             const nextInterval = Math.random() * (maxInterval - minInterval) + minInterval;
-            timers.push(setTimeout(createData, 1000));
+            timers.push(setTimeout(createData, 2000));
         };
 
         // 初始化时立即生成一条数据

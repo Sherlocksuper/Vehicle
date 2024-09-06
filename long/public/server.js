@@ -1,21 +1,26 @@
 import {createServer,} from "net";
-import {boardPort, comPort, longServerPort} from "./config.js";
+import {boardPort, comBackPort, comFrontPort, longServerPort} from "./config.js";
 import {handleReceiveComMessage} from "../tocom/computerMessageHandler.js";
-import {clientBoard, clientComputer} from "./index.js";
+import {
+  clientBoard,
+  clientBackComputer,
+  setClientBoard,
+  setClientBackComputer,
+} from "./index.js";
 import {handleReceiveBoardMessage} from "../toboard/boardMessageHandler.js";
 
 function setSocket(socket) {
-  if (socket.remotePort === comPort) {
-    if (clientComputer) {
-      clientComputer.destroy(); // 关闭之前的连接
+  if (socket.remotePort === comBackPort) {
+    if (clientBackComputer) {
+      clientBackComputer.destroy(); // 关闭之前的连接
     }
-    clientComputer = socket;
-    console.log('上位机 Computer 已连接');
+    setClientBackComputer(socket)
+    console.log('上位机 Computer 后端 已连接');
   } else if (socket.remotePort === boardPort) {
     if (clientBoard) {
       clientBoard.destroy(); // 关闭之前的连接
     }
-    clientBoard = socket;
+    setClientBoard(socket)
     console.log('下位机 Board 已连接');
   }
 }
@@ -24,7 +29,7 @@ function setSocket(socket) {
 const server = createServer((socket) => {
   console.log(`新连接: ${socket.remoteAddress}:${socket.remotePort}`);
 
-  if (socket.remotePort !== comPort && socket.remotePort !== boardPort) {
+  if (socket.remotePort !== comBackPort && socket.remotePort !== boardPort) {
     console.log("未识别的客户端，来自:", socket.remoteAddress, socket.remotePort);
     socket.write("未识别的客户端，请断开连接\n");
     return;
@@ -32,18 +37,21 @@ const server = createServer((socket) => {
 
   setSocket(socket);
 
-  // 确定客户端是 Computer 还是 Board
+  // 确定客户端是 ComputerBack 还是 Board
+  // 前端不会直接给龙芯发送消息，只会接收消息
   socket.on('data', (data) => {
-    if (!clientBoard || !clientComputer) {
-      socket.write("程序连接不完备，缺少Board或Computer\n");
-      return;
-    }
+    // if (!clientBoard || !clientComputer) {
+    //   socket.write("程序连接不完备，缺少Board或Computer\n");
+    //   return;
+    // }
     const message = data.toString().trim();
     // 处理消息
-    if (socket === clientComputer && clientBoard) {
+    // if (socket === clientComputer && clientBoard) {
+    if (socket === clientBackComputer) {
       console.log(`上位机 Computer 发来消息: ${message}`);
       handleReceiveComMessage(socket, message)
-    } else if (socket === clientBoard && clientComputer) {
+      // } else if (socket === clientBoard && clientComputer) {
+    } else if (socket === clientBoard) {
       console.log(`下位机 Board 发来消息: ${message}`);
       handleReceiveBoardMessage(socket, message)
     }
@@ -51,12 +59,12 @@ const server = createServer((socket) => {
 
   // 处理客户端断开连接
   socket.on('end', () => {
-    if (socket === clientComputer) {
+    if (socket === clientBackComputer) {
       console.log('上位机 Computer 已断开连接');
-      clientComputer = null;
+      setClientBackComputer(null)
     } else if (socket === clientBoard) {
       console.log('下位机 Board 已断开连接');
-      clientBoard = null;
+      setClientBoard(null)
     }
   });
 
