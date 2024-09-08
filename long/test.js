@@ -1,7 +1,8 @@
 import {createConnection} from "net"
+import {longServerPort} from "./public/config.js";
 
 
-const client = createConnection({port: 9001}, () => {
+const client = createConnection({port: longServerPort}, () => {
   console.log(client.localPort)
   console.log('Connected to server!');
 });
@@ -20,7 +21,7 @@ client.on('error', (err) => {
 
 
 
-const client1 = createConnection({port: 9001}, () => {
+const client1 = createConnection({port: longServerPort}, () => {
   console.log(client1.localPort)
   console.log('Connected to server!');
 });

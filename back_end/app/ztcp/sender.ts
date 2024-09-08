@@ -2,7 +2,7 @@ import * as net from "net";
 
 const PORT = process.env.LONG_PORT ? parseInt(process.env.LONG_PORT) : 9001;
 const HOST = process.env.LONG_HOST ? process.env.LONG_HOST : "localhost";
-const LOCAL_TCP_PORT = process.env.LOCAL_TCP_PORT ? parseInt(process.env.LOCAL_TCP_PORT) : 89;
+const LOCAL_TCP_PORT = process.env.LOCAL_TCP_PORT ? parseInt(process.env.LOCAL_TCP_PORT) : 2889;
 
 
 let client: net.Socket;

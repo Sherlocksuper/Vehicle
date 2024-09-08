@@ -1,13 +1,13 @@
 export const longServerPort = 9001
-export const comBackPort = 89
+export const comBackPort = 2889
 
 export const comFrontPort = 2999
 
-export const boardPort = 66
+export const boardPort = 2866
 
 //目标ip和端口号
 export const TARGETIP = "192.168.1.66"
-export const TARGETPORT = 66
+export const TARGETPORT = 2866
 
 
 // 配置/模块类别
