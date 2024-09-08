@@ -16,7 +16,6 @@ import {request} from "@/utils/request";
 import {Method} from "@/apis/standard/all";
 import CollectorInfoTable from "./CollectorInfoTable";
 import SignalInfoTable from "./SignalInfoTable";
-import "./PhyTopology.css";
 import {SUCCESS_CODE} from "@/constants";
 import {createSignal} from "@/apis/request/board-signal/signal.ts";
 import {
@@ -119,7 +118,6 @@ const PreTestManager: React.FC = () => {
     );
 };
 
-export default PreTestManager;
 
 interface AddManagerProps {
     reloadData: () => void;
@@ -395,3 +393,5 @@ const AddSignalButton = ({reloadData}: AddSignalProps) => {
         </>
     )
 }
+
+export default PreTestManager;

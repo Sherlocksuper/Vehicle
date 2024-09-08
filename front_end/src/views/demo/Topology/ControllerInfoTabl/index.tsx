@@ -1,5 +1,5 @@
 import {Button, message, Space, Table} from "antd";
-import {IControllersConfigItem} from "../PhyTopology";
+import {IControllersConfigItem} from "../PhyTopology.tsx";
 import {NOT_ON_USED, ENABLE, ON_USED, USED_INFO, DISABLE} from "@/constants/board.ts";
 import {updateController} from "@/apis/request/board-signal/controller.ts";
 import {SUCCESS_CODE} from "@/constants";
@@ -55,4 +55,4 @@ const ControllerInfoTable: React.FC<{
                   dataSource={dataSource} columns={columns}/>
 }
 
-export default ControllerInfoTable  
+export default ControllerInfoTable

@@ -27,7 +27,7 @@ interface RouteItem {
 
 export const routeItems: RouteItem[] = [
     {
-        key: '/physical-topology',
+        key: '/physical-Topology',
         label: '测试板卡信息管理',
         element: <PhyTopology/>
     },
@@ -70,7 +70,7 @@ export const routeItems: RouteItem[] = [
         element: <HistoryData/>
     },
     userUtils.isRootUser() ? {
-        key: '/user-management',
+        key: '/User-management',
         label: '用户管理',
         element: <UserManage/>
     } : {

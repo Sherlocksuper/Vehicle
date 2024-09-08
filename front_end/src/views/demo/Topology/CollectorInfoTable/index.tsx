@@ -1,5 +1,5 @@
 import {Button, Space, Table} from "antd";
-import {ICollectorsConfigItem} from "../PhyTopology";
+import {ICollectorsConfigItem} from "../PhyTopology.tsx";
 import {updateCollector} from "@/apis/request/board-signal/collector.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {NOT_ON_USED, ON_USED, USED_INFO} from "@/constants/board.ts";
@@ -55,4 +55,4 @@ const CollectorInfoTable: React.FC<{
                   columns={columns}/>
 }
 
-export default CollectorInfoTable  
+export default CollectorInfoTable

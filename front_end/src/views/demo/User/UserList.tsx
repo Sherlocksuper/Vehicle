@@ -3,9 +3,9 @@ import Search from "antd/es/input/Search";
 import { SubUser } from "@/apis/standard/user.ts";
 import { Button, Form, Input, Modal, Switch, Table } from "antd";
 import React, { useEffect, useRef } from "react";
-import { useUserActions } from "@/views/demo/User/UserFunction";
-import { userListData } from "@/views/demo/User/UserListData";
-import Managements from "@/views/demo/User/UserManagements";
+import { useUserActions } from "@/views/demo/User/UserFunction.ts";
+import { userListData } from "@/views/demo/User/UserListData.ts";
+import Managements from "@/views/demo/User/UserManagements.tsx";
 
 const UserManage: React.FC = () => {
   const [currentSearchValue, setCurrentSearchValue] =

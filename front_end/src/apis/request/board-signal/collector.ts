@@ -1,6 +1,6 @@
-import {ICollectorsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 import {MyUrl} from "@/apis/url/myUrl.ts";
 import {request} from "@/utils/request.ts";
+import {ICollectorsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 
 
 export const createCollector = async (collector: ICollectorsConfigItem) => {

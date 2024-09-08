@@ -128,7 +128,7 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
         if (value.projectName == thisProject) return true;
       return false;
     };
-  
+
     const validateProjectData = async (_: RuleObject, value: string) => {
       if (!value) {
         return Promise.reject(new Error("请输入项目名称!"));
@@ -138,7 +138,7 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
         return Promise.resolve();
       }
     };
-  
+
     return (
         <Modal
             open={open}
@@ -340,7 +340,7 @@ export const ShowProjectButton: React.FC<{ initValue: string,projects:IProject[]
             setOpen(true)
         }}>查看测试项目</Button>
         <ProjectManage open={open} mode={"show"} projects={projects} onFinished={() => {
-            setOpen(false) 
+            setOpen(false)
         }} disable={mode === "show"} initValue={initValue} key={new Date().getTime()}/>
     </>
 }

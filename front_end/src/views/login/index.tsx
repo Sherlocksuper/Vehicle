@@ -23,7 +23,7 @@ const Login: React.FC = () => {
     useEffect(() => {
         if (userUtils.getToken()) {
             console.log("token:" + userUtils.getToken())
-            navigate('/physical-topology', {replace: true})
+            navigate('/physical-Topology', {replace: true})
         }
     }, [])
 
@@ -97,7 +97,7 @@ const ToLogin = () => {
 
             const response = await loginApi(data)
             if (response.code === SUCCESS_CODE && response.data != null && !response.data.disabled) {
-                navigate('/physical-topology', {replace: true})
+                navigate('/physical-Topology', {replace: true})
             } else {
 
                 if (response.data?.disabled) {

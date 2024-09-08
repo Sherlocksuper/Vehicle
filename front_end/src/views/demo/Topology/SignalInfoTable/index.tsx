@@ -1,5 +1,6 @@
 import {Table} from "antd";
-import {ISignalsConfigItem} from "../PhyTopology";
+import React from "react";
+import {ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
 
 const SignalInfoTable: React.FC<{
     dataSource: ISignalsConfigItem[],
