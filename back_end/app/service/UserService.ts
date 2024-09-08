@@ -20,7 +20,7 @@ class UserService {
             // 如果找到用户，则返回用户对象，否则返回 null
             return user ? user.dataValues : null
         } catch (error) {
-            console.error('Error finding user:', error);
+            console.error('Error finding User:', error);
             return null
         }
     }

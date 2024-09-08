@@ -23,7 +23,7 @@ createConnectionToLong()
 
 const run = async (port: string): Promise<Server> => {
     await DB.connectDB()
-    // await DB.initDB()
+    await DB.initDB()
     return app.listen(port, () => {
         console.log(`http://localhost:${port}`);
     })

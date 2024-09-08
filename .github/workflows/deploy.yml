@@ -1,0 +1,61 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # 当代码推送到 main 分支时触发
+
+jobs:
+  # 前端部署
+  deploy_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies (Frontend)
+        run: |
+          cd front_end
+          npm install
+
+      - name: Build frontend project
+        run: |
+          cd front_end
+          npm run build
+
+      - name: Deploy Fronted
+        uses: appleboy/scp-action@master
+        with:
+          host: 119.91.193.117
+          username: root
+          password: ${{ secrets.PASSWORD }}
+          port: 22
+          source: "dist/*"
+          target: /var/www/vehicle/front
+
+  # 后端部署
+  deploy_backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.12.2'  # 确保与后端项目的 Node 版本一致
+
+      - name: Install dependencies (Backend)
+        run: |
+          cd back_end
+          npm install
+
+      - name: Deploy backend
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          DEPLOY_PATH: /path/to/deploy/backend  # 指定服务器上的部署路径
+        run: |
+          # 清理SSH密钥文件
+          rm ssh_key
