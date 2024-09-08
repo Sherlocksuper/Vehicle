@@ -5,7 +5,6 @@ import {APIStandard, ContentType, ResponseType} from "@/apis/standard/all.ts";
 import {FAIL_CODE, TOKEN_VALID_CODE} from "@/constants";
 import {message} from "antd";
 import {sleep} from "@/utils/index.ts";
-import {log} from "@antv/g2plot/lib/utils";
 // import { FAIL_CODE,  TOKEN_VALID_CODE } from '@/constants';
 // import { message } from 'antd';
 // import { sleep } from '.';
