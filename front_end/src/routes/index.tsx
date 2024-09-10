@@ -1,36 +1,30 @@
 import Login from "@/views/login";
 import RequirAuthRoute from "../components/RequireAuthRoute.tsx/index.tsx";
 import SystemTotalPage from "@/views/demo";
-import { createBrowserRouter, Outlet } from "react-router-dom";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import React, { ReactElement } from "react";
+import {createBrowserRouter, Outlet} from "react-router-dom";
+import {DndProvider} from "react-dnd";
+import {HTML5Backend} from "react-dnd-html5-backend";
+import React, {ReactElement} from "react";
 import userUtils from "@/utils/userUtils.ts";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import UserManage from "@/views/demo/User/UserList.tsx";
-import TestProject from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
-import TestTemplate from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.tsx";
-import TestVehicle from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
+import ProjectTable from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
+import TemplateTable from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.tsx";
+import VehicleTable from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
 import ConfigTestTemplate from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import TestProcessN from "@/views/demo/TestProcessN/TestProcessN.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import OfflineShow from "@/views/demo/OffLine/OfflineShow.tsx";
-import History from "@/views/demo/History/history.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
-
+import ProtocolTable from "@/views/demo/ProtocolTable";
 interface RouteItem {
-  key: string;
-  label: string;
-  element?: ReactElement;
-  children?: RouteItem[];
+    key: string;
+    label: string;
+    element?: ReactElement;
+    children?: RouteItem[];
 }
 
 export const routeItems: RouteItem[] = [
-    {
-        key: '/physical-Topology',
-        label: '测试板卡信息管理',
-        element: <PhyTopology/>
-    },
     {
         //测试预配置
         key: '/test-config',
@@ -38,19 +32,29 @@ export const routeItems: RouteItem[] = [
         element: <Outlet/>,
         children: [
             {
+                key: '/test-config/physical-Topology',
+                label: '测试板卡信息管理',
+                element: <PhyTopology/>
+            },
+            {
+                key: '/test-config/protocol-management',
+                label: '测试协议管理',
+                element: <ProtocolTable/>
+            },
+            {
                 key: '/test-config/test-vehicle',
                 label: '车辆管理',
-                element: <TestVehicle/>
+                element: <VehicleTable/>
             },
             {
                 key: '/test-config/test-config',
                 label: '测试项目',
-                element: <TestProject/>
+                element: <ProjectTable/>
             },
             {
                 key: '/test-config/test-object',
                 label: '测试模板',
-                element: <TestTemplate/>
+                element: <TemplateTable/>
             },
         ]
     },

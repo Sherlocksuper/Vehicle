@@ -10,6 +10,7 @@ import TestTemplateController from "../controller/PreSet/TestTemplateController"
 import TestObjectNController from "../controller/TestObjectNController";
 import TestProcessNController from "../controller/TestProcessNController";
 import HistoryController from "../controller/HistoryController";
+import ProtocalController from "../controller/PreSet/ProtocalController";
 
 const router = new KoaRouter({
     prefix: ''
@@ -122,5 +123,15 @@ router.get('/stopCurrentTestProcessN', TestProcessNController.stopCurrentTestPro
 router.get('/getHistory', HistoryController.getAllHistory)
 router.post('/addHistory', HistoryController.addHistory)
 router.post('/deleteHistory/:id', HistoryController.deleteHistory)
+
+/**
+ * Protocol 协议
+ */
+router.get('/getProtocolList', ProtocalController.getProtocolList)
+router.post('/createProtocol', ProtocalController.createProtocol)
+router.post('/updateProtocol/:id', ProtocalController.updateProtocol)
+router.get('/getProtocolById/:id', ProtocalController.getProtocolById)
+router.post('/deleteProtocol/:id', ProtocalController.deleteProtocol)
+
 
 export default router

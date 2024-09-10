@@ -17,6 +17,7 @@ import TestProcessN from "../model/1TestProcessN";
 import HistoryModel from "../model/History.model";
 import VehicleService from "../service/PreSet/VehicleService";
 import ProjectService from "../service/PreSet/ProjectService";
+import Protocol from "../model/PreSet/Protocol.model";
 
 const {DB_NAME, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT} = DB_CONFIG
 
@@ -25,7 +26,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     dialect: 'mysql',
     port: DB_PORT,
     logging: false,
-    models: [User, TokenBlackListItem, Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel]
+    models: [User, TokenBlackListItem, Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel, Protocol]
 });
 
 const DB_OPT = {
