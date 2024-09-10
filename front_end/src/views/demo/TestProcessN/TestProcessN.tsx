@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Button, message, Row, Space, Table} from 'antd';
+import {Button, Card, message, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import NewTestProcessN from "@/views/demo/TestProcessN/NewTestProcessN.tsx";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
@@ -149,7 +149,11 @@ const TestProcessN: React.FC = () => {
     }, []);
 
     return (
-        <div style={{padding: 20}}>
+        <Card style={{
+            overflow: "scroll",
+            overflowX: "hidden",
+            height: "100vh",
+        }}>
             <div style={{
                 marginBottom: 20,
                 display: 'flex',
@@ -163,7 +167,7 @@ const TestProcessN: React.FC = () => {
             <Table columns={newColumns} dataSource={processNList} rowKey={(value) => {
                 return value.id ?? value.testName
             }}/>
-        </div>
+        </Card>
     )
 }
 

@@ -1,30 +1,31 @@
 import React, {useEffect} from 'react';
-import {Button, Form, Input, message, Modal, Row, Space, Table} from 'antd';
+import {Button, Card, Form, Input, message, Modal, Row, Select, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {createVehicle, deleteVehicle, getVehicles, updateVehicle} from "@/apis/request/vehicle.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {useLoaderData} from "react-router-dom";
 import {confirmDelete} from "@/utils";
-import { RuleObject } from 'antd/es/form';
+import {RuleObject} from 'antd/es/form';
+import {getProtocols, IProtocol} from "@/apis/request/protocol.ts";
 
 
 const columns: TableProps<IVehicle>["columns"] = [
-  {
-    title: "车辆名称",
-    dataIndex: "vehicleName",
-    key: "vehicleName",
-  },
-  {
-    title: "是否启用",
-    dataIndex: "isDisabled",
-    key: "isDisabled",
-    render: (text) => (!text ? "是" : "否"),
-  },
-  {
-    title: "操作",
-    key: "action",
-  },
+    {
+        title: "车辆名称",
+        dataIndex: "vehicleName",
+        key: "vehicleName",
+    },
+    {
+        title: "是否启用",
+        dataIndex: "isDisabled",
+        key: "isDisabled",
+        render: (text) => (!text ? "是" : "否"),
+    },
+    {
+        title: "操作",
+        key: "action",
+    },
 ];
 
 const TestVehicle: React.FC = () => {
@@ -64,42 +65,49 @@ const TestVehicle: React.FC = () => {
                     })
                 }
                 }>{"删除"}</Button>
+                <TestVehicleDetailButton vehicle={record}/>
             </Space>
         )
     }, [])
 
 
     return (
-        <div style={{
-            padding: 20
+        <Card style={{
+            overflow: "scroll",
+            overflowX: "hidden",
+            height: "100vh",
         }}>
-            <CreateTestVehicleButton 
-            vehicles={vehicles}
-            onFinished={() => {
-                getVehicles().then((res) => {
-                    console.log(res)
-                    setVehicles(res.data)
-                })
-            }} key={new Date().getTime()}/>
+            <CreateTestVehicleButton
+                vehicles={vehicles}
+                onFinished={() => {
+                    getVehicles().then((res) => {
+                        setVehicles(res.data)
+                    })
+                }} key={new Date().getTime()}/>
             <Table style={{
                 marginTop: 20
             }} columns={columns} dataSource={vehicles}/>
-        </div>
+        </Card>
     );
 };
 
 export default TestVehicle;
 
 
-export const CreateTestVehicleButton: React.FC<{ onFinished: () => void,vehicles:IVehicle[] }> = ({onFinished,vehicles}) => {
+export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicles: IVehicle[] }> = ({
+                                                                                                        onFinished,
+                                                                                                        vehicles
+                                                                                                    }) => {
     const title = "新建车辆"
     const [form] = Form.useForm<IVehicle>()
     const [open, setOpen] = React.useState<boolean>(false)
+    const [protocols, setProtocols] = React.useState<IProtocol[]>([])
 
     useEffect(() => {
         if (open) {
             form.resetFields()
         }
+        fetchProtocol();
         form.setFieldsValue({
             isDisabled: false
         })
@@ -113,21 +121,27 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void,vehicles
     }
 
     const isSameName = (vehicles: IVehicle[], thisVehicle: string) => {
-      for (const value of vehicles)
-        if (value.vehicleName == thisVehicle) return true;
-      return false;
+        for (const value of vehicles)
+            if (value.vehicleName == thisVehicle) return true;
+        return false;
     };
-  
+
     const validateVehicleData = async (_: RuleObject, value: string) => {
-      if (!value) {
-        return Promise.reject(new Error("请输入车辆名称!"));
-      } else if (isSameName(vehicles, value)) {
-        return Promise.reject(new Error("不能与列表内已有汽车重名!"));
-      } else {
-        return Promise.resolve();
-      }
+        if (!value) {
+            return Promise.reject(new Error("请输入车辆名称!"));
+        } else if (isSameName(vehicles, value)) {
+            return Promise.reject(new Error("不能与列表内已有汽车重名!"));
+        } else {
+            return Promise.resolve();
+        }
     };
-  
+
+    const fetchProtocol = async () => {
+        getProtocols().then((res) => {
+            setProtocols(res.data)
+        })
+    }
+
 
     return (
         <>
@@ -150,12 +164,81 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void,vehicles
                     <Form.Item
                         label="车辆名称"
                         name="vehicleName"
-                        rules={[{ validator: validateVehicleData }]}
-                        >
-                        <Input/>
+                        rules={[{validator: validateVehicleData}]}
+                    >
+                        <Input placeholder={"请输入车辆名称"}/>
+                    </Form.Item>
+                    <Form.Item
+                        label="选择协议"
+                        name="protocols"
+                        rules={[{required: true, message: "请选择协议"}]}
+                    >
+                        <Select placeholder="请选择协议"
+                                mode="multiple"
+                                style={{marginBottom: 20}}>
+                            {
+                                protocols.map((item) => {
+                                    return <Select.Option key={item.protocolName}
+                                                          value={item.protocolName}>{item.protocolName}</Select.Option>
+                                })
+                            }
+                        </Select>
                     </Form.Item>
                 </Form>
             </Modal>
         </>
     );
 }
+
+export const TestVehicleDetailButton: React.FC<{ vehicle: IVehicle }> = ({vehicle}) => {
+    const title = "查看车辆"
+    const [open, setOpen] = React.useState<boolean>(false)
+
+    console.log(vehicle)
+
+    return (
+        <>
+            <Button type="primary" onClick={() => {
+                setOpen(true)
+            }}>{title}</Button>
+            <Modal
+                title={title}
+                open={open}
+                onOk={() => {
+                    setOpen(false)
+                }}
+                onCancel={() => {
+                    setOpen(false)
+                }}
+            >
+                <Form>
+                    <Form.Item
+                        label="车辆名称"
+                        name="vehicleName"
+                        rules={[{required: true, message: "请输入车辆名称"}]}
+                    >
+                        <Input placeholder={"请输入车辆名称"} value={vehicle.vehicleName} disabled={true}/>
+                    </Form.Item>
+                    <Form.Item
+                        label="协议"
+                        name="protocols"
+                        rules={[{required: true, message: "请选择协议"}]}
+                    >
+                        <Select placeholder="请选择协议"
+                                mode="multiple"
+                                disabled={true}
+                                style={{marginBottom: 20}}>
+                            {
+                                vehicle.protocols?.map((item: IProtocol) => {
+                                    return <Select.Option key={item.protocolName}
+                                                          value={item.protocolName}>{item.protocolName}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </Form.Item>
+                </Form>
+            </Modal>
+        </>
+    );
+}
+

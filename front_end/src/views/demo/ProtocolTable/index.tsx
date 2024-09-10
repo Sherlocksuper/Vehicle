@@ -1,4 +1,4 @@
-import {Button, message, Row, Space, Table, TableProps} from "antd";
+import {Button, Card, message, Row, Space, Table, TableProps} from "antd";
 import React, {useEffect} from "react";
 import {confirmDelete} from "@/utils";
 import {FAIL_CODE} from "@/constants";
@@ -51,8 +51,9 @@ const ProtocolTable = () => {
     }
 
     const deleteProtocol = (id: number) => {
+        console.log(id)
         confirmDelete() && deleteProtocolApi(id).then(res => {
-            if (res.code === FAIL_CODE) return
+            if (res.code === FAIL_CODE) message.error(res.msg)
             fetchProtocolData()
         })
     }
@@ -63,19 +64,23 @@ const ProtocolTable = () => {
     }, [])
 
     return (
-        <div style={{
-            padding: "20px"
+        <Card style={{
+            overflow: "scroll",
+            overflowX: "hidden",
+            height: "100vh",
         }}>
             <Row justify="end">
                 <Button onClick={() => setOpenProtocolModal("ADD")}>添加协议</Button>
-                <ProtocolModel mode={openProtocolModel} result={""} close={() => setOpenProtocolModal("")}/>
+                <ProtocolModel mode={openProtocolModel} result={""} close={() => setOpenProtocolModal("")}
+                               onOk={() => fetchProtocolData()}
+                />
             </Row>
             <Table
                 columns={columns}
                 dataSource={protocols}
                 rowKey="id"
             />
-        </div>
+        </Card>
     )
 }
 

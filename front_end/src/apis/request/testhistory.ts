@@ -15,7 +15,7 @@ export const addTestsHistory = (data: AddHistory) => {
 }
 
 export const deleteTestsHistory = (id: number) => {
-    const api = HISTORY_API.deleteHistory
+    const api = {...HISTORY_API.deleteHistory}
     api.url = api.url.replace(':id', id.toString())
     return request({
         api: api

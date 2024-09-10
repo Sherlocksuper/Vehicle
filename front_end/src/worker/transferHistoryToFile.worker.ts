@@ -1,5 +1,4 @@
-import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
-import {IHistory, IHistoryItemData, ITemplateData} from "@/apis/standard/history.ts";
+import {IHistory} from "@/apis/standard/history.ts";
 
 /**
  * transfer the history to a file

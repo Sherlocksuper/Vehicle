@@ -51,8 +51,7 @@ const OfflineDate = () => {
         showData()
     }
 
-    return <div style={{
-        width: '80%',
+    return <Card style={{
         margin: 'auto',
         padding: '20px',
         height: '100%',
@@ -124,7 +123,7 @@ const OfflineDate = () => {
             </Row>
           </>
         }
-    </div>
+    </Card>
 
 }
 

@@ -1,7 +1,7 @@
 import type { TableProps } from "antd";
 import Search from "antd/es/input/Search";
 import { SubUser } from "@/apis/standard/user.ts";
-import { Button, Form, Input, Modal, Switch, Table } from "antd";
+import {Button, Card, Form, Input, Modal, Switch, Table} from "antd";
 import React, { useEffect, useRef } from "react";
 import { useUserActions } from "@/views/demo/User/UserFunction.ts";
 import { userListData } from "@/views/demo/User/UserListData.ts";
@@ -68,7 +68,11 @@ const UserManage: React.FC = () => {
   }, [currentSearchValue]);
 
   return (
-    <div style={{ padding: "20px" }}>
+    <Card style={{
+        overflow: "scroll",
+        overflowX: "hidden",
+        height: "100vh",
+    }}>
       {contextHolder}
       <div
         style={{
@@ -124,7 +128,7 @@ const UserManage: React.FC = () => {
         pagination={{ pageSize: 10 }}
         rowKey={(record) => record.id}
       />
-    </div>
+    </Card>
   );
 };
 

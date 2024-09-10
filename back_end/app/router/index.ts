@@ -131,7 +131,7 @@ router.get('/getProtocolList', ProtocalController.getProtocolList)
 router.post('/createProtocol', ProtocalController.createProtocol)
 router.post('/updateProtocol/:id', ProtocalController.updateProtocol)
 router.get('/getProtocolById/:id', ProtocalController.getProtocolById)
-router.post('/deleteProtocol/:id', ProtocalController.deleteProtocol)
+router.get('/deleteProtocol/:id', ProtocalController.deleteProtocol)
 
 
 export default router

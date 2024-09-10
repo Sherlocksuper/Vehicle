@@ -27,7 +27,7 @@ export const getProcessNList = () => {
 }
 
 export const getProcessNById = (id: number) => {
-    const api = TEST_PROCESSN_API.getTestProcessNById;
+    const api = {...TEST_PROCESSN_API.getTestProcessNById};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,
@@ -35,7 +35,7 @@ export const getProcessNById = (id: number) => {
 }
 
 export const updateProcessN = (id: number, processN: ITestProcessN) => {
-    const api = TEST_PROCESSN_API.updateTestProcessN;
+    const api = {...TEST_PROCESSN_API.updateTestProcessN};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,
@@ -44,7 +44,7 @@ export const updateProcessN = (id: number, processN: ITestProcessN) => {
 }
 
 export const deleteProcessN = (id: number) => {
-    const api = TEST_PROCESSN_API.deleteTestProcessN;
+    const api = {...TEST_PROCESSN_API.deleteTestProcessN};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,

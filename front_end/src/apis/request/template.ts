@@ -28,7 +28,7 @@ export const createTestTemplate = async (template: ITemplate) => {
 }
 
 export const updateTestTemplate = async (id: string, template: ITemplate) => {
-    const api = TEMPLATE_API.getTestTemplateById
+    const api = {...TEMPLATE_API.getTestTemplateById}
     api.url = api.url.replace(':id', id);
     return request({
         api: TEMPLATE_API.updateTestTemplate,
@@ -37,8 +37,7 @@ export const updateTestTemplate = async (id: string, template: ITemplate) => {
 }
 
 export const getTestTemplateById = async (id: string) => {
-
-    const api = TEMPLATE_API.getTestTemplateById
+    const api = {...TEMPLATE_API.getTestTemplateById}
     api.url = api.url.replace(':id', id);
 
     return request({
@@ -47,7 +46,7 @@ export const getTestTemplateById = async (id: string) => {
 }
 
 export const deleteTestTemplate = async (id: string) => {
-    const api = TEMPLATE_API.getTestTemplateById
+    const api = {...TEMPLATE_API.getTestTemplateById}
     api.url = api.url.replace(':id', id);
     return request({
         api: api

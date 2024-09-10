@@ -24,7 +24,7 @@ export const PROTOCOL_API: UrlMap = {
     },
     deleteProtocol: {
         url: '/deleteProtocol/:id',
-        method: Method.POST,
+        method: Method.GET,
         format: ContentType.JSON
     }
 }

@@ -8,8 +8,8 @@ import vehicleService from "../../service/PreSet/VehicleService";
 class VehicleController {
 
     async createVehicle(ctx: Context) {
-        const {vehicleName} = ctx.request.body as Vehicle;
-        const res = await vehicleService.createVehicle(vehicleName);
+        const vehicle = ctx.request.body as Vehicle;
+        const res = await vehicleService.createVehicle(vehicle);
 
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,

@@ -1,26 +1,29 @@
-import {Button, Form, Input, Modal, Select, Space} from "antd";
+import {Button, Form, Input, message, Modal, Select, Space} from "antd";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import React, {useEffect} from "react";
-import {ProtocolType} from "@/apis/request/protocol.ts";
+import React from "react";
+import {createProtocol, ProtocolType} from "@/apis/request/protocol.ts";
+import {SUCCESS_CODE} from "@/constants";
 
 
-export const ProtocolModel = ({mode, close}: {
+export const ProtocolModel = ({mode, close, onOk}: {
     mode: "ADD" | "SHOW" | "",
     close: () => void
+    onOk?: () => void,
     result?: string,
 }) => {
     const [form] = Form.useForm();
     const [protocolType, setProtocolType] = React.useState<ProtocolType>(ProtocolType.CAN)
 
     const handleOk = () => {
-        // setIsModalOpen(false);
-        console.log(form.getFieldsValue())
-        close()
-
+        // 检查是否合法
+        form.validateFields().then(() => {
+            form.submit()
+        })
     };
 
     const handleCancel = () => {
         close()
+        form.resetFields()
     };
 
     return (
@@ -33,17 +36,36 @@ export const ProtocolModel = ({mode, close}: {
                 okText="确定"
                 cancelText="取消"
             >
-                <Form layout="vertical" form={form}>
-                    <Select placeholder="请选择协议" onSelect={(value) => {
-                        form.setFieldsValue({protocolType: value})
-                        setProtocolType(value)
-                    }} style={{marginBottom: 20}} defaultValue={ProtocolType.CAN}>
-                        {
-                            Object.values(ProtocolType).map((item) => {
-                                return <Select.Option key={item} value={item}>{item}</Select.Option>
-                            })
-                        }
-                    </Select>
+                <Form layout="vertical" form={form}
+                      onFinish={() => {
+                          const values = form.getFieldsValue()
+                          createProtocol(values).then((res) => {
+                              if (res.code === SUCCESS_CODE) {
+                                  message.success("添加成功")
+                                  onOk && onOk()
+                                  close()
+                              } else {
+                                  message.error("添加失败：", res.message)
+                              }
+                          })
+
+                      }}
+                >
+                    <Form.Item name={"protocolName"} rules={[{required: true, message: "请输入协议名称"}]}>
+                        <Input placeholder="为协议命名"/>
+                    </Form.Item>
+                    <Form.Item name={"protocolType"}>
+                        <Select placeholder="请选择协议" onSelect={(value) => {
+                            form.setFieldsValue({protocolType: value})
+                            setProtocolType(value)
+                        }} defaultValue={ProtocolType.CAN}>
+                            {
+                                Object.values(ProtocolType).map((item) => {
+                                    return <Select.Option key={item} value={item}>{item}</Select.Option>
+                                })
+                            }
+                        </Select>
+                    </Form.Item>
                     {protocolType === ProtocolType.CAN && <CanForm/>}
                 </Form>
             </Modal>
@@ -60,7 +82,7 @@ const CanForm = () => {
                         console.log(key)
                         console.log(name)
                         return (
-                            <Space key={key} style={{display: 'flex', marginBottom: 8}} align="baseline">
+                            <Space key={key} style={{display: 'flex'}} align="baseline">
                                 <Form.Item
                                     {...restField}
                                     name={[name, 'name']}

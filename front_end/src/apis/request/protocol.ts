@@ -43,7 +43,7 @@ export const createProtocol = async (iProtocol: IProtocol) => {
  * @param iProtocol
  */
 export const updateProtocol = async (id: number, iProtocol: IProtocol) => {
-    const api = PROTOCOL_API.updateProtocol;
+    const api = {...PROTOCOL_API.updateProtocol};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,
@@ -56,7 +56,7 @@ export const updateProtocol = async (id: number, iProtocol: IProtocol) => {
  * @param id
  */
 export const getProtocolById = async (id: number) => {
-    const api = PROTOCOL_API.getProjectById;
+    const api = {...PROTOCOL_API.getProtocolById};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,
@@ -69,7 +69,7 @@ export const getProtocolById = async (id: number) => {
  * @param id
  */
 export const deleteProtocolApi = async (id: number) => {
-    const api = PROTOCOL_API.deleteProject;
+    const api = {...PROTOCOL_API.deleteProtocol};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,

@@ -49,8 +49,6 @@ const DB_OPT = {
             await SignalService.initSignals()
             // 初始化超级用户表
             await UserService.initRootUser()
-            // 初始化测试对象
-            await VehicleService.initVehicle(10)
             // 初始化测试项目
             await ProjectService.initProject(10)
             console.log('The database table has been initialized.');

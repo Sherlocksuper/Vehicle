@@ -31,7 +31,7 @@ export const createProject = async (iProject: IProject) => {
  * @param iProject
  */
 export const updateProject = async (id: number, iProject: IProject) => {
-    const api = PROJECT_API.updateProject;
+    const api = {...PROJECT_API.updateProject};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,
@@ -44,7 +44,7 @@ export const updateProject = async (id: number, iProject: IProject) => {
  * @param id
  */
 export const getProjectById = async (id: number) => {
-    const api = PROJECT_API.getProjectById;
+    const api = {...PROJECT_API.getProjectById};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,
@@ -57,7 +57,7 @@ export const getProjectById = async (id: number) => {
  * @param id
  */
 export const deleteProject = async (id: number) => {
-    const api = PROJECT_API.deleteProject;
+    const api = {...PROJECT_API.deleteProject};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,

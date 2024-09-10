@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, message, Row, Space, Table} from 'antd';
+import {Button, Card, message, Row, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {ITemplate} from "@/apis/standard/template.ts";
 import {deleteTestTemplate, getTestTemplateList} from "@/apis/request/template.ts";
@@ -100,9 +100,7 @@ const TestTemplate: React.FC = () => {
     }, [])
 
     return (
-        <div style={{
-            padding: 20
-        }}>
+        <Card>
             <Row justify="end" style={{marginBottom: 20}}>
                 <Button type="link"
                         onClick={() => {
@@ -121,7 +119,7 @@ const TestTemplate: React.FC = () => {
                 }}>刷新</Button>
             </Row>
             <Table columns={columns} dataSource={templates} rowKey={(record) => record.id!.toString()}/>
-        </div>
+        </Card>
     );
 };
 

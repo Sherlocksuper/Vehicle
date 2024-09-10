@@ -1,8 +1,8 @@
 import React from 'react';
-import {Button, Row, Space, Table} from 'antd';
+import {Button, Card, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {IProject} from "@/apis/standard/project.ts";
-import ProjectManage, {
+import {
     CreateProjectButton,
     ShowProjectButton
 } from "@/views/demo/TestProcessN/TestProject/NewTestProject.tsx";
@@ -10,15 +10,6 @@ import {deleteProject, getProjects} from "@/apis/request/project.ts";
 import {confirmDelete} from "@/utils";
 
 const TestProject: React.FC = () => {
-    const [showCreateProject, setShowCreateProject] = React.useState<{
-        disabled: boolean,
-        open: boolean,
-        initValue: string
-    }>({
-        disabled: false,
-        open: false,
-        initValue: ""
-    })
     const [projects, setProjects] = React.useState<IProject[]>([])
 
 
@@ -45,19 +36,22 @@ const TestProject: React.FC = () => {
         }
     ];
 
-  const fetchProjects = () => {
-    getProjects().then((res) => {
-      setProjects(res.data);
-    });
-  };
+    const fetchProjects = () => {
+        getProjects().then((res) => {
+            setProjects(res.data);
+        });
+    };
 
-  React.useEffect(() => {
-    fetchProjects();
-  }, []);
+    React.useEffect(() => {
+        fetchProjects();
+    }, []);
 
     return (
-        <div style={{
-            padding: 20
+        <Card style={{
+            overflow: "scroll",
+            overflowX: "hidden",
+            height: "100vh",
+
         }}>
             <CreateProjectButton projects={projects} onFinished={() => {
                 fetchProjects()
@@ -65,7 +59,7 @@ const TestProject: React.FC = () => {
             <Table style={{
                 marginTop: 20
             }} columns={columns} dataSource={projects} key={projects?.length ?? 0} rowKey={"id"}/>
-        </div>
+        </Card>
     );
 };
 

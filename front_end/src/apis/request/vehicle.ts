@@ -30,7 +30,7 @@ export const createVehicle = async (iVehicle: IVehicle) => {
  * @param id
  */
 export const getVehicleById = async (id: number) => {
-    const api = VEHICLE_API.getVehicleById;
+    const api = {...VEHICLE_API.getVehicleById};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,
@@ -43,7 +43,7 @@ export const getVehicleById = async (id: number) => {
  * @param iVehicle
  */
 export const updateVehicle = async (id: number, iVehicle: IVehicle) => {
-    const api = VEHICLE_API.updateVehicle;
+    const api = {...VEHICLE_API.updateVehicle};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api,
@@ -56,7 +56,7 @@ export const updateVehicle = async (id: number, iVehicle: IVehicle) => {
  * @param id
  */
 export const deleteVehicle = async (id: number) => {
-    const api = VEHICLE_API.deleteVehicle;
+    const api = {...VEHICLE_API.deleteVehicle};
     api.url = api.url.replace(':id', id.toString());
     return request({
         api: api
