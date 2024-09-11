@@ -1,5 +1,7 @@
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from "sequelize-typescript";
 import {IProtocolModel} from "./Protocol.model";
+import {IControllerModel} from "../BoardManage/Controller.model";
+import {ICollectorModel} from "../BoardManage/Collector.model";
 
 /**
  * 车辆管理
@@ -9,7 +11,11 @@ export interface IVehicleModel {
     id?: number
     vehicleName: string
     isDisabled: boolean
-    protocols: IProtocolModel[]
+    protocols: {
+        protocol: IProtocolModel,
+        core: IControllerModel,
+        collector: ICollectorModel,
+    }[]
 }
 
 @Table({
@@ -32,5 +38,9 @@ export default class Vehicle extends Model<IVehicleModel> {
     isDisabled!: boolean;
 
     @Column(DataType.JSON)
-    protocols!: IProtocolModel[];
+    protocols!: {
+        protocol: IProtocolModel,
+        core: IControllerModel,
+        collector: ICollectorModel,
+    }[];
 }

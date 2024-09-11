@@ -4,10 +4,13 @@ import type {TableProps} from 'antd';
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {createVehicle, deleteVehicle, getVehicles, updateVehicle} from "@/apis/request/vehicle.ts";
 import {SUCCESS_CODE} from "@/constants";
-import {useLoaderData} from "react-router-dom";
 import {confirmDelete} from "@/utils";
 import {RuleObject} from 'antd/es/form';
 import {getProtocols, IProtocol} from "@/apis/request/protocol.ts";
+import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {ICollectorsConfigItem, IControllersConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
+import {getAllControllerList} from "@/apis/request/board-signal/controller.ts";
+import {getAllCollectorList} from "@/apis/request/board-signal/collector.ts";
 
 
 const columns: TableProps<IVehicle>["columns"] = [
@@ -102,16 +105,24 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
     const [form] = Form.useForm<IVehicle>()
     const [open, setOpen] = React.useState<boolean>(false)
     const [protocols, setProtocols] = React.useState<IProtocol[]>([])
+    const [controllerBoards, setControllerBoards] = React.useState<IControllersConfigItem[]>([])
+    const [collectBoards, setCollectBoards] = React.useState<ICollectorsConfigItem[]>([])
 
     useEffect(() => {
         if (open) {
             form.resetFields()
         }
-        fetchProtocol();
+        fetchData();
     }, [form, open])
 
     const newVehicle = (value) => {
-        value.protocols = value.protocols.map((item: string) => JSON.parse(item))
+        value.protocols = value.protocols.map((item) => {
+            return {
+                protocol: JSON.parse(item.protocol),
+                core: JSON.parse(item.core),
+                collector: JSON.parse(item.collect),
+            }
+        })
         createVehicle(value).then((res) => {
             console.log(res)
             onFinished()
@@ -134,9 +145,27 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
         }
     };
 
-    const fetchProtocol = async () => {
+    const fetchData = async () => {
         getProtocols().then((res) => {
+            if (res.code !== SUCCESS_CODE) {
+                message.error("获取协议失败：", res.msg)
+                return
+            }
             setProtocols(res.data)
+        })
+        getAllControllerList().then((res) => {
+            if (res.code !== SUCCESS_CODE) {
+                message.error("获取核心板卡失败：", res.msg)
+                return
+            }
+            setControllerBoards(res.data)
+        })
+        getAllCollectorList().then((res) => {
+            if (res.code !== SUCCESS_CODE) {
+                message.error("获取协议失败：", res.msg)
+                return
+            }
+            setCollectBoards(res.data)
         })
     }
 
@@ -166,23 +195,71 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
                     >
                         <Input placeholder={"请输入车辆名称"}/>
                     </Form.Item>
-                    <Form.Item
-                        label="选择协议"
-                        name="protocols"
-                        rules={[{required: true, message: "请选择协议"}]}
-                    >
-                        <Select placeholder="请选择协议"
-                                mode="multiple"
-                                style={{marginBottom: 20}}
-                        >
-                            {
-                                protocols.map((item) => {
-                                    return <Select.Option key={item.protocolName}
-                                                          value={JSON.stringify(item)}>{item.protocolName}</Select.Option>
-                                })
-                            }
-                        </Select>
-                    </Form.Item>
+                    <Form.List name="protocols">
+                        {(fields, {add, remove}) => (
+                            <>
+                                {fields.map(({key, name, ...restField}) => {
+                                    console.log(key)
+                                    console.log(name)
+                                    return (
+                                        <Space key={key} style={{display: 'flex'}} align="baseline">
+                                            <Form.Item
+                                                label="选择协议"
+                                                {...restField}
+                                                name={[name, 'protocol']}
+                                                rules={[{required: true, message: "请选择协议"}]}
+                                            >
+                                                <Select placeholder="请选择协议"
+                                                        style={{marginBottom: 20}}
+                                                >
+                                                    {
+                                                        protocols.map((item) => {
+                                                            return <Select.Option key={item.protocolName}
+                                                                                  value={JSON.stringify(item)}>{item.protocolName}</Select.Option>
+                                                        })
+                                                    }
+                                                </Select>
+                                            </Form.Item>
+                                            <Form.Item
+                                                {...restField}
+                                                name={[name, 'core']}
+                                                rules={[{required: true, message: '核心板卡不可为空'}]}
+                                            >
+                                                <Select placeholder="核心板卡">
+                                                    {
+                                                        controllerBoards.map((item) => {
+                                                            return <Select.Option key={item.controllerName}
+                                                                                  value={JSON.stringify(item)}>{item.controllerName}</Select.Option>
+                                                        })
+                                                    }
+                                                </Select>
+                                            </Form.Item>
+                                            <Form.Item
+                                                {...restField}
+                                                name={[name, 'collect']}
+                                                rules={[{required: true, message: '采集板卡不可为空'}]}
+                                            >
+                                                <Select placeholder="采集板卡">
+                                                    {
+                                                        collectBoards.map((item) => {
+                                                            return <Select.Option key={item.collectorName}
+                                                                                  value={JSON.stringify(item)}>{item.collectorName}</Select.Option>
+                                                        })
+                                                    }
+                                                </Select>
+                                            </Form.Item>
+                                            <MinusCircleOutlined onClick={() => remove(name)}/>
+                                        </Space>
+                                    )
+                                })}
+                                <Form.Item>
+                                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
+                                        添加信号
+                                    </Button>
+                                </Form.Item>
+                            </>
+                        )}
+                    </Form.List>
                 </Form>
             </Modal>
         </>
@@ -217,23 +294,31 @@ export const TestVehicleDetailButton: React.FC<{ vehicle: IVehicle }> = ({vehicl
                         <Input placeholder={"请输入车辆名称"} defaultValue={vehicle.vehicleName} disabled={true}/>
                     </Form.Item>
                     <Form.Item
-                        label="协议"
                         name="protocols"
-                        rules={[{required: true, message: "请选择协议"}]}
                     >
-                        <Select placeholder="请选择协议"
-                                mode="multiple"
-                                disabled={true}
-                                style={{marginBottom: 20}}
-                                defaultValue={vehicle.protocols?.map((item) => item.protocolName)}
-                        >
-                            {
-                                vehicle.protocols?.map((item: IProtocol) => {
-                                    return <Select.Option key={item.protocolName}
-                                                          value={item}>{item.protocolName}</Select.Option>
-                                })
-                            }
-                        </Select>
+                        <Table
+                            columns={[
+                                {
+                                    title: "协议名称",
+                                    dataIndex: "protocol",
+                                    key: "protocol",
+                                    render: (text) => text.protocolName
+                                },
+                                {
+                                    title: "核心板卡",
+                                    dataIndex: "core",
+                                    key: "core",
+                                    render: (text) => text.controllerName
+                                },
+                                {
+                                    title: "采集板卡",
+                                    dataIndex: "collector",
+                                    key: "collector",
+                                    render: (text) => text.collectorName
+                                }
+                            ]}
+                            dataSource={vehicle.protocols}
+                        />
                     </Form.Item>
                 </Form>
             </Modal>
