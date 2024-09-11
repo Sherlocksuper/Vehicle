@@ -79,6 +79,9 @@ const ProtocolTable = () => {
                 columns={columns}
                 dataSource={protocols}
                 rowKey="id"
+                style={{
+                    marginTop: "20px"
+                }}
             />
         </Card>
     )

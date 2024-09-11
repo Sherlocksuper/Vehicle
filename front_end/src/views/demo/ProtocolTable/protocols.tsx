@@ -1,6 +1,6 @@
 import {Button, Form, Input, message, Modal, Select, Space} from "antd";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import React from "react";
+import React, {useEffect} from "react";
 import {createProtocol, ProtocolType} from "@/apis/request/protocol.ts";
 import {SUCCESS_CODE} from "@/constants";
 
@@ -13,6 +13,10 @@ export const ProtocolModel = ({mode, close, onOk}: {
 }) => {
     const [form] = Form.useForm();
     const [protocolType, setProtocolType] = React.useState<ProtocolType>(ProtocolType.CAN)
+
+    useEffect(() => {
+        form.setFieldValue("protocolType", ProtocolType.CAN)
+    }, [form])
 
     const handleOk = () => {
         // 检查是否合法
@@ -54,11 +58,13 @@ export const ProtocolModel = ({mode, close, onOk}: {
                     <Form.Item name={"protocolName"} rules={[{required: true, message: "请输入协议名称"}]}>
                         <Input placeholder="为协议命名"/>
                     </Form.Item>
-                    <Form.Item name={"protocolType"}>
+                    <Form.Item name={"protocolType"}
+                               initialValue={ProtocolType.CAN}
+                    >
                         <Select placeholder="请选择协议" onSelect={(value) => {
                             form.setFieldsValue({protocolType: value})
                             setProtocolType(value)
-                        }} defaultValue={ProtocolType.CAN}>
+                        }}>
                             {
                                 Object.values(ProtocolType).map((item) => {
                                     return <Select.Option key={item} value={item}>{item}</Select.Option>

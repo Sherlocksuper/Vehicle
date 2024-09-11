@@ -338,7 +338,7 @@ const AddSignalButton = ({reloadData}: AddSignalProps) => {
                 >
                     {collectors.map((item: any) => {
                         return (
-                            <Select.Option value={item.id}>
+                            <Select.Option value={item.id} key={item.id}>
                                 {item.collectorName}
                             </Select.Option>
                         );

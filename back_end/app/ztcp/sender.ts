@@ -35,7 +35,7 @@ export function createConnectionToLong() {
     client.on('error', (err: Error) => {
         console.error('连接出错:', err.message);
         client.destroy(); // 销毁当前连接，防止意外复用
-        attemptReconnect();
+        // attemptReconnect();
     });
 }
 

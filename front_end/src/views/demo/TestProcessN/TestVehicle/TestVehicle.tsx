@@ -108,12 +108,10 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
             form.resetFields()
         }
         fetchProtocol();
-        form.setFieldsValue({
-            isDisabled: false
-        })
-    }, [open])
+    }, [form, open])
 
-    const newVehicle = (value: IVehicle) => {
+    const newVehicle = (value) => {
+        value.protocols = value.protocols.map((item: string) => JSON.parse(item))
         createVehicle(value).then((res) => {
             console.log(res)
             onFinished()
@@ -175,11 +173,12 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
                     >
                         <Select placeholder="请选择协议"
                                 mode="multiple"
-                                style={{marginBottom: 20}}>
+                                style={{marginBottom: 20}}
+                        >
                             {
                                 protocols.map((item) => {
                                     return <Select.Option key={item.protocolName}
-                                                          value={item.protocolName}>{item.protocolName}</Select.Option>
+                                                          value={JSON.stringify(item)}>{item.protocolName}</Select.Option>
                                 })
                             }
                         </Select>
@@ -193,8 +192,6 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
 export const TestVehicleDetailButton: React.FC<{ vehicle: IVehicle }> = ({vehicle}) => {
     const title = "查看车辆"
     const [open, setOpen] = React.useState<boolean>(false)
-
-    console.log(vehicle)
 
     return (
         <>
@@ -217,7 +214,7 @@ export const TestVehicleDetailButton: React.FC<{ vehicle: IVehicle }> = ({vehicl
                         name="vehicleName"
                         rules={[{required: true, message: "请输入车辆名称"}]}
                     >
-                        <Input placeholder={"请输入车辆名称"} value={vehicle.vehicleName} disabled={true}/>
+                        <Input placeholder={"请输入车辆名称"} defaultValue={vehicle.vehicleName} disabled={true}/>
                     </Form.Item>
                     <Form.Item
                         label="协议"
@@ -227,11 +224,13 @@ export const TestVehicleDetailButton: React.FC<{ vehicle: IVehicle }> = ({vehicl
                         <Select placeholder="请选择协议"
                                 mode="multiple"
                                 disabled={true}
-                                style={{marginBottom: 20}}>
+                                style={{marginBottom: 20}}
+                                defaultValue={vehicle.protocols?.map((item) => item.protocolName)}
+                        >
                             {
                                 vehicle.protocols?.map((item: IProtocol) => {
                                     return <Select.Option key={item.protocolName}
-                                                          value={item.protocolName}>{item.protocolName}</Select.Option>
+                                                          value={item}>{item.protocolName}</Select.Option>
                                 })
                             }
                         </Select>

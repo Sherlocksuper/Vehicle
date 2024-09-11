@@ -3,7 +3,7 @@ import {localConfig} from "@/localConfig.ts";
 
 
 let client: net.Socket;
-let reconnectDelay = 3000; // 初始重连延迟时间，单位为毫秒
+let reconnectDelay = 1000; // 初始重连延迟时间，单位为毫秒
 
 // 创建并连接到服务器
 export function createConnectionToLong() {
