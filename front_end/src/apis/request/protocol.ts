@@ -1,5 +1,6 @@
 import {request} from "@/utils/request.ts";
 import {PROTOCOL_API} from "@/apis/url/protocol.ts";
+import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 
 
 export enum ProtocolType {
@@ -9,18 +10,30 @@ export enum ProtocolType {
     B1552B = '1552B',
 }
 
+export interface ICanBaseConfig {
+    baudRate: number
+}
+
+export interface IFlexRayBaseConfig {
+    macroticksPerCycle: number
+    transmissionStartTime: number
+    staticFramepayload: number
+    staticSlotsCount: number
+    dynamicSlotCount: number
+    dynamicSlotLength: number
+    setAsSyncNode: number
+}
+
+
 export interface IProtocol {
     id?: number
     protocolName: string
     protocolType: ProtocolType
-    signals: {
-        // 信号名称
-        name: string
-        // 量纲
-        dimension: string
-        // 信号，在前端拼接好的
-        // 信号1起点	信号1长度[7:2]   斜率乘或除[1]   偏移正或负[0]	信号1斜率	信号1偏移
-        result: string
+    baseConfig: ICanBaseConfig | IFlexRayBaseConfig
+    signalsParsingConfig: {
+        frameNumber: string,
+        frameId: string,
+        signals: IProtocolSignal[]
     }[]
 }
 

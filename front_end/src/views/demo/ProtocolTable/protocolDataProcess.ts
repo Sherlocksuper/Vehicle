@@ -1,4 +1,5 @@
 import {ProtocolType} from "@/apis/request/protocol.ts";
+
 export const processProtocolData = (type, data) => {
     switch (type) {
         case ProtocolType.CAN:
@@ -18,13 +19,9 @@ export const parseProtocolData = (type, data) => {
     switch (type) {
         case ProtocolType.CAN:
             return parseCanData(data)
-        // case ProtocolType.FlexRay:
-        //     return processFlexRayData(data)
-        // case ProtocolType.MIC:
-        //     return processMicData(data)
-        // case ProtocolType.B1552B:
-        //     return processB1552BData(data)
-        // default:
+        case ProtocolType.FlexRay:
+            return processFlexRayData(data)
+        default:
             return {}
     }
 }

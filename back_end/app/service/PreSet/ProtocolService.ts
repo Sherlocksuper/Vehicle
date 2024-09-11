@@ -20,11 +20,9 @@ class ProtocolService {
 
     async updateProtocol(id: number, newProtocol: IProtocolModel) {
         const protocol = await Protocol.findByPk(id);
+        newProtocol.id = id
         if (protocol) {
-            protocol.protocolName = newProtocol.protocolName;
-            protocol.protocolType = newProtocol.protocolType;
-            protocol.signals = newProtocol.signals;
-            await protocol.save();
+            await protocol.update(newProtocol);
             return protocol;
         }
 

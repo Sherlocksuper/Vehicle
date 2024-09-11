@@ -4,8 +4,30 @@ import {Col} from "sequelize/types/utils";
 export enum ProtocolType {
     FlexRay = 'FlexRay',
     CAN = 'CAN',
-    MIC = 'MIC',
-    B1552B = '1552B',
+}
+
+
+export interface IProtocolSignal {
+    name: string
+    dimension: string
+    startPoint: string
+    length: string
+    slope: string
+    offset: string
+}
+
+export interface ICanBaseConfig {
+    baudRate: number
+}
+
+export interface IFlexRayBaseConfig {
+    macroticksPerCycle: number
+    transmissionStartTime: number
+    staticFramepayload: number
+    staticSlotsCount: number
+    dynamicSlotCount: number
+    dynamicSlotLength: number
+    setAsSyncNode: number
 }
 
 
@@ -18,14 +40,11 @@ export interface IProtocolModel {
     id?: number
     protocolName: string
     protocolType: ProtocolType
-    signals: {
-        // 信号名称
-        name: string
-        // 量纲
-        dimension: string
-        // 信号，在前端拼接好的
-        // 信号1起点	信号1长度[7:2]   斜率乘或除[1]   偏移正或负[0]	信号1斜率	信号1偏移
-        result: string
+    baseConfig: ICanBaseConfig | IFlexRayBaseConfig
+    signalsParsingConfig: {
+        frameNumber: string,
+        frameId: string,
+        signals: IProtocolSignal[]
     }[]
 }
 
@@ -46,9 +65,12 @@ export default class Protocol extends Model<IProtocolModel> {
     protocolType!: ProtocolType;
 
     @Column(DataType.JSON)
-    signals!: {
-        name: string
-        dimension: string
-        result: string
+    baseConfig!: ICanBaseConfig | IFlexRayBaseConfig;
+
+    @Column(DataType.JSON)
+    signalsParsingConfig!: {
+        frameNumber: string,
+        frameId: string,
+        signals: IProtocolSignal[]
     }[]
 }
