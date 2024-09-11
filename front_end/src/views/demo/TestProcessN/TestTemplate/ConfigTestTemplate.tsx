@@ -19,7 +19,7 @@ import {createTestTemplate} from "@/apis/request/template.ts";
 import {DEFAULT_TITLE, SUCCESS_CODE} from "@/constants";
 import {v4 as uuidv4} from 'uuid';
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
-import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
+import {ICollector, IController, ISignal} from "@/views/demo/Topology/PhyTopology.tsx";
 import {updateProcessN} from "@/apis/request/testProcessN.ts";
 import {deleteUndefined, transferToDragItems} from "@/utils";
 import {PROCESS_CLOSE_HINT} from "@/constants/process_hint.ts";
@@ -74,9 +74,9 @@ export interface IDragItem {
 export interface ISignalItem {
     vehicleName: string
     projectName: string
-    controller: IControllersConfigItem
-    collector: ICollectorsConfigItem
-    signal: ISignalsConfigItem
+    controller: IController
+    collector: ICollector
+    signal: ISignal
 }
 
 const ConfigTestTemplate: React.FC = () => {

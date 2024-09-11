@@ -1,11 +1,11 @@
 import {Button, message, Space, Table} from "antd";
-import {IControllersConfigItem} from "../PhyTopology.tsx";
+import {IController} from "../PhyTopology.tsx";
 import {NOT_ON_USED, ENABLE, ON_USED, USED_INFO, DISABLE} from "@/constants/board.ts";
 import {updateController} from "@/apis/request/board-signal/controller.ts";
 import {SUCCESS_CODE} from "@/constants";
 
 const ControllerInfoTable: React.FC<{
-    dataSource: IControllersConfigItem[],
+    dataSource: IController[],
     reload: () => void
 }> = ({dataSource, reload}) => {
 
@@ -23,17 +23,17 @@ const ControllerInfoTable: React.FC<{
         {
             title: USED_INFO,
             key: 'isDisabled',
-            render: (record: IControllersConfigItem) => {
+            render: (record: IController) => {
                 return <span>{record.isDisabled ? NOT_ON_USED : ON_USED}</span>
             }
         },
         {
             title: '操作',
             key: 'action',
-            render: (record: IControllersConfigItem) => {
+            render: (record: IController) => {
                 return <Space size="middle">
                     <Button type="primary" onClick={() => {
-                        const newController = {...record, isDisabled: !record.isDisabled} as IControllersConfigItem
+                        const newController = {...record, isDisabled: !record.isDisabled} as IController
                         delete newController.userId
                         updateController(newController).then((res) => {
                             if (res.code === SUCCESS_CODE) {

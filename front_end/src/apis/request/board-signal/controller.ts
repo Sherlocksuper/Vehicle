@@ -1,9 +1,9 @@
-import {IControllersConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
+import {IController} from "@/views/demo/Topology/PhyTopology.tsx";
 import {MyUrl} from "@/apis/url/myUrl.ts";
 import {request} from "@/utils/request.ts";
 
 
-export const createController = async (controller: IControllersConfigItem) => {
+export const createController = async (controller: IController) => {
     const api = MyUrl.TEST.createController
     return request({
         api: api,
@@ -25,7 +25,7 @@ export const getAllControllerList = async () => {
     });
 }
 
-export const updateController = async (controller: IControllersConfigItem) => {
+export const updateController = async (controller: IController) => {
     const api = MyUrl.TEST.updateController
     return request({
         api: api,

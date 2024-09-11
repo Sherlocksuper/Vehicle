@@ -24,7 +24,7 @@ import {
 } from "@/apis/request/board-signal/collector.ts";
 import {createController} from "@/apis/request/board-signal/controller.ts";
 
-export interface IControllersConfigItem {
+export interface IController {
     id: number;
     controllerName: string;
     controllerAddress: string;
@@ -32,7 +32,7 @@ export interface IControllersConfigItem {
     isDisabled: boolean;
 }
 
-export interface ICollectorsConfigItem {
+export interface ICollector {
     id: number;
     collectorName: string;
     collectorAddress: string;
@@ -40,7 +40,7 @@ export interface ICollectorsConfigItem {
     isDisabled: boolean;
 }
 
-export interface ISignalsConfigItem {
+export interface ISignal {
     id: number;
     signalName: string;
     signalUnit: string;
@@ -49,13 +49,13 @@ export interface ISignalsConfigItem {
     remark: string;
     innerIndex: number;
     collectorId: number;
-    collector: ICollectorsConfigItem;
+    collector: ICollector;
 }
 
 interface ITestData {
-    controllersConfig: IControllersConfigItem[];
-    collectorsConfig: ICollectorsConfigItem[];
-    signalsConfig: ISignalsConfigItem[];
+    controllersConfig: IController[];
+    collectorsConfig: ICollector[];
+    signalsConfig: ISignal[];
 }
 
 const PreTestManager: React.FC = () => {
@@ -158,7 +158,7 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
         const controller = {
             controllerName: name,
             controllerAddress: address,
-        } as IControllersConfigItem;
+        } as IController;
 
         createController(controller).then((res) => {
             if (res.code === SUCCESS_CODE) {
@@ -175,7 +175,7 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
         const collector = {
             collectorName: name,
             collectorAddress: address,
-        } as ICollectorsConfigItem;
+        } as ICollector;
 
         createCollector(collector).then((res: any) => {
             if (res.code === SUCCESS_CODE) {
@@ -239,7 +239,7 @@ interface AddSignalProps {
 
 const AddSignalButton = ({reloadData}: AddSignalProps) => {
     const [open, setOpen] = useState(false)
-    const [single, setSingle] = useState<ISignalsConfigItem>({
+    const [single, setSingle] = useState<ISignal>({
         signalName: '',
         signalUnit: '',
         signalType: '',
@@ -247,7 +247,7 @@ const AddSignalButton = ({reloadData}: AddSignalProps) => {
         remark: '',
         innerIndex: 0,
         collectorId: 0
-    } as ISignalsConfigItem)
+    } as ISignal)
 
     //获取采集板卡列表
     const [collectors, setCollectors] = useState<any[]>([]);
@@ -292,7 +292,7 @@ const AddSignalButton = ({reloadData}: AddSignalProps) => {
             remark: "",
             innerIndex: 0,
             collectorId: 0,
-        } as ISignalsConfigItem);
+        } as ISignal);
     };
 
     useMemo(() => {

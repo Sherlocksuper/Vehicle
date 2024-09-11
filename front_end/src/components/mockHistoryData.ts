@@ -1,6 +1,6 @@
 import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
-import {ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
+import {ISignal} from "@/views/demo/Topology/PhyTopology.tsx";
 
 // 改进后的generateHistoryData函数
 export function generateHistoryData(
@@ -24,7 +24,7 @@ export function generateHistoryData(
     let timers: NodeJS.Timeout[] = [];  // 使用多个定时器以支持每个 templateItem 独立的时间间隔
 
     // 提取所有的 ISignalsConfigItem
-    const signalItems: ISignalsConfigItem[] = [];
+    const signalItems: ISignal[] = [];
 
     console.log(JSON.stringify(testProcess))
 

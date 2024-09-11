@@ -8,7 +8,7 @@ import {confirmDelete} from "@/utils";
 import {RuleObject} from 'antd/es/form';
 import {getProtocols, IProtocol} from "@/apis/request/protocol.ts";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import {ICollectorsConfigItem, IControllersConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
+import {ICollector, IController} from "@/views/demo/Topology/PhyTopology.tsx";
 import {getAllControllerList} from "@/apis/request/board-signal/controller.ts";
 import {getAllCollectorList} from "@/apis/request/board-signal/collector.ts";
 
@@ -105,8 +105,8 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
     const [form] = Form.useForm<IVehicle>()
     const [open, setOpen] = React.useState<boolean>(false)
     const [protocols, setProtocols] = React.useState<IProtocol[]>([])
-    const [controllerBoards, setControllerBoards] = React.useState<IControllersConfigItem[]>([])
-    const [collectBoards, setCollectBoards] = React.useState<ICollectorsConfigItem[]>([])
+    const [controllerBoards, setControllerBoards] = React.useState<IController[]>([])
+    const [collectBoards, setCollectBoards] = React.useState<ICollector[]>([])
 
     useEffect(() => {
         if (open) {
@@ -185,6 +185,7 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
                 }}
                 onCancel={() => {
                     onFinished()
+                    setOpen(false)
                 }}
             >
                 <Form form={form}>

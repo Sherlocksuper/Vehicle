@@ -1,11 +1,11 @@
 import {Button, Space, Table} from "antd";
-import {ICollectorsConfigItem} from "../PhyTopology.tsx";
+import {ICollector} from "../PhyTopology.tsx";
 import {updateCollector} from "@/apis/request/board-signal/collector.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {NOT_ON_USED, ON_USED, USED_INFO} from "@/constants/board.ts";
 
 const CollectorInfoTable: React.FC<{
-    dataSource: ICollectorsConfigItem[],
+    dataSource: ICollector[],
     reload: () => void
 }> = ({dataSource, reload}) => {
     const columns = [
@@ -22,14 +22,14 @@ const CollectorInfoTable: React.FC<{
         {
             title: USED_INFO,
             key: 'isDisabled',
-            render: (record: ICollectorsConfigItem) => {
+            render: (record: ICollector) => {
                 return record.isDisabled ? NOT_ON_USED : ON_USED
             }
         },
         {
             title: '操作',
             key: 'action',
-            render: (record: ICollectorsConfigItem) => {
+            render: (record: ICollector) => {
                 return <Space size="middle">
                     <Button type="primary" onClick={() => {
                         const newCollector = {...record, isDisabled: !record.isDisabled}

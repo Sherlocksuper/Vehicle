@@ -69,8 +69,8 @@ const ProtocolTable = () => {
             overflowX: "hidden",
             height: "100vh",
         }}>
-            <Row justify="end">
-                <Button onClick={() => setOpenProtocolModal("ADD")}>添加协议</Button>
+            <Row justify="start">
+                <Button type={"primary"} onClick={() => setOpenProtocolModal("ADD")}>添加协议</Button>
                 <ProtocolModel mode={openProtocolModel} result={""} close={() => setOpenProtocolModal("")}
                                onOk={() => fetchProtocolData()}
                 />

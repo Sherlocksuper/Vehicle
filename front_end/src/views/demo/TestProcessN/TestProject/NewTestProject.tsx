@@ -3,7 +3,7 @@ import React, {useEffect} from "react";
 import {ITestProcess} from "@/apis/standard/test.ts";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {IProject} from "@/apis/standard/project.ts";
-import {ICollectorsConfigItem, IControllersConfigItem, ISignalsConfigItem} from "@/views/demo/Topology/PhyTopology.tsx";
+import {ICollector, IController, ISignal} from "@/views/demo/Topology/PhyTopology.tsx";
 import {createProject, getProjects} from "@/apis/request/project.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {getSignalListByCollectorId} from "@/apis/request/board-signal/signal.ts";
@@ -36,9 +36,9 @@ interface CreateProjectProps {
 
 const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, disable, initValue, projects}) => {
     const [form] = Form.useForm<IProject>();
-    const [controllerList, setControllerList] = React.useState<IControllersConfigItem[]>([])
-    const [collectorList, setCollectorList] = React.useState<ICollectorsConfigItem[]>([])
-    const [signalList, setSignalList] = React.useState<ISignalsConfigItem[]>([])
+    const [controllerList, setControllerList] = React.useState<IController[]>([])
+    const [collectorList, setCollectorList] = React.useState<ICollector[]>([])
+    const [signalList, setSignalList] = React.useState<ISignal[]>([])
     const [projectList, setProjectList] = React.useState<IProject[]>([])
 
 
@@ -197,7 +197,7 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
                                         rules={[{required: true, message: '请选择控制器'}]}
                                     >
                                         <Select placeholder="请选择控制器" onSelect={(value) => {
-                                            const item = JSON.parse(value) as IControllersConfigItem;
+                                            const item = JSON.parse(value) as IController;
                                             const newProjectResult = {...projectResult} as IProject
                                             newProjectResult.projectConfig[index].controller = item
 
@@ -221,7 +221,7 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
                                         <Select
                                             placeholder="请选择采集器"
                                             onChange={(value: string) => {
-                                                const item: ICollectorsConfigItem = JSON.parse(value);
+                                                const item: ICollector = JSON.parse(value);
 
                                                 const newProjectResult = {...projectResult} as IProject
                                                 newProjectResult.projectConfig[index].collector = item
@@ -254,7 +254,7 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
                                             disabled={disable || !selectedCollector}
                                             key={singleKey}
                                             onSelect={(value) => {
-                                                const item = JSON.parse(value) as ISignalsConfigItem;
+                                                const item = JSON.parse(value) as ISignal;
                                                 const newProjectResult = {...projectResult} as IProject
                                                 newProjectResult.projectConfig[index].signal = item
                                                 setProjectResult(newProjectResult)
@@ -284,9 +284,9 @@ const ProjectManage: React.FC<CreateProjectProps> = ({open, mode, onFinished, di
                                     setProjectResult({
                                         ...projectResult,
                                         projectConfig: [...projectResult?.projectConfig || [], {
-                                            controller: {} as IControllersConfigItem,
-                                            collector: {} as ICollectorsConfigItem,
-                                            signal: {} as ISignalsConfigItem
+                                            controller: {} as IController,
+                                            collector: {} as ICollector,
+                                            signal: {} as ISignal
                                         }]
                                     } as IProject)
                                 }} block icon={<PlusOutlined/>}>
