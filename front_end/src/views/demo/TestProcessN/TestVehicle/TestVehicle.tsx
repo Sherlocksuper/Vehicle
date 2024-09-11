@@ -237,7 +237,24 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
                                             <Form.Item
                                                 {...restField}
                                                 name={[name, 'collect']}
-                                                rules={[{required: true, message: '采集板卡不可为空'}]}
+                                                rules={[{required: true, message: '采集板卡不可为空'},
+                                                    ({getFieldValue}) => ({
+                                                        validator(_, value) {
+                                                            // 协议类型相同的话，采集板卡不能相同
+                                                            const protocol = getFieldValue(['protocols', name, 'protocol'])
+                                                            const collect = value
+                                                            console.log(value)
+                                                            for (let i = 0; i < fields.length; i++) {
+                                                                if (i === name) continue
+                                                                if (protocol["protocolType"] === getFieldValue(['protocols', i, 'protocol'])["protocolType"] &&
+                                                                    collect["collectorName"] === getFieldValue(['protocols', i, 'collect'])["collectorName"]) {
+                                                                    return Promise.reject('相同协议类型的协议采集板卡不能相同')
+                                                                }
+                                                            }
+                                                            return Promise.resolve()
+                                                        },
+                                                    }),
+                                                ]}
                                             >
                                                 <Select placeholder="采集板卡">
                                                     {
