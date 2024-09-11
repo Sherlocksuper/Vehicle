@@ -23,6 +23,7 @@ class CollectorService {
                 })
                 data = srcData
             }
+            console.log(data)
             data = data.map(i => ({...i, userId: config?.userId}))
             await Collector.bulkCreate(data)
             await transaction.commit()

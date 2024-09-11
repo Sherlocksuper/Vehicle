@@ -1,6 +1,8 @@
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
 import {IDragItem} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
+import {Modal} from "antd";
+import {configs} from "@typescript-eslint/eslint-plugin";
 
 
 /**
@@ -117,5 +119,5 @@ export function formatFileSize(size: number) {
  */
 
 export function confirmDelete() {
-    return (prompt('请输入 delete 以删除') === "delete")
+    return (confirm('是否删除'))
 }

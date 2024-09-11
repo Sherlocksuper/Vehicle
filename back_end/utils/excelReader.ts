@@ -1,7 +1,7 @@
 import * as xlsx from 'node-xlsx';
 import * as fs from 'fs';
 
-export async function excelReader({ path, workSheetName, keys }: {
+export async function excelReader({path, workSheetName, keys}: {
     path: string
     workSheetName: string
     keys: string[]
@@ -23,7 +23,8 @@ export async function excelReader({ path, workSheetName, keys }: {
                 row.forEach((val, i) => {
                     obj[keys[i]] = val || '-'
                 })
-                data.push(obj)
+                // 如果obj的键值对数量大于0，就将obj添加到data数组中
+                if (Object.keys(obj).length > 0) data.push(obj)
             }
         });
         resolve(data)

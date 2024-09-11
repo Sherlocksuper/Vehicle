@@ -23,7 +23,7 @@ class ProtocolService {
         if (protocol) {
             protocol.protocolName = newProtocol.protocolName;
             protocol.protocolType = newProtocol.protocolType;
-            protocol.result = newProtocol.result;
+            protocol.signals = newProtocol.signals;
             await protocol.save();
             return protocol;
         }
