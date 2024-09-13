@@ -4,12 +4,13 @@
 import {request} from "@/utils/request.ts";
 import {TEST_CONFIG_API} from "@/apis/url/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
+import {ContentType, Method} from "@/apis/standard/all.ts";
 
 export const getTestConfigs = async () => {
-    const api = TEST_CONFIG_API.getTestConfigList;
-    return request({
-        api: api
-    });
+  const api = TEST_CONFIG_API.getTestConfigList;
+  return request({
+    api: api
+  });
 }
 
 /**
@@ -17,11 +18,11 @@ export const getTestConfigs = async () => {
  * @param iConfig
  */
 export const createTestConfig = async (iConfig: ITestConfig) => {
-    const api = TEST_CONFIG_API.createTestConfig;
-    return request({
-        api: api,
-        params: iConfig
-    });
+  const api = TEST_CONFIG_API.createTestConfig;
+  return request({
+    api: api,
+    params: iConfig
+  });
 
 }
 
@@ -31,12 +32,12 @@ export const createTestConfig = async (iConfig: ITestConfig) => {
  * @param id
  */
 export const getTestConfigById = async (id: number) => {
-    const api = {...TEST_CONFIG_API.getTestConfigById};
-    api.url = api.url.replace(':id', id.toString());
-    return request({
-        api: api,
-        params: {id: id}
-    });
+  const api = {...TEST_CONFIG_API.getTestConfigById};
+  api.url = api.url.replace(':id', id.toString());
+  return request({
+    api: api,
+    params: {id: id}
+  });
 }
 
 /**
@@ -44,10 +45,37 @@ export const getTestConfigById = async (id: number) => {
  * @param id
  */
 export const deleteTestConfig = async (id: number) => {
-    const api = {...TEST_CONFIG_API.deleteTestConfig};
-    api.url = api.url.replace(':id', id.toString());
-    return request({
-        api: api,
-        params: {id: id}
-    });
+  const api = {...TEST_CONFIG_API.deleteTestConfig};
+  api.url = api.url.replace(':id', id.toString());
+  return request({
+    api: api,
+    params: {id: id}
+  });
+}
+
+// //router.post('/downTestConfig', TestConfigController.downTestConfig);
+export const downTestConfig = async (iConfigId: number) => {
+  const api = TEST_CONFIG_API.downTestConfig;
+  return request({
+    api: api,
+    params: {id: iConfigId}
+  });
+}
+
+
+// // router.get('/getCurrentTestConfig', TestConfigController.getCurrentTestConfig);
+export const getCurrentTestConfig = async () => {
+  const api = TEST_CONFIG_API.getCurrentTestConfig;
+  return request({
+    api: api
+  });
+}
+
+// // // 停止当前测试配置
+// // router.get('/stopCurrentTestConfig', TestConfigController.stopCurrentTest);
+export const stopCurrentTestConfig = async () => {
+  const api = TEST_CONFIG_API.stopCurrentTestConfig;
+  return request({
+    api: api
+  });
 }

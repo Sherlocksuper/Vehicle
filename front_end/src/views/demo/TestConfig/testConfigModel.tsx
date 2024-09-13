@@ -47,6 +47,36 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
 
   const handleOk = () => {
     form.validateFields().then(() => {
+      // 把每个config的vehicle部分JSON.parse
+      form.setFieldsValue({
+        configs: form.getFieldsValue().configs.map(config => {
+          return {
+            ...config,
+            vehicle: JSON.parse(config.vehicle)
+          }
+        })
+      })
+
+      // 把每个config的projects的indicators的signal部分JSON.parse
+      form.setFieldsValue({
+        configs: form.getFieldsValue().configs.map(config => {
+          return {
+            ...config,
+            projects: config.projects.map(project => {
+              return {
+                ...project,
+                indicators: project.indicators.map(indicator => {
+                  return {
+                    ...indicator,
+                    signal: JSON.parse(indicator.signal)
+                  }
+                })
+              }
+            })
+          }
+        })
+      })
+
       createTestConfig(form.getFieldsValue()).then(res => {
         if (res.code === SUCCESS_CODE) {
           onOk && onOk()
@@ -58,8 +88,15 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
     })
   };
 
+  const parseToObject = (value: any) => {
+    if (typeof value === "object") {
+      return value
+    } else {
+      return JSON.parse(value)
+    }
+  }
+
   const handleCancel = () => {
-    // 如果是ADD模式，重置表单
     close()
   };
 
@@ -134,7 +171,7 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
                                                            rules={[{required: true, message: 'Missing signal'}]}>
                                                   <Select placeholder="Select signal">
                                                     {
-                                                      vehicleHasSelected.find(vehicle => vehicle.id === JSON.parse(form.getFieldValue(['configs', configIndex, 'vehicle'])).id)?.protocols.map(protocol => {
+                                                      vehicleHasSelected.find(vehicle => vehicle.id === parseToObject(form.getFieldValue(['configs', configIndex, 'vehicle'])).id)?.protocols.map(protocol => {
                                                         return (
                                                           protocol.protocol.signalsParsingConfig.map(parsingConfig => (
                                                             parsingConfig.signals.map(signal => (
