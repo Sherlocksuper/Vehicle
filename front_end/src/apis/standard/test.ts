@@ -1,4 +1,22 @@
 import {v4 as uuid} from "uuid"
+import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
+import {IVehicle} from "@/apis/standard/vehicle.ts";
+
+export interface ITestConfig {
+    id: number
+    name: string
+    configs: {
+        vehicle: IVehicle,
+        projects: {
+            name: string,
+            indicators: {
+                name: string,
+                signal: IProtocolSignal
+            }[]
+        }
+    }[]
+}
+
 
 //测试过程格式
 export interface ITestProcess {

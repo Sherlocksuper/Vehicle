@@ -42,7 +42,7 @@ const ProtocolTable = () => {
             render: (text, record) => (
                 <Space>
                     <a onClick={() => deleteProtocol(record.id!)}>删除</a>
-                    <Button type={"primary"} onClick={() => handleShowDetail(record)}>查看详情</Button>
+                    <Button type={"link"} onClick={() => handleShowDetail(record)}>查看详情</Button>
                 </Space>
             ),
         },

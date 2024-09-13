@@ -17,6 +17,8 @@ import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import OfflineShow from "@/views/demo/OffLine/OfflineShow.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
 import ProtocolTable from "@/views/demo/ProtocolTable";
+import TestConfig from "@/views/demo/TestConfig";
+
 interface RouteItem {
     key: string;
     label: string;
@@ -46,15 +48,20 @@ export const routeItems: RouteItem[] = [
                 label: '车辆管理',
                 element: <VehicleTable/>
             },
-            {
-                key: '/test-config/test-config',
-                label: '测试项目',
-                element: <ProjectTable/>
-            },
+            // {
+            //     key: '/test-config/test-project',
+            //     label: '测试项目',
+            //     element: <ProjectTable/>
+            // },
             {
                 key: '/test-config/test-object',
                 label: '测试模板',
                 element: <TemplateTable/>
+            },
+            {
+                key: '/test-config/test-config',
+                label: '测试配置',
+                element: <TestConfig/>
             },
         ]
     },

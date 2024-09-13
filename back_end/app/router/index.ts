@@ -1,4 +1,6 @@
 import KoaRouter from 'koa-router'
+// Import TestConfigController at the top of your file
+import TestConfigController from '../controller/TestConfig';
 import indexController from '../controller/indexController'
 import UserController from '../controller/UserController'
 import AuthMiddleware from '../middleware/AuthMiddleware'
@@ -133,5 +135,11 @@ router.post('/updateProtocol/:id', ProtocalController.updateProtocol)
 router.get('/getProtocolById/:id', ProtocalController.getProtocolById)
 router.get('/deleteProtocol/:id', ProtocalController.deleteProtocol)
 
+
+// Then add these routes in your router configuration
+router.post('/createTestConfig', TestConfigController.createTestConfig);
+router.delete('/deleteTestConfig/:id', TestConfigController.deleteTestConfigById);
+router.get('/getTestConfig/:id', TestConfigController.getTestConfigById);
+router.get('/getAllTestConfig', TestConfigController.getAllTestConfig);
 
 export default router

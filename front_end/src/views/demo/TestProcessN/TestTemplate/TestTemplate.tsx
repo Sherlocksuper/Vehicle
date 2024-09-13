@@ -100,7 +100,11 @@ const TestTemplate: React.FC = () => {
     }, [])
 
     return (
-        <Card>
+        <Card style={{
+                overflow: "scroll",
+                overflowX: "hidden",
+                height: "100vh"
+            }} >
             <Row justify="end" style={{marginBottom: 20}}>
                 <Button type="link"
                         onClick={() => {

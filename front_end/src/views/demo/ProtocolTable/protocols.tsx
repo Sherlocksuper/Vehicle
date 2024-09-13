@@ -1,10 +1,7 @@
 import {Button, Divider, Form, Input, message, Modal, Row, Select, Space} from "antd";
-import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import React, {useEffect} from "react";
 import {createProtocol, IProtocol, ProtocolType} from "@/apis/request/protocol.ts";
 import {SUCCESS_CODE} from "@/constants";
-import {parseProtocolData, processProtocolData} from "@/views/demo/ProtocolTable/protocolDataProcess.ts";
-import {log} from "@antv/g2plot/lib/utils";
 import {
     CanBaseConfig,
     CanSignalsParsingForm,

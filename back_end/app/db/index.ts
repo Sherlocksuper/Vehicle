@@ -18,6 +18,7 @@ import HistoryModel from "../model/History.model";
 import VehicleService from "../service/PreSet/VehicleService";
 import ProjectService from "../service/PreSet/ProjectService";
 import Protocol from "../model/PreSet/Protocol.model";
+import TestConfig from "../model/TestConfig";
 
 const {DB_NAME, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT} = DB_CONFIG
 
@@ -26,7 +27,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     dialect: 'mysql',
     port: DB_PORT,
     logging: false,
-    models: [User, TokenBlackListItem, Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel, Protocol]
+    models: [User, TokenBlackListItem, Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel, Protocol, TestConfig]
 });
 
 const DB_OPT = {
@@ -50,7 +51,7 @@ const DB_OPT = {
             // 初始化超级用户表
             await UserService.initRootUser()
             // 初始化测试项目
-            await ProjectService.initProject(10)
+            // await ProjectService.initProject(10)
             console.log('The database table has been initialized.');
         } catch (error) {
             console.error('Description Database table initialization failed:', error);
