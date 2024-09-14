@@ -138,7 +138,7 @@ router.get('/deleteProtocol/:id', ProtocalController.deleteProtocol)
 
 // Then add these routes in your router configuration
 router.post('/createTestConfig', TestConfigController.createTestConfig);
-router.delete('/deleteTestConfig/:id', TestConfigController.deleteTestConfigById);
+router.get('/deleteTestConfig/:id', TestConfigController.deleteTestConfigById);
 router.get('/getTestConfig/:id', TestConfigController.getTestConfigById);
 router.get('/getAllTestConfig', TestConfigController.getAllTestConfig);
 

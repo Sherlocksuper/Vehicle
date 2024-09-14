@@ -49,7 +49,6 @@ export const deleteTestConfig = async (id: number) => {
   api.url = api.url.replace(':id', id.toString());
   return request({
     api: api,
-    params: {id: id}
   });
 }
 

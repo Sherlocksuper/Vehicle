@@ -13,7 +13,7 @@ export interface ITestConfig {
                 name: string,
                 signal: IProtocolSignal
             }[]
-        }
+        }[]
     }[]
 }
 

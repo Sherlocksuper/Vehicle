@@ -19,6 +19,8 @@ import VehicleService from "../service/PreSet/VehicleService";
 import ProjectService from "../service/PreSet/ProjectService";
 import Protocol from "../model/PreSet/Protocol.model";
 import TestConfig from "../model/TestConfig";
+import ProtocolService from "../service/PreSet/ProtocolService";
+import TestConfigService from "../service/TestConfig";
 
 const {DB_NAME, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT} = DB_CONFIG
 
@@ -52,6 +54,12 @@ const DB_OPT = {
             await UserService.initRootUser()
             // 初始化测试项目
             // await ProjectService.initProject(10)
+            // 初始化Protocol协议
+            await ProtocolService.initProtocol()
+            // 初始化车辆
+            await VehicleService.initVehicleData()
+            // 初始化测试配置
+            await TestConfigService.initTestConfig()
             console.log('The database table has been initialized.');
         } catch (error) {
             console.error('Description Database table initialization failed:', error);

@@ -7,7 +7,6 @@ import TestConfigService from "../service/TestConfig";
 import {ITestConfig} from "../model/TestConfig";
 
 
-const testConfigService = new TestConfigService();
 
 class TestConfigController {
 
@@ -18,7 +17,7 @@ class TestConfigController {
      */
     async createTestConfig(ctx: Context) {
         const param = ctx.request.body as ITestConfig;
-        const res = await testConfigService.createTestConfig(param);
+        const res = await TestConfigService.createTestConfig(param);
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,
             msg: SEARCH_SUCCESS_MSG,
@@ -36,7 +35,7 @@ class TestConfigController {
      */
     async deleteTestConfigById(ctx: Context) {
         const {id} = ctx.params;
-        const res = await testConfigService.deleteTestConfigById(Number(id));
+        const res = await TestConfigService.deleteTestConfigById(Number(id));
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,
             msg: SEARCH_SUCCESS_MSG,
@@ -54,7 +53,7 @@ class TestConfigController {
      */
     async getTestConfigById(ctx: Context) {
         const {id} = ctx.params;
-        const res = await testConfigService.getTestConfigById(Number(id));
+        const res = await TestConfigService.getTestConfigById(Number(id));
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,
             msg: SEARCH_SUCCESS_MSG,
@@ -71,7 +70,7 @@ class TestConfigController {
      * 查询所有测试对象
      */
     async getAllTestConfig(ctx: Context) {
-        const res = await testConfigService.getAllTestConfig();
+        const res = await TestConfigService.getAllTestConfig();
         res && ((ctx.body as IResBody) = {
             code: SUCCESS_CODE,
             msg: SEARCH_SUCCESS_MSG,

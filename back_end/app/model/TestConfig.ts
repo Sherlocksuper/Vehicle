@@ -17,7 +17,7 @@ export interface ITestConfig {
         name: string,
         signal: IProtocolSignal
       }[]
-    }
+    }[]
   }[]
 }
 
@@ -50,7 +50,7 @@ export default class TestConfig extends Model<ITestConfig> {
         name: string,
         signal: IProtocolSignal
       }[]
-    }
+    }[]
   }[]
   //
   // @ForeignKey(() => User)

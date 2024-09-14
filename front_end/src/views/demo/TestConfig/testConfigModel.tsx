@@ -1,4 +1,4 @@
-import {Button, Divider, Form, Input, Modal, Select, Space} from "antd";
+import {Button, Divider, Form, Input, Modal, Select, Space, Tree, TreeDataNode} from "antd";
 import React, {useEffect} from "react";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import {DeleteFilled, DeleteOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
@@ -6,6 +6,7 @@ import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {getVehicles} from "@/apis/request/vehicle.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {createTestConfig} from "@/apis/request/testConfig.ts";
+import protocolTable from "@/views/demo/ProtocolTable";
 
 export const TestConfigModel = ({open, close, onOk, initValue}: {
   // 外面的状态
@@ -14,6 +15,8 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
   initValue?: ITestConfig
   onOk?: () => void,
 }) => {
+
+
   const [form] = Form.useForm();
   const [vehicles, setVehicles] = React.useState<IVehicle[]>([])
   const [vehicleHasSelected, setVehicleHasSelected] = React.useState<IVehicle[]>([])
@@ -32,18 +35,11 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
 
 
   useEffect(() => {
-    // 初始化为initValue
-    if (initValue) {
-      console.log(initValue)
-      form.setFieldsValue(initValue)
-    } else {
-      fetchData()
-    }
-
+    fetchData()
     return () => {
       form.resetFields()
     }
-  }, [form, initValue])
+  }, [form])
 
   const handleOk = () => {
     form.validateFields().then(() => {
@@ -76,9 +72,11 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
           }
         })
       })
+      console.log(form.getFieldsValue())
 
       createTestConfig(form.getFieldsValue()).then(res => {
         if (res.code === SUCCESS_CODE) {
+          form.resetFields()
           onOk && onOk()
           close()
         } else {
@@ -89,6 +87,9 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
   };
 
   const parseToObject = (value: any) => {
+    if (typeof value === "undefined") {
+      return undefined
+    }
     if (typeof value === "object") {
       return value
     } else {
@@ -97,8 +98,10 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
   }
 
   const handleCancel = () => {
+    form.resetFields()
     close()
   };
+
 
   return (
     <>
@@ -111,129 +114,180 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
         cancelText="取消"
         width={"80%"}
       >
-        <Form form={form}
-              disabled={initValue !== undefined}
-        >
-          <Form.Item name={"name"} rules={[{required: true, message: 'Missing test config name'}]}>
-            <Input placeholder="Test config name"/>
-          </Form.Item>
-          <Form.List name={['configs']}>
-            {(fields, {add, remove}) => (
-              <>
-                {fields.map(({key, name, fieldKey, ...restField}) => {
-                  const configIndex = name
-                  return (
-                    <Space key={key}
-                           style={{display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'start'}}
-                    >
-                      <Form.Item
-                        {...restField}
-                        name={[configIndex, 'vehicle']}
-                        rules={[{required: true, message: 'Missing vehicle'}]}
-                      >
-                        <Select placeholder="Select vehicle"
-                                onChange={() => {
-                                  const formValue = form.getFieldsValue()
-                                  const currentVehicles = formValue.configs.map(config => JSON.parse(config.vehicle))
-                                  setVehicleHasSelected(currentVehicles)
-                                }}
+        {
+          initValue !== undefined ? <TestConfigTree testConfig={initValue}/> :
+            <Form form={form}>
+              <Form.Item name={"name"} rules={[{required: true, message: 'Missing test config name'}]}>
+                <Input placeholder="Test config name"/>
+              </Form.Item>
+              <Form.List name={['configs']}>
+                {(fields, {add, remove}) => (
+                  <>
+                    {fields.map(({key, name, fieldKey, ...restField}) => {
+                      const configIndex = name
+                      return (
+                        <Space key={key}
+                               style={{display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'start'}}
                         >
-                          {vehicles.map(vehicle => (
-                            <Select.Option key={vehicle.id} value={JSON.stringify(vehicle)}>{vehicle.vehicleName}</Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                      <Form.List name={[configIndex, 'projects']}>
-                        {(fields, {add, remove}) => (
-                          <>
-                            {fields.map(({key, name, fieldKey, ...restField}) => {
-                              const projectIndex = name
-                              return (
-                                <Space key={key} style={{display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'start',}}>
-                                  <Form.Item {...restField} name={[projectIndex, 'name']} rules={[{required: true, message: 'Missing project name'}]}>
-                                    <Input placeholder="Project name"/>
-                                  </Form.Item>
-                                  <Form.List name={[projectIndex, 'indicators']}>
-                                    {(fields, {add, remove}) => (
-                                      <>
-                                        {fields.map(({key, name, fieldKey, ...restField}) => {
-                                          const indicatorIndex = name
-                                          return (
-                                            <Space key={key}
-                                                   style={{display: 'flex', flexDirection: 'column', alignItems: 'start', justifyContent: 'start',}}>
-                                              <Space key={key}
-                                                     style={{display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'start'}}>
-                                                <Form.Item {...restField} name={[indicatorIndex, 'name']}
-                                                           rules={[{required: true, message: 'Missing indicator name'}]}>
-                                                  <Input placeholder="Indicator name"/>
-                                                </Form.Item>
-                                                <Form.Item {...restField} name={[indicatorIndex, 'signal']} fieldKey={[fieldKey, 'signal']}
-                                                           rules={[{required: true, message: 'Missing signal'}]}>
-                                                  <Select placeholder="Select signal">
-                                                    {
-                                                      vehicleHasSelected.find(vehicle => vehicle.id === parseToObject(form.getFieldValue(['configs', configIndex, 'vehicle'])).id)?.protocols.map(protocol => {
-                                                        return (
-                                                          protocol.protocol.signalsParsingConfig.map(parsingConfig => (
-                                                            parsingConfig.signals.map(signal => (
-                                                              <Select.Option key={signal.name}
-                                                                             value={JSON.stringify(signal)}>{signal.name}</Select.Option>
-                                                            ))
-                                                          ))
-                                                        )
-                                                      })
-                                                    }
-                                                  </Select>
-                                                </Form.Item>
-                                                <MinusCircleOutlined onClick={() => remove(name)}/>
-                                              </Space>
-                                            </Space>
-                                          )
-                                        })}
-                                        <Form.Item>
-                                          <Button type="dashed" onClick={() => {
-                                            add()
-                                          }}>
-                                            <PlusOutlined/> Add indicator
-                                          </Button>
-                                        </Form.Item>
-                                      </>
-                                    )}
-                                  </Form.List>
-                                  <DeleteOutlined onClick={() => remove(name)}/>
-                                  <Divider/>
-                                </Space>
-                              )
-                            })}
-                            <Form.Item>
-                              <Button type="dashed" onClick={() => {
-                                add()
-                              }}>
-                                <PlusOutlined/> Add project
-                              </Button>
-                            </Form.Item>
-                          </>
-                        )}
-                      </Form.List>
-                      <DeleteFilled onClick={() => remove(name)}/>
-                      <Divider/>
-                    </Space>
-                  )
-                })}
+                          <Form.Item
+                            {...restField}
+                            name={[configIndex, 'vehicle']}
+                            rules={[{required: true, message: 'Missing vehicle'}]}
+                          >
+                            <Select placeholder={"Select vehicle"}
+                              onChange={() => {
+                              const formValue = form.getFieldsValue()
+                              const currentVehicles = formValue.configs.map(config => parseToObject(config.vehicle))
+                              setVehicleHasSelected(currentVehicles.filter(vehicle => vehicle !== undefined))
+                            }} >
+                              {vehicles.map(vehicle => (
+                                <Select.Option key={vehicle.id} value={JSON.stringify(vehicle)}>{vehicle.vehicleName}</Select.Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                          <Form.List name={[configIndex, 'projects']}>
+                            {(fields, {add, remove}) => (
+                              <>
+                                {fields.map(({key, name, fieldKey, ...restField}) => {
+                                  const projectIndex = name
+                                  return (
+                                    <Space key={key} style={{display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'start',}}>
+                                      <Form.Item {...restField} name={[projectIndex, 'name']} rules={[{required: true, message: 'Missing project name'}]}>
+                                        <Input placeholder="Project name"/>
+                                      </Form.Item>
+                                      <Form.List name={[projectIndex, 'indicators']}>
+                                        {(fields, {add, remove}) => (
+                                          <>
+                                            {fields.map(({key, name, fieldKey, ...restField}) => {
+                                              const indicatorIndex = name
+                                              return (
+                                                <Space key={key}
+                                                       style={{display: 'flex', flexDirection: 'column', alignItems: 'start', justifyContent: 'start',}}>
+                                                  <Space key={key}
+                                                         style={{display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'start'}}>
+                                                    <Form.Item {...restField} name={[indicatorIndex, 'name']}
+                                                               rules={[{required: true, message: 'Missing indicator name'}]}>
+                                                      <Input placeholder="Indicator name"/>
+                                                    </Form.Item>
+                                                    <Form.Item {...restField} name={[indicatorIndex, 'signal']} fieldKey={[fieldKey, 'signal']}
+                                                               rules={[{required: true, message: 'Missing signal'}]}>
 
-                <Form.Item>
-                  <Button type="dashed" onClick={() => {
-                    add()
-                  }}>
-                    <PlusOutlined/> Add Vehicle
-                  </Button>
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
-        </Form>
+                                                      <Select placeholder="Select signal"
+                                                      >
+                                                        {
+                                                          vehicleHasSelected.find(vehicle => vehicle.id === parseToObject(form.getFieldValue(['configs', configIndex, 'vehicle']))?.id)?.protocols.map(protocol => {
+                                                            console.log(protocol)
+                                                            return (
+                                                              protocol.protocol.signalsParsingConfig.map(parsingConfig => (
+                                                                parsingConfig.signals.map(signal => (
+                                                                  <Select.Option key={signal.name}
+                                                                                 value={JSON.stringify(signal)}>{signal.name}</Select.Option>
+                                                                ))
+                                                              ))
+                                                            )
+                                                          })
+                                                        }
+                                                      </Select>
+                                                    </Form.Item>
+                                                    <MinusCircleOutlined onClick={() => remove(name)} disabled={initValue !== undefined}/>
+                                                  </Space>
+                                                </Space>
+                                              )
+                                            })}
+                                            <Form.Item>
+                                              <Button type="dashed" onClick={() => {
+                                                add()
+                                              }}
+                                                      disabled={initValue !== undefined}
+                                              >
+                                                <PlusOutlined/> Add indicator
+                                              </Button>
+                                            </Form.Item>
+                                          </>
+                                        )}
+                                      </Form.List>
+                                      <DeleteOutlined onClick={() => remove(name)} disabled={initValue !== undefined}/>
+                                      <Divider/>
+                                    </Space>
+                                  )
+                                })}
+                                <Form.Item>
+                                  <Button type="dashed" onClick={() => {
+                                    add()
+                                  }}>
+                                    <PlusOutlined/> Add project
+                                  </Button>
+                                </Form.Item>
+                              </>
+                            )}
+                          </Form.List>
+                          <DeleteFilled onClick={() => remove(name)} disabled={initValue !== undefined}/>
+                          <Divider/>
+                        </Space>
+                      )
+                    })}
+
+                    <Form.Item>
+                      <Button type="dashed" onClick={() => {
+                        add()
+                      }}
+                              disabled={initValue !== undefined}
+                      >
+                        <PlusOutlined/> Add Vehicle
+                      </Button>
+                    </Form.Item>
+                  </>
+                )}
+              </Form.List>
+            </Form>
+
+        }
       </Modal>
     </>
   );
 };
+
+const TestConfigTree = ({testConfig}: { testConfig: ITestConfig }) => {
+
+  const calculateTreeNode = (testConfig: ITestConfig) => {
+    const treeData: TreeDataNode[] = []
+    testConfig.configs[0].projects
+    testConfig.configs.forEach(config => {
+      const configNode: TreeDataNode = {
+        title: config.vehicle.vehicleName,
+        key: config.vehicle.id.toString(),
+        children: []
+      }
+
+      config.projects.forEach(project => {
+        const projectNode: TreeDataNode = {
+          title: project.name,
+          key: project.name,
+          children: []
+        }
+
+        project.indicators.forEach(indicator => {
+          const indicatorNode: TreeDataNode = {
+            title: indicator.name + " - " + indicator.signal.name,
+            key: indicator.name,
+          }
+          projectNode.children.push(indicatorNode)
+        })
+
+        configNode.children.push(projectNode)
+      })
+
+      treeData.push(configNode)
+    })
+
+    return treeData
+  }
+
+  return (
+    <Tree
+      treeData={calculateTreeNode(testConfig)}
+    />
+  )
+}
 
 

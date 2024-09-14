@@ -64,7 +64,8 @@ const TestConfig = () => {
 
   // 前往查看当前数据
   const handleShowCurrentData = () => {
-    // TODO
+    const win = window.open(`/test-template-config`);
+    if (!win) return
   }
 
   const handleStopCurrentCollect = () => {
