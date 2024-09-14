@@ -7,6 +7,7 @@ import {
     CanSignalsParsingForm,
     FlexRayBaseConfig, FlexRaySignalsParsingForm
 } from "@/views/demo/ProtocolTable/protocolComponent.tsx";
+import {v4 as uuid} from "uuid"
 
 export const ProtocolModel = ({open, close, onOk, initValue}: {
     // 外面的状态
@@ -58,9 +59,15 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
                 <Form layout="vertical" form={form}
                       disabled={initValue !== undefined}
                       onFinish={() => {
-                          const values = form.getFieldsValue()
+                          const value = form.getFieldsValue() as IProtocol
                           // console.log(values)
-                          createProtocol(values as IProtocol).then((res) => {
+                          value.signalsParsingConfig.forEach((item) => {
+                              item.signals.forEach((signal) => {
+                                  signal.id = uuid()
+                              })
+                          })
+
+                          createProtocol(value as IProtocol).then((res) => {
                               if (res.code === SUCCESS_CODE) {
                                   message.success("添加成功")
                                   onOk && onOk()

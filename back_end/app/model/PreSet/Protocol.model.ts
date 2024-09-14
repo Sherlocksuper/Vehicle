@@ -8,6 +8,7 @@ export enum ProtocolType {
 
 
 export interface IProtocolSignal {
+    id: string
     name: string
     dimension: string
     startPoint: string

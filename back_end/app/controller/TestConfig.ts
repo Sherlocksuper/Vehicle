@@ -145,6 +145,22 @@ class TestConfigController {
             data: res
         })
     }
+
+    async updateTestConfigById(ctx: Context) {
+        const {id} = ctx.params;
+        const param = ctx.request.body as ITestConfig;
+        const res = await TestConfigService.updateTestConfigById(Number(id), param);
+        res && ((ctx.body as IResBody) = {
+            code: SUCCESS_CODE,
+            msg: SEARCH_SUCCESS_MSG,
+            data: null
+        })
+        !res && ((ctx.body as IResBody) = {
+            code: FAIL_CODE,
+            msg: SEARCH_FAIL_MSG,
+            data: null
+        })
+    }
 }
 
 export default new TestConfigController()

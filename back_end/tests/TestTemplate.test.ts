@@ -3,11 +3,11 @@ import run from "../app";
 import BE_CONFIG from "../app/config/be_config";
 import OT_CONFIG from "../app/config/ot_config";
 import {Server} from "http";
-import {ITestTemplate, TestTemplateType} from "../app/model/PreSet/TestTemplate.model";
+import {ITemplate, TestTemplateType} from "../app/model/PreSet/TestTemplate.model";
 
 
 describe('测试模板', () => {
-    let testTemplateData: ITestTemplate;
+    let testTemplateData: ITemplate;
     let backendServer: Server
     let tokenRequest: Agent
 

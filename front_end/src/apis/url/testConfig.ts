@@ -45,5 +45,19 @@ export const TEST_CONFIG_API = {
     url: '/stopCurrentTestConfig',
     method: Method.GET,
     format: ContentType.JSON
+  },
+  ////
+  // /**
+  //  * 通过id更新测试配置
+  //  * @param id
+  //  * @param param
+  //  */
+  // // async updateTestConfigById
+  //
+  // router.post('/updateTestConfig/:id', TestConfigController.updateTestConfigById);
+  updateTestConfigById: {
+    url: '/updateTestConfig/:id',
+    method: Method.POST,
+    format: ContentType.JSON
   }
 }

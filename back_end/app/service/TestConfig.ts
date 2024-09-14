@@ -175,30 +175,43 @@ class TestConfigService {
     return null;
   }
 
-  // 下发
+  async getCurrentTestConfig() {
+    return this.currentTestConfig
+  }
+
 
   /**
    * 下发测试流程，设置当前的测试流程为testPrdcessN
    */
   async downTestConfig(testConfigId: number) {
     const testConfig = await this.getTestConfigById(testConfigId);
-    if (!testConfig) {
-      return false
+    if (this.currentTestConfig) return false
+    this.currentTestConfig = testConfig
+    const message: ILongMessageType = {
+      type: LongMessage.STARTCOLLECT,
+      body: testConfig
     }
-    return true
+    const result = sendToLong(message)
+    if (result !== undefined) {
+      this.currentTestConfig = null
+    }
+    return result === undefined ? true : result
   }
 
   /**
    * 停止当前下发
    */
   async stopCurrentTestConfig() {
+    const message: ILongMessageType = {
+      type: LongMessage.STOPCOLLECT,
+      body: null
+    }
+    const result = sendToLong(message)
+    if (result !== undefined) {
+      return result
+    }
     this.currentTestConfig = null
-    return true
-  }
-
-
-  async getCurrentTestConfig() {
-    return this.currentTestConfig
+    return result
   }
 }
 

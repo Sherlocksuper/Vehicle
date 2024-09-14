@@ -1,6 +1,6 @@
 import {Context} from "koa";
 import TestTemplateService from "../../service/PreSet/TestTemplateService";
-import {ITestTemplate} from "../../model/PreSet/TestTemplate.model";
+import {ITemplate} from "../../model/PreSet/TestTemplate.model";
 import {FAIL_CODE, SUCCESS_CODE, WRITE_FAIL_MSG, WRITE_SUCCESS_MSG} from "../../constants";
 
 class TestTemplateController {
@@ -11,7 +11,7 @@ class TestTemplateController {
      * @apiParam {ITestTemplate} testTemplateData TestTemplate的数据
      */
     async createTestTemplate(ctx: Context) {
-        const testTemplateData = ctx.request.body as ITestTemplate
+        const testTemplateData = ctx.request.body as ITemplate
         const res = await TestTemplateService.create(testTemplateData)
 
         res && (ctx.body = {
@@ -58,7 +58,7 @@ class TestTemplateController {
      */
     async updateTestTemplate(ctx: Context) {
         const {id} = ctx.params
-        const updateData = ctx.request.body as ITestTemplate
+        const updateData = ctx.request.body as ITemplate
         const res = await TestTemplateService.update(id, updateData)
 
         res && (ctx.body = {

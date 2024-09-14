@@ -50,15 +50,15 @@ function startCollect(socket, body) {
   // 处理 body 内容
   setCurrentCollectConfig(body)
 
-  historyDataFunction = generateHistoryData(currentCollectConfig, 2000, 2000, (data) => {
-    socket.write(JSON.stringify(data) + '\n');
-  })
+  // historyDataFunction = generateHistoryData(currentCollectConfig, 2000, 2000, (data) => {
+  //   socket.write(JSON.stringify(data) + '\n');
+  // })
 
   // 发送确认或其他响应给上位机
   socket.write('开始采集已接收\n');
 
   // 开始采集
-  historyDataFunction.start()
+  // historyDataFunction.start()
 }
 
 // 停止采集的处理函数

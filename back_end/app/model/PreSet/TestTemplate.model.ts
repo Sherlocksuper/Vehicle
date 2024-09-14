@@ -10,7 +10,7 @@ export enum TestTemplateType {
     NUMBER = 'NUMBER'
 }
 
-export interface ITestTemplate {
+export interface ITemplate {
     id?: number
     name: string
     description: string
@@ -41,7 +41,7 @@ export interface ITestTemplate {
     timestamps: false
 })
 
-export default class TestTemplate extends Model<ITestTemplate> {
+export default class TestTemplate extends Model<ITemplate> {
     @PrimaryKey
     @AutoIncrement
     @Column(DataType.INTEGER)

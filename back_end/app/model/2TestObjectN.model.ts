@@ -1,14 +1,14 @@
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from "sequelize-typescript";
 import {IVehicleModel} from "./PreSet/Vehicle.model";
 import {IProjectModel} from "./PreSet/3Project.model";
-import {ITestTemplate} from "./PreSet/TestTemplate.model";
+import {ITemplate} from "./PreSet/TestTemplate.model";
 
 export interface ITestObjectNModel {
     id: number
     title: string
     vehicle: IVehicleModel
     project: IProjectModel[]
-    template: ITestTemplate
+    template: ITemplate
 }
 
 /**
@@ -37,5 +37,5 @@ export default class TestObjectN extends Model<ITestObjectNModel> {
     project!: IProjectModel[]
 
     @Column(DataType.JSON)
-    template!: ITestTemplate
+    template!: ITemplate
 }

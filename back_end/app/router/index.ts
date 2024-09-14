@@ -142,6 +142,17 @@ router.get('/deleteTestConfig/:id', TestConfigController.deleteTestConfigById);
 router.get('/getTestConfig/:id', TestConfigController.getTestConfigById);
 router.get('/getAllTestConfig', TestConfigController.getAllTestConfig);
 
+//
+/**
+ * 通过id更新测试配置
+ * @param id
+ * @param param
+ */
+// async updateTestConfigById
+
+router.post('/updateTestConfig/:id', TestConfigController.updateTestConfigById);
+
+
 // 下发测试配置、获取当前测试配置、停止当前测试配置
 router.post('/downTestConfig', TestConfigController.downTestConfig);
 router.get('/getCurrentTestConfig', TestConfigController.getCurrentTestConfig);

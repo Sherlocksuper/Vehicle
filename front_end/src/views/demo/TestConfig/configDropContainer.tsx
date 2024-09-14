@@ -10,6 +10,7 @@ import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
 import PureNumberChart from "@/components/Charts/PureNumberChart/PureNumberChart.tsx";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
+import {v4 as uuid} from "uuid"
 
 export enum NewTestTemplateMode {
   CONFIG = "config",
@@ -61,7 +62,8 @@ const ConfigDropContainer: React.FC<{
               className="dc_item_container"
               id={item.id}
               key={item.id}
-              style={{border: "1px solid transparent"}}
+              style={{border: "1px solid transparent",
+                backgroundColor: "rgba(255, 255, 255, 0.8)"}}
               data-grid={{
                 ...item.itemConfig,
                 w: item.itemConfig.width / 30,

@@ -5,17 +5,18 @@ import DraggableComponent, {
   IDraggleComponent,
   INumberChartExtra
 } from "@/views/demo/DataDisplay/DraggableComponent";
-import {Button} from "antd";
+import {Button, message} from "antd";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import GridLayout from "react-grid-layout";
 import {DEFAULT_TITLE, SUCCESS_CODE} from "@/constants";
 import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
-import {getTestConfigById} from "@/apis/request/testConfig.ts";
+import {getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
 import {getDefaultTestTemplate, updateDefaultTestTemplate} from "@/apis/request/template.ts";
+import {v4 as uuid} from "uuid"
 
 export interface IDragItem {
   id: string
@@ -72,14 +73,7 @@ const TestTemplateForConfig: React.FC = () => {
           testConfig = res.data as ITestConfig
           console.log(testConfig)
           setTestConfig(testConfig)
-        }
-      })
-
-      getDefaultTestTemplate().then((res) => {
-        if (res.code === SUCCESS_CODE) {
-          const template = res.data as ITemplate
-          console.log(template)
-          setDragItems(transferITemplateToDragItems(template))
+          setDragItems(transferITemplateToDragItems(testConfig.template))
         }
       })
     }
@@ -227,9 +221,11 @@ const TestTemplateForConfig: React.FC = () => {
         {renderADDModeInfo()}
       </div>
       <Button onClick={() => {
-        updateDefaultTestTemplate(transferDragItemsToITemplate(dragItems)).then((res) => {
+        const config = Object.assign({}, testConfig)
+        config.template = transferDragItemsToITemplate(dragItems)
+        updateTestConfigById(config.id, config).then((res) => {
           if (res.code === SUCCESS_CODE) {
-            console.log('更新成功')
+            message.success('更新成功')
           }
         })
       }}>确定更改配置</Button>

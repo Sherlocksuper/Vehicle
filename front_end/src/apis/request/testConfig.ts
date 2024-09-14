@@ -78,3 +78,12 @@ export const stopCurrentTestConfig = async () => {
     api: api
   });
 }
+
+export const updateTestConfigById = async (id: number, iConfig: ITestConfig) => {
+  const api = {...TEST_CONFIG_API.updateTestConfigById};
+  api.url = api.url.replace(':id', id.toString());
+  return request({
+    api: api,
+    params: iConfig
+  });
+}

@@ -1,6 +1,7 @@
 import {v4 as uuid} from "uuid"
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 import {IVehicle} from "@/apis/standard/vehicle.ts";
+import {ITemplate} from "@/apis/standard/template.ts";
 
 export interface ITestConfig {
     id: number
@@ -15,6 +16,7 @@ export interface ITestConfig {
             }[]
         }[]
     }[]
+    template: ITemplate
 }
 
 

@@ -3,6 +3,7 @@ import React from "react";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 
 export interface IProtocolSignal {
+    id: string
     name: string
     dimension: string
     startPoint: string

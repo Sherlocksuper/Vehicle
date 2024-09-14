@@ -1,8 +1,8 @@
-import TestTemplateModel, {ITestTemplate} from '../../model/PreSet/TestTemplate.model';
+import TestTemplateModel, {ITemplate} from '../../model/PreSet/TestTemplate.model';
 
 class TestTemplateService {
     // 创建一个新的TestTemplate
-    async create(testTemplateData: ITestTemplate) {
+    async create(testTemplateData: ITemplate) {
         try {
             const testTemplate = await TestTemplateModel.create(testTemplateData);
             return testTemplate;
@@ -22,7 +22,7 @@ class TestTemplateService {
     }
 
     // 有则更新，无则添加
-    async update(id: string, updateData: ITestTemplate) {
+    async update(id: string, updateData: ITemplate) {
         try {
             const testTemplate = await TestTemplateModel.findByPk(id);
             if (testTemplate) {

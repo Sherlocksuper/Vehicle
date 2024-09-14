@@ -1,7 +1,7 @@
 import {AutoIncrement, BelongsTo, Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt} from "sequelize-typescript";
 import User from "./User.model";
 import {ITestObjectNModel} from "./2TestObjectN.model";
-import {ITestTemplate} from "./PreSet/TestTemplate.model";
+import {ITemplate} from "./PreSet/TestTemplate.model";
 import {ITestProcessNModel} from "./1TestProcessN";
 import {IVehicleModel} from "./PreSet/Vehicle.model";
 import {IProtocolSignal} from "./PreSet/Protocol.model";
@@ -19,6 +19,7 @@ export interface ITestConfig {
       }[]
     }[]
   }[]
+  template: ITemplate
 }
 
 @Table({
@@ -59,6 +60,9 @@ export default class TestConfig extends Model<ITestConfig> {
   //
   // @BelongsTo(() => User)
   // user!: User
+
+  @Column(DataType.JSON)
+  template!: ITemplate
 
   @CreatedAt
   @Column

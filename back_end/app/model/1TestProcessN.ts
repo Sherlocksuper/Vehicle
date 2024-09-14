@@ -10,14 +10,14 @@ import {
 } from 'sequelize-typescript'
 import User from './User.model';
 import {ITestObjectNModel} from "./2TestObjectN.model";
-import {ITestTemplate} from "./PreSet/TestTemplate.model";
+import {ITemplate} from "./PreSet/TestTemplate.model";
 
 export interface ITestProcessNModel {
     id?: number
     userId: number
     testName: string
     testObjectNs: ITestObjectNModel[]
-    template: ITestTemplate
+    template: ITemplate
     createAt?: Date
     updateAt?: Date
 }
@@ -50,7 +50,7 @@ export default class TestProcessN extends Model<ITestProcessNModel> {
     testObjectNs!: ITestObjectNModel[]
 
     @Column(DataType.JSON)
-    template!: ITestTemplate
+    template!: ITemplate
 
     @BelongsTo(() => User)
     user!: User
