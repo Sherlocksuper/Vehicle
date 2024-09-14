@@ -1,8 +1,5 @@
-import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
-import {IDragItem} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
-import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
-import {Modal} from "antd";
-import {configs} from "@typescript-eslint/eslint-plugin";
+import {ITemplate} from "@/apis/standard/template.ts";
+import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
 
 
 /**
@@ -48,16 +45,6 @@ export async function sleep(time: number) {
     return new Promise(res => {
         setTimeout(res, time)
     })
-}
-
-export function deleteUndefined(obj: any) {
-    for (let key in obj) {
-        if (obj[key] === undefined || obj[key] === null) {
-            delete obj[key]
-        } else if (typeof obj[key] === 'object') {
-            deleteUndefined(obj[key])
-        }
-    }
 }
 
 export function transferToDragItems(template: ITemplate): IDragItem[] {

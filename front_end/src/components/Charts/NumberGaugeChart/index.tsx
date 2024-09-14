@@ -1,9 +1,8 @@
 import * as echarts from "echarts"
-import {useEffect, useMemo, useRef, useState} from "react"
+import {useEffect, useRef, useState} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
-import {generateRandomData, mockHistoryData} from "@/components/Charts";
-import {TEST_INTERNAL} from "@/constants";
 import {IHistoryItemData} from "@/apis/standard/history.ts";
+import {mockHistoryData} from "@/components/Charts";
 
 const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
 
@@ -32,7 +31,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
         if (!requestSignals || requestSignals.length === 0) {
             return;
         }
-        setValue(data.data[requestSignals[0].signal.id])
+        setValue(data.data[requestSignals[0].name])
     }
 
     // 历史记录

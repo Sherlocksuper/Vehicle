@@ -1,5 +1,5 @@
-import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {IHistoryItemData} from "@/apis/standard/history.ts";
+import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 
 export enum DataSourceType {
     NETWORK = 'network',
@@ -10,7 +10,7 @@ export enum DataSourceType {
 export interface IChartInterface {
     startRequest: boolean
     sourceType?: DataSourceType
-    requestSignals: ISignalItem[]
+    requestSignals: IProtocolSignal[]
 
     historyData?: IHistoryItemData[]
     currentTestChartData?: IHistoryItemData[]

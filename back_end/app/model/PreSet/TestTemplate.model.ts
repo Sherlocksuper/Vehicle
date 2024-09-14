@@ -2,17 +2,7 @@
  * 用来存放测试模板的模型
  */
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table, UpdatedAt, CreatedAt} from "sequelize-typescript";
-import {IControllerModel} from "../BoardManage/Controller.model";
-import {ICollectorModel} from "../BoardManage/Collector.model";
-import {ISignalModel} from "../BoardManage/Signal.model";
-
-export interface ISignalItem {
-    vehicleName: string
-    projectName: string
-    controller: IControllerModel
-    collector: ICollectorModel
-    signal: ISignalModel
-}
+import {IProtocolSignal} from "./Protocol.model";
 
 export enum TestTemplateType {
     BOOLEAN = 'BOOLEAN',
@@ -29,7 +19,7 @@ export interface ITestTemplate {
     itemConfig: {
         type: TestTemplateType
         requestSignalId: number | null
-        requestSignals: ISignalItem[]
+        requestSignals: IProtocolSignal[]
         x: number
         y: number
         width: number
@@ -75,7 +65,7 @@ export default class TestTemplate extends Model<ITestTemplate> {
     itemsConfig!: {
         type: TestTemplateType
         requestSignalId: number | null
-        requestSignals: ISignalItem[]
+        requestSignals: IProtocolSignal[]
         x: number
         y: number
         width: number

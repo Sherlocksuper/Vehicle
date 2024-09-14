@@ -82,6 +82,69 @@ class TestConfigController {
             data: null
         })
     }
+
+    // /**
+    //    * 下发测试流程，设置当前的测试流程为testPrdcessN
+    //    */
+    //   async downTestConfig(testConfig: ITestConfig) {
+    //     this.currentTestConfig = testConfig
+    //     return true
+    //   }
+    //
+    //   /**
+    //    * 停止当前下发
+    //    */
+    //   async stopCurrentTestProcessN() {
+    //     this.currentTestConfig = null
+    //     return true
+    //   }
+    //
+    //
+    //   async getCurrentTestConfig() {
+    //     return this.currentTestConfig
+    //   }
+
+    // 下发测试配置
+    async downTestConfig(ctx: Context) {
+        // @ts-ignore
+      const {id} = ctx.request.body;
+        const res = await TestConfigService.downTestConfig(Number(id));
+        res && ((ctx.body as IResBody) = {
+            code: SUCCESS_CODE,
+            msg: SEARCH_SUCCESS_MSG,
+            data: null
+        })
+        !res && ((ctx.body as IResBody) = {
+            code: FAIL_CODE,
+            msg: SEARCH_FAIL_MSG,
+            data: null
+        })
+    }
+
+    // 停止当前下发
+    async stopCurrentTestConfig(ctx: Context) {
+        const res = await TestConfigService.stopCurrentTestConfig();
+        res && ((ctx.body as IResBody) = {
+            code: SUCCESS_CODE,
+            msg: SEARCH_SUCCESS_MSG,
+            data: null
+        })
+        !res && ((ctx.body as IResBody) = {
+            code: FAIL_CODE,
+            msg: SEARCH_FAIL_MSG,
+            data: null
+        })
+    }
+
+    // 获取当前下发的测试配置
+    async getCurrentTestConfig(ctx: Context) {
+        const res = await TestConfigService.getCurrentTestConfig();
+       ((ctx.body as IResBody) = {
+            code: SUCCESS_CODE,
+            msg: SEARCH_SUCCESS_MSG,
+            data: res
+        })
+    }
 }
 
 export default new TestConfigController()

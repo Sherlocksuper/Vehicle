@@ -2,8 +2,6 @@ import {ITestProcessN} from "@/apis/standard/testProcessN.ts";
 import {TEST_PROCESSN_API} from "@/apis/url/testProcessN.ts";
 import {request} from "@/utils/request.ts";
 import {PROCESS_CONFIG_HINT} from "@/constants/process_hint.ts";
-import {NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
-import {message} from "antd";
 
 ////router.get('/getTestProcessNList', TestProcessNController.getAllTestProcessNs)
 // // router.post('/createTestProcessN', TestProcessNController.createTestProcessN)
@@ -72,10 +70,4 @@ export const getCurrentProcessN = () => {
     return request({
         api: api
     })
-}
-
-export const checkCurrentProcessN = (record: ITestProcessN) => {
-    const testProcessNRecord = JSON.stringify(record)
-    if (!confirm("" + PROCESS_CONFIG_HINT)) return
-    window.open(`/test-template-config?testProcessNRecord=${testProcessNRecord}&model=${NewTestTemplateMode.SHOW}`)
 }

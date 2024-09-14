@@ -3,8 +3,14 @@
  */
 
 import TestConfig, {ITestConfig} from "../model/TestConfig";
+import {ITestProcessNModel} from "../model/1TestProcessN";
+import {ILongMessageType, LongMessage} from "../ztcp/type";
+import {sendToLong} from "../ztcp/sender";
 
 class TestConfigService {
+
+  currentTestConfig: ITestConfig | null = null
+
   /**
    * 创建测试配置
    * @param param
@@ -169,9 +175,35 @@ class TestConfigService {
     return null;
   }
 
+  // 下发
+
+  /**
+   * 下发测试流程，设置当前的测试流程为testPrdcessN
+   */
+  async downTestConfig(testConfigId: number) {
+    const testConfig = await this.getTestConfigById(testConfigId);
+    if (!testConfig) {
+      return false
+    }
+    return true
+  }
+
+  /**
+   * 停止当前下发
+   */
+  async stopCurrentTestConfig() {
+    this.currentTestConfig = null
+    return true
+  }
+
+
+  async getCurrentTestConfig() {
+    return this.currentTestConfig
+  }
 }
 
 export default new TestConfigService()
+
 
 
 

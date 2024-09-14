@@ -1,8 +1,7 @@
-import {useEffect, useMemo, useRef, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import './index.css'
 import {IChartInterface} from "@/components/Charts/interface.ts";
-import {generateRandomData, mockHistoryData} from "@/components/Charts";
-import {TEST_INTERNAL} from "@/constants";
+import {mockHistoryData} from "@/components/Charts";
 import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 const BooleanChart: React.FC<IChartInterface> = (props) => {
@@ -25,7 +24,7 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
         if (!requestSignals || requestSignals.length === 0) {
             return;
         }
-        setValue(data.data[requestSignals[0].signal.id] > 0.5)
+        setValue(data.data[requestSignals[0].name] > 0.5)
     }
 
     useEffect(() => {

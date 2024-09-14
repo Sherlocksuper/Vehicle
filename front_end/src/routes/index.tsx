@@ -8,16 +8,13 @@ import React, {ReactElement} from "react";
 import userUtils from "@/utils/userUtils.ts";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import UserManage from "@/views/demo/User/UserList.tsx";
-import ProjectTable from "@/views/demo/TestProcessN/TestProject/TestProject.tsx";
-import TemplateTable from "@/views/demo/TestProcessN/TestTemplate/TestTemplate.tsx";
 import VehicleTable from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
-import ConfigTestTemplate from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
-import TestProcessN from "@/views/demo/TestProcessN/TestProcessN.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import OfflineShow from "@/views/demo/OffLine/OfflineShow.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
 import ProtocolTable from "@/views/demo/ProtocolTable";
 import TestConfig from "@/views/demo/TestConfig";
+import TestTemplateForConfig from "@/views/demo/TestConfig/template.tsx";
 
 interface RouteItem {
     key: string;
@@ -48,27 +45,12 @@ export const routeItems: RouteItem[] = [
                 label: '车辆管理',
                 element: <VehicleTable/>
             },
-            // {
-            //     key: '/test-config/test-project',
-            //     label: '测试项目',
-            //     element: <ProjectTable/>
-            // },
-            {
-                key: '/test-config/test-object',
-                label: '测试模板',
-                element: <TemplateTable/>
-            },
             {
                 key: '/test-config/test-config',
                 label: '测试配置',
                 element: <TestConfig/>
             },
         ]
-    },
-    {
-        key: '/process-execution',
-        label: '测试配置生成',
-        element: <TestProcessN/>
     },
     {
         key: '/offline-management',
@@ -96,12 +78,12 @@ export const my_router = createBrowserRouter([
             element: <Login/>,
         },
         {
-            //测试模板配置
-            path: '/test-template-config',
-            element: <DndProvider backend={HTML5Backend}>
-                <ConfigTestTemplate/>,
-            </DndProvider>
-        },
+        //测试模板配置
+        path: '/test-template-for-config',
+        element: <DndProvider backend={HTML5Backend}>
+            <TestTemplateForConfig/>,
+        </DndProvider>
+    },
         {
             path: '/offline-show',
             element: <DndProvider backend={HTML5Backend}>

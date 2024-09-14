@@ -142,4 +142,9 @@ router.get('/deleteTestConfig/:id', TestConfigController.deleteTestConfigById);
 router.get('/getTestConfig/:id', TestConfigController.getTestConfigById);
 router.get('/getAllTestConfig', TestConfigController.getAllTestConfig);
 
+// 下发测试配置、获取当前测试配置、停止当前测试配置
+router.post('/downTestConfig', TestConfigController.downTestConfig);
+router.get('/getCurrentTestConfig', TestConfigController.getCurrentTestConfig);
+router.get('/stopCurrentTestConfig', TestConfigController.stopCurrentTestConfig);
+
 export default router

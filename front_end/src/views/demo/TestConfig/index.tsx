@@ -19,6 +19,10 @@ const TestConfig = () => {
   };
 
   const downConfig = (record: ITestConfig) => {
+    if (currentDownConfig) {
+      message.error('请先停止当前下发');
+      return;
+    }
     downTestConfig(record.id).then(res => {
       if (res.code === FAIL_CODE) {
         message.error("下发失败:" + res.msg + "请检查网络");
@@ -64,7 +68,7 @@ const TestConfig = () => {
 
   // 前往查看当前数据
   const handleShowCurrentData = () => {
-    const win = window.open(`/test-template-config`);
+    const win = window.open(`/test-template-for-config?testConfigId=${currentDownConfig?.id}`);
     if (!win) return
   }
 

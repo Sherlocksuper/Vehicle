@@ -21,7 +21,7 @@ class TestTemplateService {
         }
     }
 
-    // 更新一个TestTemplate
+    // 有则更新，无则添加
     async update(id: string, updateData: ITestTemplate) {
         try {
             const testTemplate = await TestTemplateModel.findByPk(id);
@@ -29,7 +29,8 @@ class TestTemplateService {
                 await testTemplate.update(updateData);
                 return testTemplate;
             }
-            throw new Error('TestTemplate not found');
+            const newTestTemplate = await TestTemplateModel.create(updateData);
+            return newTestTemplate;
         } catch (error) {
             throw error;
         }

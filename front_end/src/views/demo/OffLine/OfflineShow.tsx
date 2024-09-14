@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {IHistory, IHistoryItemData, ITemplateData} from "@/apis/standard/history.ts";
+import {IHistory} from "@/apis/standard/history.ts";
 import {useDrop} from "react-dnd";
 import {
     IBooleanChartExtra,
@@ -7,11 +7,11 @@ import {
     INumberChartExtra
 } from "@/views/demo/DataDisplay/DraggableComponent";
 import GridLayout from "react-grid-layout";
-import DropContainer from "@/views/demo/DataDisplay/DropContainer";
-import {IDragItem, NewTestTemplateMode} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import {transferToDragItems} from "@/utils";
 import {getFileToHistoryWorker} from "@/worker/app.ts";
+import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
+import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 
 
 const OfflineShow: React.FC = () => {
@@ -117,14 +117,14 @@ const OfflineShow: React.FC = () => {
         }}>
             <div className="dd_body">
                 <div className="dd_drop_container" ref={ref}>
-                    <DropContainer
+                    <ConfigDropContainer
                         banModify={true}
                         items={dragItems}
 
                         onLayoutChange={updateAllByLayout}
-                        updateDragItem={(newItem) => {
+                        updateDragItem={() => {
                         }}
-                        onReceiveData={(data: IHistoryItemData) => {
+                        onReceiveData={() => {
                         }}
                         fileHistory={history}
                         netHistory={undefined}

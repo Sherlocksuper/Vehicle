@@ -45,6 +45,14 @@ export const getTestTemplateById = async (id: string) => {
     });
 }
 
+export const getDefaultTestTemplate = async () => {
+    return await getTestTemplateById('1');
+}
+
+export const updateDefaultTestTemplate = async (template: ITemplate) => {
+    return await updateTestTemplate('1', template);
+}
+
 export const deleteTestTemplate = async (id: string) => {
     const api = {...TEMPLATE_API.getTestTemplateById}
     api.url = api.url.replace(':id', id);

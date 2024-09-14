@@ -1,17 +1,17 @@
-import {ISignalItem} from "@/views/demo/TestProcessN/TestTemplate/ConfigTestTemplate.tsx";
 import {IHistoryItemData} from "@/apis/standard/history.ts";
+import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 
 /**
  * @param requestSignals
  */
-export const generateRandomData = (requestSignals: ISignalItem[]): IHistoryItemData => {
+export const generateRandomData = (requestSignals: IProtocolSignal[]): IHistoryItemData => {
     const time = new Date().getTime()
 
     //循环根据id生成数据
     const timeData: { [key: number]: number } = {}
 
     requestSignals.forEach((item) => {
-        timeData[item.signal.id] = Math.floor(Math.random() * 100)
+        timeData[item.name] = Math.floor(Math.random() * 100)
     })
 
     return ({
@@ -22,7 +22,6 @@ export const generateRandomData = (requestSignals: ISignalItem[]): IHistoryItemD
 
 
 // 用来展示history,并非模拟
-// @ts-ignore
 export const mockHistoryData = (index: number, pushData: (data: IHistoryItemData) => void, historyData: IHistoryItemData[]) => {
     function mock(index: number) {
         if (!historyData) return
