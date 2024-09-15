@@ -4,7 +4,7 @@ import type {TableProps} from 'antd';
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {createVehicle, deleteVehicle, getVehicles, updateVehicle} from "@/apis/request/vehicle.ts";
 import {SUCCESS_CODE} from "@/constants";
-import {confirmDelete} from "@/utils";
+import {confirmDelete, parseToObject} from "@/utils";
 import {RuleObject} from 'antd/es/form';
 import {getProtocols, IProtocol} from "@/apis/request/protocol.ts";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
@@ -200,8 +200,6 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
                         {(fields, {add, remove}) => (
                             <>
                                 {fields.map(({key, name, ...restField}) => {
-                                    console.log(key)
-                                    console.log(name)
                                     return (
                                         <Space key={key} style={{display: 'flex'}} align="baseline">
                                             <Form.Item
@@ -242,13 +240,17 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
                                                     ({getFieldValue}) => ({
                                                         validator(_, value) {
                                                             // 协议类型相同的话，采集板卡不能相同
-                                                            const protocol = getFieldValue(['protocols', name, 'protocol'])
-                                                            const collect = value
-                                                            console.log(value)
+                                                            const protocol1 = parseToObject(getFieldValue(['protocols', name, 'protocol']))
+                                                            const collect1 = parseToObject(value)
                                                             for (let i = 0; i < fields.length; i++) {
                                                                 if (i === name) continue
-                                                                if (protocol["protocolType"] === getFieldValue(['protocols', i, 'protocol'])["protocolType"] &&
-                                                                    collect["collectorName"] === getFieldValue(['protocols', i, 'collect'])["collectorName"]) {
+                                                                const protocol2 = parseToObject(getFieldValue(['protocols', i, 'protocol']))
+                                                                const collect2 = parseToObject(getFieldValue(['protocols', i, 'collect']))
+
+                                                                console.log(protocol1, protocol2, collect1, collect2)
+
+                                                                if (protocol1["protocolType"] === protocol2["protocolType"] &&
+                                                                    collect1["collectorName"] === collect2["collectorName"]) {
                                                                     return Promise.reject('相同协议类型的协议采集板卡不能相同')
                                                                 }
                                                             }

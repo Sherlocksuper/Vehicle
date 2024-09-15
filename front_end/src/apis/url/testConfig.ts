@@ -59,5 +59,13 @@ export const TEST_CONFIG_API = {
     url: '/updateTestConfig/:id',
     method: Method.POST,
     format: ContentType.JSON
+  },
+  //建立eventsource连接
+  // router.get('/startConnection', TestConfigController.startConnection);
+  startConnection :{
+    // url: 'startConnection',
+    // url: 'api/startConnection',
+    url: 'http://localhost:8080/startConnection',
+    method: Method.GET,
   }
 }

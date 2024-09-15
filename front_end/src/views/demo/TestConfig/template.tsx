@@ -15,8 +15,7 @@ import {getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
-import {getDefaultTestTemplate, updateDefaultTestTemplate} from "@/apis/request/template.ts";
-import {v4 as uuid} from "uuid"
+import {createConnection} from "@/views/demo/TestConfig/eventsource.ts";
 
 export interface IDragItem {
   id: string
@@ -42,9 +41,12 @@ export interface IDragItem {
 
 const TestTemplateForConfig: React.FC = () => {
   const [testConfig, setTestConfig] = useState<ITestConfig | null>(null)
+  const [mode, setMode] = useState<'CHANGING' | 'COLLECTING'>('CHANGING')
 
   const ref = useRef<HTMLDivElement>(null)
   const [dragItems, setDragItems] = useState<IDragItem[]>([])
+
+  const socketRef = useRef<WebSocket>(null)
 
   const [history, setHistory] = useState<IHistory>({
     historyName: '默认名称',
@@ -60,6 +62,7 @@ const TestTemplateForConfig: React.FC = () => {
     },
     historyData: []
   })
+
 
   useEffect(() => {
     const search = window.location.search
@@ -78,6 +81,26 @@ const TestTemplateForConfig: React.FC = () => {
       })
     }
   }, [])
+
+  useEffect(() => {
+    const socket = new WebSocket('http://localhost:8080/ws');
+    socket.onopen = () => {
+      socketRef.current = socket
+    }
+    socket.onclose = () => {
+      socketRef.current = null
+    }
+
+    socket.onmessage = (event) => {
+      console.log(event.data)
+      console.log(event)
+    };
+
+    // 清理 WebSocket 连接
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   const [, drop] = useDrop<{ id: string } & IDraggleComponent>({
     accept: 'box',
@@ -207,6 +230,22 @@ const TestTemplateForConfig: React.FC = () => {
 
   const renderManageButton = () => {
 
+    const confirmChangeConfig = () => {
+      const config = Object.assign({}, testConfig)
+      config.template = transferDragItemsToITemplate(dragItems)
+      updateTestConfigById(config.id, config).then((res) => {
+        if (res.code === SUCCESS_CODE) {
+          message.success('更新成功')
+        }
+      })
+    }
+
+    if (mode === "COLLECTING") {
+      return <Button onClick={() => {
+        setMode('CHANGING')
+      }}>切换到配置模式</Button>
+    }
+
     return <div style={{
       zIndex: 100,
       display: "flex",
@@ -217,18 +256,16 @@ const TestTemplateForConfig: React.FC = () => {
       top: 0,
       right: 0,
     }}>
+      <Button onClick={() => {
+        confirmChangeConfig()
+      }}>确定更改配置</Button>
+      <Button onClick={() => {
+        confirmChangeConfig()
+        setMode('COLLECTING')
+      }}>查看收集数据</Button>
       <div className="dd_info">
         {renderADDModeInfo()}
       </div>
-      <Button onClick={() => {
-        const config = Object.assign({}, testConfig)
-        config.template = transferDragItemsToITemplate(dragItems)
-        updateTestConfigById(config.id, config).then((res) => {
-          if (res.code === SUCCESS_CODE) {
-            message.success('更新成功')
-          }
-        })
-      }}>确定更改配置</Button>
     </div>
   }
 
@@ -301,8 +338,9 @@ const TestTemplateForConfig: React.FC = () => {
       <div className="dd_body">
         <div className="dd_drop_container" ref={ref}>
           <ConfigDropContainer
-            banModify={false}
+            banModify={mode === "COLLECTING"}
             items={dragItems}
+            testConfig={testConfig}
 
             onLayoutChange={updateAllByLayout}
             updateDragItem={updateDragItem}

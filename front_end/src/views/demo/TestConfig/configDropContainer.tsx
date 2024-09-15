@@ -3,23 +3,21 @@ import NumberGaugeChart from "@/components/Charts/NumberGaugeChart";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import React, {useEffect} from "react";
+import React from "react";
 import LinesChart from "@/components/Charts/LinesChart/LinesChart.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
 import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
 import PureNumberChart from "@/components/Charts/PureNumberChart/PureNumberChart.tsx";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
-import {v4 as uuid} from "uuid"
-
-export enum NewTestTemplateMode {
-  CONFIG = "config",
-  TEMPLATE = "template",
-}
+import {Form, Input, Modal, Select} from "antd";
+import {ITestConfig} from "@/apis/standard/test.ts";
+import {getAllProtocolSignalsFromTestConfig} from "@/utils";
 
 const ConfigDropContainer: React.FC<{
   banModify: boolean;
   items: IDragItem[];
+  testConfig: ITestConfig;
   onLayoutChange: (layout: GridLayout.Layout[]) => void;
   updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
   onReceiveData: (data: IHistoryItemData) => void;
@@ -28,21 +26,15 @@ const ConfigDropContainer: React.FC<{
 }> = ({
         banModify,
         items,
+        testConfig,
         onLayoutChange,
         fileHistory,
-        netHistory
+        netHistory,
+        updateDragItem,
       }) => {
-  const search = window.location.search;
-  const params = new URLSearchParams(search);
-  const testProcessNRecord = params.get("testProcessNRecord");
-  const mode: NewTestTemplateMode = params.get("model") as NewTestTemplateMode;
 
 
-  useEffect(() => {
-    if (mode === NewTestTemplateMode.CONFIG) {
-      return
-    }
-  }, [mode])
+  const [openItemId, setOpenItemId] = React.useState<string>("");
 
 
   return (
@@ -62,8 +54,10 @@ const ConfigDropContainer: React.FC<{
               className="dc_item_container"
               id={item.id}
               key={item.id}
-              style={{border: "1px solid transparent",
-                backgroundColor: "rgba(255, 255, 255, 0.8)"}}
+              style={{
+                border: "1px solid transparent",
+                backgroundColor: "rgba(255, 255, 255, 0.8)"
+              }}
               data-grid={{
                 ...item.itemConfig,
                 w: item.itemConfig.width / 30,
@@ -72,16 +66,16 @@ const ConfigDropContainer: React.FC<{
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
-                // if (mode === NewTestTemplateMode.CONFIG) setOpenItemId(item.id);
+                if (banModify) setOpenItemId(item.id);
               }}
             >
-              {/*<UpdateItemModal*/}
-              {/*  item={item}*/}
-              {/*  setOpenItemId={setOpenItemId}*/}
-              {/*  open={item.id === openItemId}*/}
-              {/*  testProcessN={testProcessN}*/}
-              {/*  updateDragItem={updateDragItem}*/}
-              {/*/>*/}
+              <UpdateItemModal
+                item={item}
+                setOpenItemId={setOpenItemId}
+                open={item.id === openItemId}
+                updateDragItem={updateDragItem}
+                testConfig={testConfig}
+              />
               <SetDragItem
                 item={item}
                 banModify={banModify}
@@ -93,6 +87,61 @@ const ConfigDropContainer: React.FC<{
         })}
       </GridLayout>
     </div>
+  );
+};
+
+const UpdateItemModal: React.FC<{
+  item: IDragItem;
+  open: boolean;
+  testConfig: ITestConfig
+  setOpenItemId: (id: string) => void;
+  updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
+}> = ({item, open, setOpenItemId, updateDragItem, testConfig}) => {
+
+  const [itemConfig, setItemConfig] = React.useState(item.itemConfig);
+  const requestSignals = getAllProtocolSignalsFromTestConfig(testConfig)
+
+  const isSingleChart = (type: DragItemType) => ! (type === DragItemType.LINES)
+
+  const handleUpdate = () => {
+    updateDragItem(item.id, itemConfig);
+    setOpenItemId("");
+  };
+
+  return (
+    <Modal
+      title="修改控件"
+      open={open}
+      onOk={handleUpdate}
+      onClose={() => setOpenItemId("")}
+      onCancel={() => setOpenItemId("")}
+    >
+      <Form
+        labelCol={{span: 6}}
+        wrapperCol={{span: 18}}
+        initialValues={itemConfig}
+        onValuesChange={(changedValues) => {
+          setItemConfig((prev) => ({
+            ...prev,
+            ...changedValues,
+          }));
+        }}
+      >
+        <Form.Item label="标题" name="title">
+          <Input/>
+        </Form.Item>
+        <Form.Item label="请求信号" name="requestSignals">
+          <Select mode={isSingleChart(item.type) ? null : "multiple"}>
+
+            {requestSignals.map((signal) => (
+              <Select.Option key={signal.id} value={signal.id}>
+                {signal.name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 };
 

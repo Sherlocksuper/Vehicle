@@ -5,6 +5,7 @@
 
 import {currentCollectConfig, setCurrentCollectConfig} from "../public/index.js";
 import {generateHistoryData} from "../public/mockBoardData.js";
+import {comFrontPort} from "../public/config.js";
 
 // 定义消息类型枚举
 const LongMessage = {
@@ -53,6 +54,13 @@ function startCollect(socket, body) {
   // historyDataFunction = generateHistoryData(currentCollectConfig, 2000, 2000, (data) => {
   //   socket.write(JSON.stringify(data) + '\n');
   // })
+
+  // 每2s发送一条消息
+
+  setInterval(() => {
+    socket.write("随机消息" + '\n');
+  }, 2000)
+
 
   // 发送确认或其他响应给上位机
   socket.write('开始采集已接收\n');

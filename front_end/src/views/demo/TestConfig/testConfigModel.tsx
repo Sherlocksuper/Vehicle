@@ -7,6 +7,7 @@ import {getVehicles} from "@/apis/request/vehicle.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {createTestConfig} from "@/apis/request/testConfig.ts";
 import protocolTable from "@/views/demo/ProtocolTable";
+import {parseToObject} from "@/utils";
 
 export const TestConfigModel = ({open, close, onOk, initValue}: {
   // 外面的状态
@@ -86,16 +87,6 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
     })
   };
 
-  const parseToObject = (value: any) => {
-    if (typeof value === "undefined") {
-      return undefined
-    }
-    if (typeof value === "object") {
-      return value
-    } else {
-      return JSON.parse(value)
-    }
-  }
 
   const handleCancel = () => {
     form.resetFields()
@@ -180,7 +171,7 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
                                                             return (
                                                               protocol.protocol.signalsParsingConfig.map(parsingConfig => (
                                                                 parsingConfig.signals.map(signal => (
-                                                                  <Select.Option key={signal.name}
+                                                                  <Select.Option key={signal.id}
                                                                                  value={JSON.stringify(signal)}>{signal.name}</Select.Option>
                                                                 ))
                                                               ))

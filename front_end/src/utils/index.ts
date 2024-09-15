@@ -1,5 +1,7 @@
 import {ITemplate} from "@/apis/standard/template.ts";
 import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
+import {ITestConfig} from "@/apis/standard/test.ts";
+import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 
 
 /**
@@ -107,4 +109,27 @@ export function formatFileSize(size: number) {
 
 export function confirmDelete() {
     return (confirm('是否删除'))
+}
+
+export const parseToObject = (value: any) => {
+    if (typeof value === "undefined") {
+        return undefined
+    }
+    if (typeof value === "object") {
+        return value
+    } else {
+        return JSON.parse(value)
+    }
+}
+
+export const getAllProtocolSignalsFromTestConfig = (testConfig: ITestConfig) => {
+    const signals: IProtocolSignal[] = []
+    testConfig.configs.forEach((config) => {
+        config.projects.forEach((project) => {
+            project.indicators.forEach((indicator) => {
+                signals.push(indicator.signal)
+            })
+        })
+    })
+    return signals
 }

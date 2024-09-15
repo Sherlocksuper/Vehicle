@@ -40,17 +40,10 @@ const server = createServer((socket) => {
   // 确定客户端是 ComputerBack 还是 Board
   // 前端不会直接给龙芯发送消息，只会接收消息
   socket.on('data', (data) => {
-    // if (!clientBoard || !clientComputer) {
-    //   socket.write("程序连接不完备，缺少Board或Computer\n");
-    //   return;
-    // }
     const message = data.toString().trim();
-    // 处理消息
-    // if (socket === clientComputer && clientBoard) {
     if (socket === clientBackComputer) {
       console.log(`上位机 Computer 发来消息: ${message}`);
       handleReceiveComMessage(socket, message)
-      // } else if (socket === clientBoard && clientComputer) {
     } else if (socket === clientBoard) {
       console.log(`下位机 Board 发来消息: ${message}`);
       handleReceiveBoardMessage(socket, message)
