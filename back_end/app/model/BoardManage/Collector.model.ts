@@ -16,7 +16,7 @@ import User from '../User.model';
 export interface ICollectorModel {
     id?: number
     collectorName: string
-    collectorAddress: string
+    collectorAddress:number
     userId: number | null
     isDisabled: boolean
 }
@@ -47,7 +47,7 @@ export default class Collector extends Model<ICollectorModel> {
     collectorName!: string;
 
     @Column(DataType.STRING)
-    collectorAddress!: string
+    collectorAddress!:number
 
     @HasMany(() => Signal)
     signals!: Signal[]

@@ -15,7 +15,6 @@ import {getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
-import {createConnection} from "@/views/demo/TestConfig/eventsource.ts";
 
 export interface IDragItem {
   id: string
@@ -63,6 +62,8 @@ const TestTemplateForConfig: React.FC = () => {
     historyData: []
   })
 
+  const [historyRecordMap, setHistoryRecordMap] = useState<Map<string, number[]>>(new Map())
+
 
   useEffect(() => {
     const search = window.location.search
@@ -74,7 +75,6 @@ const TestTemplateForConfig: React.FC = () => {
       getTestConfigById(Number(testConfigId)).then((res) => {
         if (res.code === SUCCESS_CODE) {
           testConfig = res.data as ITestConfig
-          console.log(testConfig)
           setTestConfig(testConfig)
           setDragItems(transferITemplateToDragItems(testConfig.template))
         }
@@ -92,8 +92,18 @@ const TestTemplateForConfig: React.FC = () => {
     }
 
     socket.onmessage = (event) => {
-      console.log(event.data)
-      console.log(event)
+      const keys = Object.keys(JSON.parse(event.data))
+      keys.forEach((key) => {
+
+        if (historyRecordMap.has(key)) {
+          historyRecordMap.set(key, [...historyRecordMap.get(key), JSON.parse(event.data)[key]])
+        } else {
+          historyRecordMap.set(key, [JSON.parse(event.data)[key]])
+        }
+
+      })
+      // 更新触发状态更新
+      setHistoryRecordMap(new Map(historyRecordMap))
     };
 
     // 清理 WebSocket 连接
@@ -195,6 +205,20 @@ const TestTemplateForConfig: React.FC = () => {
 
   const updateDragItem = (id: string, itemConfig: IDragItem['itemConfig']) => {
     console.log(id)
+    console.log(itemConfig)
+    const result = dragItems.map((item) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          itemConfig: {
+            ...item.itemConfig,
+            ...itemConfig
+          }
+        }
+      }
+      return item
+    })
+    console.log(result)
     setDragItems(dragItems.map((item) => {
       if (item.id === id) {
         return {
@@ -346,7 +370,7 @@ const TestTemplateForConfig: React.FC = () => {
             updateDragItem={updateDragItem}
             onReceiveData={onReceiveData}
             fileHistory={undefined}
-            netHistory={history}
+            netHistory={historyRecordMap}
           />
         </div>
         {renderManageButton()}

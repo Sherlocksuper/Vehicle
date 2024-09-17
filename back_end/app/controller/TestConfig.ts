@@ -82,27 +82,6 @@ class TestConfigController {
     })
   }
 
-  // /**
-  //    * 下发测试流程，设置当前的测试流程为testPrdcessN
-  //    */
-  //   async downTestConfig(testConfig: ITestConfig) {
-  //     this.currentTestConfig = testConfig
-  //     return true
-  //   }
-  //
-  //   /**
-  //    * 停止当前下发
-  //    */
-  //   async stopCurrentTestProcessN() {
-  //     this.currentTestConfig = null
-  //     return true
-  //   }
-  //
-  //
-  //   async getCurrentTestConfig() {
-  //     return this.currentTestConfig
-  //   }
-
   // 下发测试配置
   async downTestConfig(ctx: Context) {
     // @ts-ignore

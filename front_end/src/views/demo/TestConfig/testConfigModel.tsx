@@ -126,11 +126,11 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
                             rules={[{required: true, message: 'Missing vehicle'}]}
                           >
                             <Select placeholder={"Select vehicle"}
-                              onChange={() => {
-                              const formValue = form.getFieldsValue()
-                              const currentVehicles = formValue.configs.map(config => parseToObject(config.vehicle))
-                              setVehicleHasSelected(currentVehicles.filter(vehicle => vehicle !== undefined))
-                            }} >
+                                    onChange={() => {
+                                      const formValue = form.getFieldsValue()
+                                      const currentVehicles = formValue.configs.map(config => parseToObject(config.vehicle))
+                                      setVehicleHasSelected(currentVehicles.filter(vehicle => vehicle !== undefined))
+                                    }}>
                               {vehicles.map(vehicle => (
                                 <Select.Option key={vehicle.id} value={JSON.stringify(vehicle)}>{vehicle.vehicleName}</Select.Option>
                               ))}
@@ -164,6 +164,9 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
                                                                rules={[{required: true, message: 'Missing signal'}]}>
 
                                                       <Select placeholder="Select signal"
+                                                              style={{
+                                                                width: 200
+                                                              }}
                                                       >
                                                         {
                                                           vehicleHasSelected.find(vehicle => vehicle.id === parseToObject(form.getFieldValue(['configs', configIndex, 'vehicle']))?.id)?.protocols.map(protocol => {
@@ -172,7 +175,7 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
                                                               protocol.protocol.signalsParsingConfig.map(parsingConfig => (
                                                                 parsingConfig.signals.map(signal => (
                                                                   <Select.Option key={signal.id}
-                                                                                 value={JSON.stringify(signal)}>{signal.name}</Select.Option>
+                                                                                 value={JSON.stringify(signal)}>{ protocol.protocol.protocolName + ": " + signal.name}</Select.Option>
                                                                 ))
                                                               ))
                                                             )

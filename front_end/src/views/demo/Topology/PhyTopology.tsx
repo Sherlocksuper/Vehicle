@@ -35,7 +35,7 @@ export interface IController {
 export interface ICollector {
     id: number;
     collectorName: string;
-    collectorAddress: string;
+    collectorAddress: number;
     userId?: number;
     isDisabled: boolean;
 }
@@ -174,7 +174,7 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
     const addCollector = () => {
         const collector = {
             collectorName: name,
-            collectorAddress: address,
+            collectorAddress: Number(address),
         } as ICollector;
 
         createCollector(collector).then((res: any) => {
@@ -220,9 +220,10 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
                     }}
                 />
                 <Input
-                    placeholder={`请输入${boardType}地址,格式如：127.0.0.1`}
+                    placeholder={`请输入采集板卡序号`}
                     style={{marginBottom: 10}}
                     required={true}
+                    type={"number"}
                     onChange={(e) => {
                         setAddress(e.target.value);
                     }}

@@ -28,10 +28,10 @@ const wss = new WebSocket.Server({noServer: true});
 wss.on('connection', (ws: WebSocket) => {
   console.log('客户端已连接');
   addWebSocket(ws)
-  ws.on('message', (message: string) => {
-    console.log('收到消息:', message);
+  ws.on('message', (message: Buffer) => {
     ws.send(`你发送的消息: ${message}`);
   });
+
   ws.on('close', () => {
     removeWebSocket(ws)
   });

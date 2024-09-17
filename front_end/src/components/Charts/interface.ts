@@ -13,7 +13,7 @@ export interface IChartInterface {
     requestSignals: IProtocolSignal[]
 
     historyData?: IHistoryItemData[]
-    currentTestChartData?: IHistoryItemData[]
+    currentTestChartData?: Map<string, number[]>
 
     requestSignalId: number | null
     width: number

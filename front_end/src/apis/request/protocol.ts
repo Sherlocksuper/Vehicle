@@ -6,8 +6,9 @@ import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx"
 export enum ProtocolType {
     FlexRay = 'FlexRay',
     CAN = 'CAN',
-    MIC = 'MIC',
-    B1552B = '1552B',
+    Serial = "Serial",
+    Analog = "Analog",
+    Digital = "Digital"
 }
 
 export interface ICanBaseConfig {
@@ -15,6 +16,7 @@ export interface ICanBaseConfig {
 }
 
 export interface IFlexRayBaseConfig {
+    microticksPerCycle: number
     macroticksPerCycle: number
     transmissionStartTime: number
     staticFramepayload: number
@@ -33,6 +35,7 @@ export interface IProtocol {
     signalsParsingConfig: {
         frameNumber: string,
         frameId: string,
+        cycleNumber?:number
         signals: IProtocolSignal[]
     }[]
 }

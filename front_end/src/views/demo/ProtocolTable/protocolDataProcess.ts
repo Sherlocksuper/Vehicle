@@ -6,10 +6,6 @@ export const processProtocolData = (type, data) => {
             return processCanData(data)
         case ProtocolType.FlexRay:
             return processFlexRayData(data)
-        case ProtocolType.MIC:
-            return processMicData(data)
-        case ProtocolType.B1552B:
-            return processB1552BData(data)
         default:
             return {}
     }

@@ -66,7 +66,7 @@ class ProjectService {
                                 "isDisabled": false,
                                 "id": 1,
                                 "collectorName": "zx-04A-1",
-                                "collectorAddress": "1",
+                                "collectorAddress": 0x01,
                                 "userId": null
                             },
                             "controller": {

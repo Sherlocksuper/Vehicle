@@ -1,48 +1,41 @@
-import {useEffect, useRef, useState} from 'react'
+import {useCallback, useEffect, useState} from 'react'
 import './index.css'
 import {IChartInterface} from "@/components/Charts/interface.ts";
-import {mockHistoryData} from "@/components/Charts";
-import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 const BooleanChart: React.FC<IChartInterface> = (props) => {
     const {
-        startRequest,
         requestSignals,
-        sourceType,
-
-        historyData,
         currentTestChartData,
-
         trueLabel,
         falseLabel,
         title,
     } = props
-    const timerRef = useRef<NodeJS.Timeout | null>(null)
     const [value, setValue] = useState(false)
 
-    const pushData = (data: IHistoryItemData) => {
+    const pushData = useCallback((data: Map<string, number[]>) => {
+        if (!requestSignals){
+            return
+        }
+        if (!data) {
+            setValue(false)
+            return
+        }
         if (!requestSignals || requestSignals.length === 0) {
             return;
         }
-        setValue(data.data[requestSignals[0].name] > 0.5)
-    }
-
-    useEffect(() => {
-        if (!historyData) {
-            return
+        const signal = requestSignals[0]
+        const signalData = data.get(signal.id)
+        if (signalData) {
+            setValue(signalData[signalData.length - 1] > 50)
         }
-        const getFileData = mockHistoryData(0, pushData, historyData)
-        getFileData(0)
-    }, [startRequest, requestSignals])
-
+    }, [requestSignals]);
 
     // 同步netWorkData
     useEffect(() => {
-        if (!currentTestChartData || currentTestChartData.length === 0) {
-            return
+        if (currentTestChartData) {
+            pushData(currentTestChartData)
         }
-        pushData(currentTestChartData[currentTestChartData.length - 1])
-    }, [currentTestChartData?.length])
+    }, [currentTestChartData, pushData])
 
 
     return <div className="bc_container" style={{

@@ -1,16 +1,14 @@
 import * as echarts from "echarts"
-import {useEffect, useMemo, useRef} from "react"
+import {useCallback, useEffect, useRef} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
-import {generateRandomData, mockHistoryData} from "@/components/Charts";
-import {IHistoryItemData} from "@/apis/standard/history.ts";
 
 interface ISeries {
-    id: string
-    name: string
-    type: string
-    stack: string
-    symbol: string
-    data: number[]
+  id: string
+  name: string
+  type: string
+  stack: string
+  symbol: string
+  data: number[]
 }
 
 /**
@@ -27,120 +25,128 @@ interface ISeries {
  * @param props
  */
 const LinesChart: React.FC<IChartInterface> = (props) => {
-    const {
-        startRequest,
-        requestSignals,
+  const {
+    requestSignals,
+    currentTestChartData
+  } = props
 
-        historyData,
-        currentTestChartData
-    } = props
 
-    const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const chartRef = useRef<echarts.ECharts | null>()
+  const chartContainerRef = useRef<HTMLDivElement>(null)
 
-    const chartRef = useRef<echarts.ECharts | null>()
-    const chartContainerRef = useRef<HTMLDivElement>(null)
+  const xAxis = useRef<string[]>([])
+  const dataRef = useRef<ISeries[]>(requestSignals.map((item, index) => {
+    return {
+      id: item.id,
+      name: item.name + ' ' + item.name + ' ' + item.name,
+      type: 'line',
+      stack: 'Total',
+      symbol: 'none',
+      data: []
+    }
+  }))
 
-    const xAxis = useRef<string[]>([])
-    const dataRef = useRef<ISeries[]>(requestSignals.map((item, index) => {
-        return {
-            id: JSON.stringify(item),
-            name: item.vehicleName + ' ' + item.projectName + ' ' + item.signal.signalName,
-            type: 'line',
-            stack: 'Total',
-            symbol: 'none',
-            data: []
-        }
-    }))
-
-    const pushData = (data: IHistoryItemData) => {
-        if (!requestSignals || requestSignals.length === 0) {
-            return;
-        }
-        xAxis.current.push(new Date(data.xAxis).toLocaleTimeString())
-        dataRef.current.forEach((item) => {
-            item.data.push(data.data[JSON.parse(item.id).signal.id])
-        })
-        const option = {
-            xAxis: {
-                data: xAxis.current
-            },
-            series: dataRef.current
-        }
-        chartRef.current?.setOption(option)
+  const pushData = useCallback((data: Map<string, number[]>) => {
+    if (!requestSignals || requestSignals.length === 0) {
+      return;
     }
 
-    // 同步historyData
-    useEffect(() => {
-        if (!historyData) {
-            return;
-        }
-        const getFileData = mockHistoryData(0, pushData, historyData!)
-        getFileData(0)
-    }, [requestSignals.length])
+    const getCurrentTime = (time?: number) => {
+      if (!time) return new Date().getTime()
+      return new Date(time).getTime()
+    }
 
-    // 同步netWorkData
-    useEffect(() => {
-        if (!currentTestChartData || currentTestChartData.length === 0 || historyData !== undefined) {
-            return
-        }
-        pushData(currentTestChartData[currentTestChartData.length - 1])
-    }, [currentTestChartData?.length])
+    xAxis.current.push(new Date(getCurrentTime()).toLocaleTimeString())
 
-    useEffect(() => {
-        chartRef.current = echarts.init(chartContainerRef.current)
-        const option = {
-            dataZoom: [
-                {
-                    type: 'slider',
-                    show: true,
-                    xAxisIndex: [0],
-                    start: 1,
-                    end: 100
-                },
-                {
-                    type: 'inside',
-                    xAxisIndex: [0],
-                    start: 1,
-                    end: 100
-                }
-            ],
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data: dataRef.current.map((item) => item.name)
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: xAxis.current,
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: []
-        };
-        const resizeObserver = new ResizeObserver(() => {
-            chartRef.current && chartRef.current.resize()
+    if (dataRef.current.length === 0) {
+      requestSignals.forEach((item) => {
+        dataRef.current.push({
+          id: item.id,
+          name: item.name,
+          type: 'line',
+          stack: 'Total',
+          symbol: 'none',
+          data: []
         })
-        chartContainerRef.current && resizeObserver.observe(chartContainerRef.current)
-        chartRef.current?.setOption(option)
+      })
+    } else {
+      dataRef.current.forEach((item) => {
+        const value = data.get(item.id)?.[data.get(item.id)?.length - 1] || 0
+        item.data.push(value)
+      })
+    }
 
-        return () => {
-            resizeObserver.disconnect()
-            chartRef.current?.dispose()
+    const option = {
+      xAxis: {
+        data: xAxis.current
+      },
+      series: dataRef.current
+    }
+    chartRef.current?.setOption(option)
+  }, [requestSignals])
+
+  // 同步netWorkData
+  useEffect(() => {
+    if (currentTestChartData) {
+      pushData(currentTestChartData)
+    }
+  }, [currentTestChartData, pushData])
+
+  useEffect(() => {
+    chartRef.current = echarts.init(chartContainerRef.current)
+    const option = {
+      dataZoom: [
+        {
+          type: 'slider',
+          show: true,
+          xAxisIndex: [0],
+          start: 1,
+          end: 100
+        },
+        {
+          type: 'inside',
+          xAxisIndex: [0],
+          start: 1,
+          end: 100
         }
-    }, [])
+      ],
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: dataRef.current.map((item) => item.name)
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: xAxis.current,
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: []
+    };
+    const resizeObserver = new ResizeObserver(() => {
+      chartRef.current && chartRef.current.resize()
+    })
+    chartContainerRef.current && resizeObserver.observe(chartContainerRef.current)
+    chartRef.current?.setOption(option)
 
-    return <div ref={chartContainerRef} style={{
-        width: '100%', height: '100%'
-    }}></div>
+    return () => {
+      resizeObserver.disconnect()
+      chartRef.current?.dispose()
+    }
+  }, [])
+
+  return <div ref={chartContainerRef} style={{
+    width: '100%', height: '100%'
+  }}></div>
 }
 
 export default LinesChart

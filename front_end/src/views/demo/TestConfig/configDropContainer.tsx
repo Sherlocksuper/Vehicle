@@ -3,7 +3,7 @@ import NumberGaugeChart from "@/components/Charts/NumberGaugeChart";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import React from "react";
+import React, {useEffect, useMemo} from "react";
 import LinesChart from "@/components/Charts/LinesChart/LinesChart.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
 import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
@@ -13,6 +13,7 @@ import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
 import {Form, Input, Modal, Select} from "antd";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import {getAllProtocolSignalsFromTestConfig} from "@/utils";
+import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 
 const ConfigDropContainer: React.FC<{
   banModify: boolean;
@@ -22,7 +23,7 @@ const ConfigDropContainer: React.FC<{
   updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
   onReceiveData: (data: IHistoryItemData) => void;
   fileHistory?: IHistory;
-  netHistory?: IHistory
+  netHistory?: Map<string, number[]>;
 }> = ({
         banModify,
         items,
@@ -98,14 +99,30 @@ const UpdateItemModal: React.FC<{
   updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
 }> = ({item, open, setOpenItemId, updateDragItem, testConfig}) => {
 
-  const [itemConfig, setItemConfig] = React.useState(item.itemConfig);
+  const [form] = Form.useForm();
+
+  const itemConfig = useMemo(() => item.itemConfig, [item])
   const requestSignals = getAllProtocolSignalsFromTestConfig(testConfig)
 
-  const isSingleChart = (type: DragItemType) => ! (type === DragItemType.LINES)
+  const isSingleChart = (type: DragItemType) => !(type === DragItemType.LINES)
+
+
+  useEffect(()=>{
+    console.log(itemConfig)
+    form.setFieldsValue(itemConfig)
+    form.setFieldsValue({requestSignals: itemConfig.requestSignals.map((signal) => JSON.stringify(signal))})
+  },[form, itemConfig,open])
 
   const handleUpdate = () => {
-    updateDragItem(item.id, itemConfig);
+    const newConfig = form.getFieldsValue()
+    newConfig.requestSignals = newConfig.requestSignals.map((signal: string) => {
+      console.log(signal)
+      return JSON.parse(signal)
+    })
+    itemConfig.requestSignals = newConfig.requestSignals
+    itemConfig.title = newConfig.title
     setOpenItemId("");
+    updateDragItem(item.id, itemConfig);
   };
 
   return (
@@ -117,24 +134,21 @@ const UpdateItemModal: React.FC<{
       onCancel={() => setOpenItemId("")}
     >
       <Form
+        form={form}
         labelCol={{span: 6}}
         wrapperCol={{span: 18}}
         initialValues={itemConfig}
-        onValuesChange={(changedValues) => {
-          setItemConfig((prev) => ({
-            ...prev,
-            ...changedValues,
-          }));
-        }}
       >
         <Form.Item label="标题" name="title">
           <Input/>
         </Form.Item>
         <Form.Item label="请求信号" name="requestSignals">
-          <Select mode={isSingleChart(item.type) ? null : "multiple"}>
+          <Select mode={"multiple"}
+                  maxCount={isSingleChart(item.type) ? 2 : undefined}
+          >
 
             {requestSignals.map((signal) => (
-              <Select.Option key={signal.id} value={signal.id}>
+              <Select.Option key={signal.id} value={JSON.stringify(signal)}>
                 {signal.name}
               </Select.Option>
             ))}
@@ -144,6 +158,20 @@ const UpdateItemModal: React.FC<{
     </Modal>
   );
 };
+
+const getUsefulSignal = (requestSignals: IProtocolSignal[], signalRecordMap: Map<string, number[]>) => {
+  if (typeof requestSignals === 'string') {
+    requestSignals = [requestSignals]
+  }
+  const resultMap = new Map<string, number[]>()
+  requestSignals.forEach((signal) => {
+    const signalData = signalRecordMap.get(signal.id)
+    if (signalData) {
+      resultMap.set(signal.id, signalData)
+    }
+  })
+  return resultMap
+}
 
 
 /**
@@ -156,17 +184,15 @@ const UpdateItemModal: React.FC<{
  * @constructor
  * 功能：根据不同的type返回不同的控件
  */
-export const SetDragItem = ({
-                              item,
-                              banModify,
-                              fileHistory,
-                              currentTestData,
-                            }: {
+
+interface ISetDragItem {
   item: IDragItem;
   banModify: boolean;
   fileHistory?: IHistory;
-  currentTestData?: IHistory
-}) => {
+  currentTestData?: Map<string, number[]>;
+}
+
+export const SetDragItem = ({item, banModify, fileHistory, currentTestData,}: ISetDragItem) => {
   const {
     type,
     itemConfig: {
@@ -201,9 +227,7 @@ export const SetDragItem = ({
         height={height}
         historyData={historyData}
         currentTestChartData={
-          currentTestData?.historyData.find(
-            (templateItem) => templateItem.templateItemId === item.id
-          )?.data
+          getUsefulSignal(requestSignals || [], currentTestData || new Map())
         }
       />
     ),
@@ -221,9 +245,7 @@ export const SetDragItem = ({
         height={height}
         historyData={historyData}
         currentTestChartData={
-          currentTestData?.historyData.find(
-            (templateItem) => templateItem.templateItemId === item.id
-          )?.data ?? []
+          getUsefulSignal(requestSignals || [], currentTestData || new Map())
         }
       />
     ),
@@ -240,9 +262,7 @@ export const SetDragItem = ({
         height={height}
         historyData={historyData}
         currentTestChartData={
-          currentTestData?.historyData.find(
-            (templateItem) => templateItem.templateItemId === item.id
-          )?.data ?? []
+          getUsefulSignal(requestSignals || [], currentTestData || new Map())
         }
       />
     ),
@@ -259,9 +279,7 @@ export const SetDragItem = ({
         height={height}
         historyData={historyData}
         currentTestChartData={
-          currentTestData?.historyData.find(
-            (templateItem) => templateItem.templateItemId === item.id
-          )?.data ?? []
+          getUsefulSignal(requestSignals || [], currentTestData || new Map())
         }
       />
     ),

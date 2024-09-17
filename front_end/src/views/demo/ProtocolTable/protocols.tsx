@@ -3,9 +3,10 @@ import React, {useEffect} from "react";
 import {createProtocol, IProtocol, ProtocolType} from "@/apis/request/protocol.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {
+    AnalogBaseConfig, AnalogSignalsParsingForm,
     CanBaseConfig,
-    CanSignalsParsingForm,
-    FlexRayBaseConfig, FlexRaySignalsParsingForm
+    CanSignalsParsingForm, DigitalBaseConfig, DigitalSignalsParsingForm,
+    FlexRayBaseConfig, FlexRaySignalsParsingForm, SerialBaseConfig, SerialSignalsParsingForm
 } from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 import {v4 as uuid} from "uuid"
 
@@ -25,6 +26,7 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
         if (initValue) {
             console.log(initValue)
             form.setFieldsValue(initValue)
+            setProtocolType(initValue.protocolType)
         }
 
         return () => {
@@ -97,9 +99,15 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
                     <Divider>基础配置</Divider>
                     {protocolType === ProtocolType.CAN && <CanBaseConfig/>}
                     {protocolType === ProtocolType.FlexRay && <FlexRayBaseConfig/>}
+                    {protocolType === ProtocolType.Serial && <SerialBaseConfig/>}
+                    {protocolType === ProtocolType.Analog && <AnalogBaseConfig/>}
+                    {protocolType === ProtocolType.Digital && <DigitalBaseConfig/>}
                     <Divider>信号解析配置</Divider>
                     {protocolType === ProtocolType.CAN && <CanSignalsParsingForm/>}
                     {protocolType === ProtocolType.FlexRay && <FlexRaySignalsParsingForm/>}
+                    {protocolType === ProtocolType.Serial && <SerialSignalsParsingForm/>}
+                    {protocolType === ProtocolType.Analog && <AnalogSignalsParsingForm/>}
+                    {protocolType === ProtocolType.Digital && <DigitalSignalsParsingForm/>}
                 </Form>
             </Modal>
         </>

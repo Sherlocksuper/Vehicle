@@ -1,5 +1,7 @@
 import * as net from "net";
 
+// sender to long
+
 const PORT = process.env.LONG_PORT ? parseInt(process.env.LONG_PORT) : 9001;
 const HOST = process.env.LONG_HOST ? process.env.LONG_HOST : "localhost";
 const LOCAL_TCP_PORT = process.env.LOCAL_TCP_PORT ? parseInt(process.env.LOCAL_TCP_PORT) : 2889;
@@ -23,7 +25,7 @@ export function createConnectionToLong() {
 
     // 接收服务器和 Board 的消息
     client.on('data', (data: Buffer) => {
-        console.log('收到消息: ' + data.toString());
+        // console.log('收到消息: ' + data.toString());
     });
 
     // 处理连接关闭
