@@ -1,12 +1,9 @@
-import {IHistory} from "@/apis/standard/history.ts";
-
 /**
  * transfer the history to a file
  */
 
-self.onmessage = (event: MessageEvent<IHistory>) => {
-    const result = event.data as IHistory;
-    result.endTime = Date.now()
+self.onmessage = (event) => {
+    const result = event.data;
     const file = new File([JSON.stringify(result)], 'result.json', {type: 'application/json'})
     self.postMessage(file)
 }

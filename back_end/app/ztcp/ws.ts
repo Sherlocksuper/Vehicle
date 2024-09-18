@@ -24,7 +24,6 @@ let publicIntervalRecords: NodeJS.Timeout[] = []
 export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
   // signalMap是一个Map，忽略key，以每组的value为键值，模拟数据源
   // 每个value是一个数组，数组的每个元素是一个信号的值
-  console.log("start mock board message")
   const valueGroups = Array.from(signalMap.values())
 
   valueGroups.forEach((values, index) => {

@@ -25,6 +25,11 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
         }
         const signal = requestSignals[0]
         const signalData = data.get(signal.id)
+
+        if (value === (signalData && signalData[signalData.length - 1] > 50)) {
+            return
+        }
+
         if (signalData) {
             setValue(signalData[signalData.length - 1] > 50)
         }

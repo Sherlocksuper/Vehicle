@@ -20,7 +20,6 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
 
 
   const pushData = useCallback((data: Map<string, number[]>) => {
-    console.log("number gauge")
     if (!requestSignals) {
       return
     }
@@ -28,8 +27,15 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
     if (!requestSignals || requestSignals.length === 0) {
       return;
     }
+
     const value = data.get(requestSignals[0].id)
+
     if (!value) {
+      return
+    }
+
+    // 如果value的最后一个和原有的最后一个一样，那么不更新
+    if (value[value.length - 1] === chartRef.current?.getOption()?.series[0].data[0].value ?? "undefined") {
       return
     }
 

@@ -56,8 +56,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       return new Date(time).getTime()
     }
 
-    xAxis.current.push(new Date(getCurrentTime()).toLocaleTimeString())
-
+    // Check if it's the first time initializing the chart data
     if (dataRef.current.length === 0) {
       requestSignals.forEach((item) => {
         dataRef.current.push({
@@ -67,30 +66,52 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
           stack: 'Total',
           symbol: 'none',
           data: []
-        })
-      })
-    } else {
-      dataRef.current.forEach((item) => {
-        const value = data.get(item.id)?.[data.get(item.id)?.length - 1] || 0
-        item.data.push(value)
-      })
+        });
+      });
     }
 
+    // Add current time to the x-axis
+    xAxis.current.push(new Date(getCurrentTime()).toLocaleTimeString());
+
+    // Iterate through each series in dataRef
+    dataRef.current.forEach((seriesItem) => {
+      const signalData = data.get(seriesItem.id); // Get data for this particular signal
+      const lastExistingValue = seriesItem.data[seriesItem.data.length - 1]; // Last value in the chart series
+
+      // Only update the data for this signal if it's changed
+      if (signalData && signalData[signalData.length - 1] !== lastExistingValue) {
+        const newValue = signalData[signalData.length - 1] || 0;
+        seriesItem.data.push(newValue);
+      } else {
+        // Keep the last value in case there's no update for this signal
+        seriesItem.data.push(lastExistingValue || 0);
+      }
+    });
+
+    // Update chart options
     const option = {
       xAxis: {
         data: xAxis.current
       },
       series: dataRef.current
+    };
+    chartRef.current?.setOption(option);
+  }, [requestSignals]);
+
+  // 只有存在展示的信息发生变化的时候才更新
+  const updateFlag = requestSignals.map((signal) => {
+    if (currentTestChartData.has(signal.id)){
+      return currentTestChartData.get(signal.id).length
     }
-    chartRef.current?.setOption(option)
-  }, [requestSignals])
+    return 0
+  }).reduce((prev, curr) => prev + curr, 0)
 
   // 同步netWorkData
   useEffect(() => {
-    if (currentTestChartData) {
+    if (currentTestChartData && !chartRef.current?.isDisposed()) {
       pushData(currentTestChartData)
     }
-  }, [currentTestChartData, pushData])
+  }, [updateFlag, pushData, requestSignals])
 
   useEffect(() => {
     chartRef.current = echarts.init(chartContainerRef.current)
@@ -139,10 +160,11 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     chartRef.current?.setOption(option)
 
     return () => {
+      console.log("discoonnectefds")
       resizeObserver.disconnect()
       chartRef.current?.dispose()
     }
-  }, [])
+  }, [requestSignals.length])
 
   return <div ref={chartContainerRef} style={{
     width: '100%', height: '100%'

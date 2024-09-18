@@ -6,7 +6,7 @@ import "react-resizable/css/styles.css";
 import React, {useEffect, useMemo} from "react";
 import LinesChart from "@/components/Charts/LinesChart/LinesChart.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
-import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
+import {IHistory} from "@/apis/standard/history.ts";
 import PureNumberChart from "@/components/Charts/PureNumberChart/PureNumberChart.tsx";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
@@ -21,7 +21,6 @@ const ConfigDropContainer: React.FC<{
   testConfig: ITestConfig;
   onLayoutChange: (layout: GridLayout.Layout[]) => void;
   updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
-  onReceiveData: (data: IHistoryItemData) => void;
   fileHistory?: IHistory;
   netHistory?: Map<string, number[]>;
 }> = ({
@@ -36,10 +35,23 @@ const ConfigDropContainer: React.FC<{
 
 
   const [openItemId, setOpenItemId] = React.useState<string>("");
+  const [open, setOpen] = React.useState<boolean>(false);
 
 
   return (
     <div className="dc_container">
+      {
+        openItemId && items && items.length > 0 && (
+          <UpdateItemModal
+            item={items.find((item) => item.id === openItemId)!}
+            open={open}
+            setOpenItemId={setOpenItemId}
+            updateDragItem={updateDragItem}
+            testConfig={testConfig}
+          />
+        )
+      }
+
       <GridLayout
         cols={30}
         rowHeight={40}
@@ -67,16 +79,12 @@ const ConfigDropContainer: React.FC<{
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
-                if (banModify) setOpenItemId(item.id);
+                if (banModify) {
+                  setOpen(true);
+                  setOpenItemId(item.id);
+                }
               }}
             >
-              <UpdateItemModal
-                item={item}
-                setOpenItemId={setOpenItemId}
-                open={item.id === openItemId}
-                updateDragItem={updateDragItem}
-                testConfig={testConfig}
-              />
               <SetDragItem
                 item={item}
                 banModify={banModify}
@@ -107,16 +115,15 @@ const UpdateItemModal: React.FC<{
   const isSingleChart = (type: DragItemType) => !(type === DragItemType.LINES)
 
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(itemConfig)
     form.setFieldsValue(itemConfig)
     form.setFieldsValue({requestSignals: itemConfig.requestSignals.map((signal) => JSON.stringify(signal))})
-  },[form, itemConfig,open])
+  }, [form, itemConfig, open])
 
   const handleUpdate = () => {
     const newConfig = form.getFieldsValue()
     newConfig.requestSignals = newConfig.requestSignals.map((signal: string) => {
-      console.log(signal)
       return JSON.parse(signal)
     })
     itemConfig.requestSignals = newConfig.requestSignals
@@ -144,7 +151,7 @@ const UpdateItemModal: React.FC<{
         </Form.Item>
         <Form.Item label="请求信号" name="requestSignals">
           <Select mode={"multiple"}
-                  maxCount={isSingleChart(item.type) ? 2 : undefined}
+                  maxCount={isSingleChart(item.type) ? 1 : undefined}
           >
 
             {requestSignals.map((signal) => (
@@ -192,7 +199,7 @@ interface ISetDragItem {
   currentTestData?: Map<string, number[]>;
 }
 
-export const SetDragItem = ({item, banModify, fileHistory, currentTestData,}: ISetDragItem) => {
+export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) => {
   const {
     type,
     itemConfig: {
@@ -209,11 +216,9 @@ export const SetDragItem = ({item, banModify, fileHistory, currentTestData,}: IS
     },
   } = item as IDragItem;
 
-  const historyData: IHistoryItemData[] | undefined =
-    fileHistory?.historyData.find(
-      (templateItem) => templateItem.templateItemId === item.id
-    )?.data || undefined;
-
+  const memoizedTestData = useMemo(() => {
+    return getUsefulSignal(requestSignals || [], currentTestData || new Map());
+  }, [requestSignals, currentTestData]);
 
   return {
     [DragItemType.LINES]: (
@@ -225,9 +230,9 @@ export const SetDragItem = ({item, banModify, fileHistory, currentTestData,}: IS
         title={title}
         width={width}
         height={height}
-        historyData={historyData}
+        historyData={[]}
         currentTestChartData={
-          getUsefulSignal(requestSignals || [], currentTestData || new Map())
+        memoizedTestData
         }
       />
     ),
@@ -243,9 +248,9 @@ export const SetDragItem = ({item, banModify, fileHistory, currentTestData,}: IS
         max={max || 100}
         width={width}
         height={height}
-        historyData={historyData}
+        historyData={[]}
         currentTestChartData={
-          getUsefulSignal(requestSignals || [], currentTestData || new Map())
+          memoizedTestData
         }
       />
     ),
@@ -260,9 +265,9 @@ export const SetDragItem = ({item, banModify, fileHistory, currentTestData,}: IS
         falseLabel={falseLabel || "否"}
         width={width}
         height={height}
-        historyData={historyData}
+        historyData={[]}
         currentTestChartData={
-          getUsefulSignal(requestSignals || [], currentTestData || new Map())
+          memoizedTestData
         }
       />
     ),
@@ -277,9 +282,9 @@ export const SetDragItem = ({item, banModify, fileHistory, currentTestData,}: IS
         falseLabel={falseLabel || "否"}
         width={width}
         height={height}
-        historyData={historyData}
+        historyData={[]}
         currentTestChartData={
-          getUsefulSignal(requestSignals || [], currentTestData || new Map())
+          memoizedTestData
         }
       />
     ),

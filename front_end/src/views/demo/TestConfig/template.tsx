@@ -5,16 +5,17 @@ import DraggableComponent, {
   IDraggleComponent,
   INumberChartExtra
 } from "@/views/demo/DataDisplay/DraggableComponent";
-import {Button, message} from "antd";
+import {Button, message, Space} from "antd";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import GridLayout from "react-grid-layout";
 import {DEFAULT_TITLE, SUCCESS_CODE} from "@/constants";
-import {IHistory, IHistoryItemData} from "@/apis/standard/history.ts";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 import {getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
+import {getHistoryToFileWorker} from "@/worker/app.ts";
+import {IHistory} from "@/apis/standard/history.ts";
 
 export interface IDragItem {
   id: string
@@ -38,7 +39,10 @@ export interface IDragItem {
   }
 }
 
-const TestTemplateForConfig: React.FC = () => {
+const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
+                                                                               dataMode
+                                                                             }) => {
+  console.log(dataMode)
   const [testConfig, setTestConfig] = useState<ITestConfig | null>(null)
   const [mode, setMode] = useState<'CHANGING' | 'COLLECTING'>('CHANGING')
 
@@ -47,22 +51,16 @@ const TestTemplateForConfig: React.FC = () => {
 
   const socketRef = useRef<WebSocket>(null)
 
-  const [history, setHistory] = useState<IHistory>({
-    historyName: '默认名称',
-    configName: '默认名称',
+  const history = useRef<IHistory>({
+    historyName: "默认名称",
+    configName: '默认配置',
     startTime: Date.now(),
     endTime: Date.now(),
-    template: {
-      name: '默认模板',
-      description: '默认描述',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      itemsConfig: []
-    },
+    template: null,
     historyData: []
   })
 
-  const [historyRecordMap, setHistoryRecordMap] = useState<Map<string, number[]>>(new Map())
+  const [netDataRecorder, setNetDataRecorder] = useState<Map<string, number[]>>(new Map())
 
 
   useEffect(() => {
@@ -75,6 +73,9 @@ const TestTemplateForConfig: React.FC = () => {
       getTestConfigById(Number(testConfigId)).then((res) => {
         if (res.code === SUCCESS_CODE) {
           testConfig = res.data as ITestConfig
+          console.log(testConfigId)
+          history.current.template = testConfig.template
+
           setTestConfig(testConfig)
           setDragItems(transferITemplateToDragItems(testConfig.template))
         }
@@ -92,18 +93,25 @@ const TestTemplateForConfig: React.FC = () => {
     }
 
     socket.onmessage = (event) => {
+      const currentData = {
+        time: new Date().getTime(),
+        data: JSON.parse(event.data)
+      }
+
+      history.current.historyData.push(currentData)
+
       const keys = Object.keys(JSON.parse(event.data))
       keys.forEach((key) => {
 
-        if (historyRecordMap.has(key)) {
-          historyRecordMap.set(key, [...historyRecordMap.get(key), JSON.parse(event.data)[key]])
+        if (netDataRecorder.has(key)) {
+          netDataRecorder.set(key, [...netDataRecorder.get(key), JSON.parse(event.data)[key]])
         } else {
-          historyRecordMap.set(key, [JSON.parse(event.data)[key]])
+          netDataRecorder.set(key, [JSON.parse(event.data)[key]])
         }
 
       })
       // 更新触发状态更新
-      setHistoryRecordMap(new Map(historyRecordMap))
+      setNetDataRecorder(new Map(netDataRecorder))
     };
 
     // 清理 WebSocket 连接
@@ -204,8 +212,6 @@ const TestTemplateForConfig: React.FC = () => {
   }
 
   const updateDragItem = (id: string, itemConfig: IDragItem['itemConfig']) => {
-    console.log(id)
-    console.log(itemConfig)
     const result = dragItems.map((item) => {
       if (item.id === id) {
         return {
@@ -218,23 +224,12 @@ const TestTemplateForConfig: React.FC = () => {
       }
       return item
     })
-    console.log(result)
-    setDragItems(dragItems.map((item) => {
-      if (item.id === id) {
-        return {
-          ...item,
-          itemConfig: {
-            ...item.itemConfig,
-            ...itemConfig
-          }
-        }
-      }
-      return item
-    }))
+    setDragItems(result)
+    history.current.template = transferDragItemsToITemplate(result)
   }
 
   const updateAllByLayout = (layout: GridLayout.Layout[]) => {
-    setDragItems(dragItems.map((item) => {
+    const result = dragItems.map((item) => {
       const newItem = layout.find((newItem) => newItem.i === item.id)
       if (newItem) {
         return {
@@ -249,7 +244,9 @@ const TestTemplateForConfig: React.FC = () => {
         }
       }
       return item
-    }))
+    })
+    setDragItems(result)
+    history.current.template = transferDragItemsToITemplate(result)
   }
 
   const renderManageButton = () => {
@@ -265,9 +262,33 @@ const TestTemplateForConfig: React.FC = () => {
     }
 
     if (mode === "COLLECTING") {
-      return <Button onClick={() => {
-        setMode('CHANGING')
-      }}>切换到配置模式</Button>
+      return <Space
+        direction="vertical"
+        size="middle"
+      >
+        <Button onClick={() => {
+          confirmChangeConfig()
+        }}>确定更改配置</Button>
+
+        <Button
+          onClick={() => {
+            setMode('CHANGING')
+          }}>切换到配置模式</Button>
+
+        <Button onClick={() => {
+          const worker = getHistoryToFileWorker()
+          worker.onmessage = (event) => {
+            const file = event.data
+            const a = document.createElement('a')
+            a.href = URL.createObjectURL(file)
+            a.download = 'history.json'
+            a.click()
+          }
+
+          history.current.endTime = Date.now()
+          worker.postMessage(history.current)
+        }}>下载收集数据</Button>
+      </Space>
     }
 
     return <div style={{
@@ -291,14 +312,6 @@ const TestTemplateForConfig: React.FC = () => {
         {renderADDModeInfo()}
       </div>
     </div>
-  }
-
-  const onReceiveData = (data: IHistoryItemData) => {
-    const newHistory = {...history} as IHistory
-    for (let i = 0; i < history.historyData.length; i++) {
-      newHistory.historyData[i].data.push(data)
-    }
-    setHistory(newHistory)
   }
 
   const transferDragItemsToITemplate = (dragItems: IDragItem[]): ITemplate => {
@@ -368,9 +381,8 @@ const TestTemplateForConfig: React.FC = () => {
 
             onLayoutChange={updateAllByLayout}
             updateDragItem={updateDragItem}
-            onReceiveData={onReceiveData}
             fileHistory={undefined}
-            netHistory={historyRecordMap}
+            netHistory={netDataRecorder}
           />
         </div>
         {renderManageButton()}
