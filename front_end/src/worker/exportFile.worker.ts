@@ -20,12 +20,12 @@ self.onmessage = async (e: MessageEvent<IFileExportProps>) => {
     history.startTime = startTime
     history.endTime = endTime
 
-    history.historyData.map((item) => {
-        item.data = item.data.filter((data) => {
-            const date = new Date(data.xAxis)
-            return date.getTime() >= startTime && date.getTime() <= endTime
-        })
-    })
+    history.historyData = history.historyData.map((item) => {
+        const itemTime = item["time"]
+        if (itemTime > startTime && itemTime < endTime) {
+            return item
+        }
+    }).filter((item) => item !== undefined)
 
     const resultFile = new File([JSON.stringify(history)], fileName, {type: 'application/json'})
     self.postMessage(resultFile)

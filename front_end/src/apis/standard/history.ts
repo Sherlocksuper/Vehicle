@@ -16,7 +16,10 @@ export interface IHistory {
     endTime: number
     template: ITemplate
     historyData: {
-        [key: string]: number
+        time: number
+        data: {
+            [key: number]: number
+        }
     }[]
 }
 

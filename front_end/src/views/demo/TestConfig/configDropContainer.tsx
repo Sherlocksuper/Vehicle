@@ -3,7 +3,7 @@ import NumberGaugeChart from "@/components/Charts/NumberGaugeChart";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import React, {useEffect, useMemo} from "react";
+import React, {useEffect, useMemo, useRef} from "react";
 import LinesChart from "@/components/Charts/LinesChart/LinesChart.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
 import {IHistory} from "@/apis/standard/history.ts";
@@ -36,6 +36,8 @@ const ConfigDropContainer: React.FC<{
 
   const [openItemId, setOpenItemId] = React.useState<string>("");
   const [open, setOpen] = React.useState<boolean>(false);
+
+  const pathRef = useRef(window.location.pathname);
 
 
   return (
@@ -79,6 +81,9 @@ const ConfigDropContainer: React.FC<{
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
+                if (pathRef.current  === "/offline-show"){
+                  return
+                }
                 if (banModify) {
                   setOpen(true);
                   setOpenItemId(item.id);

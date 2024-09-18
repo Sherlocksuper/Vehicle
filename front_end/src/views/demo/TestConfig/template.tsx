@@ -14,7 +14,7 @@ import {getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
-import {getHistoryToFileWorker} from "@/worker/app.ts";
+import {getFileToHistoryWorker, getHistoryToFileWorker} from "@/worker/app.ts";
 import {IHistory} from "@/apis/standard/history.ts";
 
 export interface IDragItem {
@@ -39,18 +39,16 @@ export interface IDragItem {
   }
 }
 
+// dataMode 不用放到useEffect，因为它不会变
 const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
                                                                                dataMode
                                                                              }) => {
-  console.log(dataMode)
   const [testConfig, setTestConfig] = useState<ITestConfig | null>(null)
   const [mode, setMode] = useState<'CHANGING' | 'COLLECTING'>('CHANGING')
 
   const ref = useRef<HTMLDivElement>(null)
   const [dragItems, setDragItems] = useState<IDragItem[]>([])
-
   const socketRef = useRef<WebSocket>(null)
-
   const history = useRef<IHistory>({
     historyName: "默认名称",
     configName: '默认配置',
@@ -59,11 +57,69 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     template: null,
     historyData: []
   })
-
   const [netDataRecorder, setNetDataRecorder] = useState<Map<string, number[]>>(new Map())
+  const historyManagers = useRef(undefined)
 
+  const updateDataRecorder = (data, time = undefined) => {
+    const currentData = {
+      time: time ?? new Date().getTime(),
+      data: JSON.parse(data)
+    }
+
+    history.current.historyData.push(currentData)
+
+    const keys = Object.keys(JSON.parse(data))
+    keys.forEach((key) => {
+
+      if (netDataRecorder.has(key)) {
+        netDataRecorder.set(key, [...netDataRecorder.get(key), JSON.parse(data)[key]])
+      } else {
+        netDataRecorder.set(key, [JSON.parse(data)[key]])
+      }
+
+    })
+    // 更新触发状态更新
+    setNetDataRecorder(new Map(netDataRecorder))
+  }
+  const startOfflineData = (dataToShow: { time: number, data: { [key: string]: number } }[]) => {
+    let index = 0;
+    let isPaused = true;  // 控制是否暂停
+    const scheduleNext = () => {
+      if (isPaused || index >= dataToShow.length - 1) return;
+      const currentTime = dataToShow[index].time;
+      const nextTime = dataToShow[index + 1]?.time;
+
+      if (nextTime === undefined) return;
+
+      setTimeout(() => {
+        if (!isPaused) {
+          updateDataRecorder(JSON.stringify(dataToShow[index].data), currentTime);
+          index++;
+          scheduleNext();  // 递归调用，继续调度下一个
+        }
+      }, nextTime - currentTime);
+    };
+
+    // 暴露的控制接口
+    return {
+      start: () => {
+        if (isPaused) {
+          isPaused = false;
+          scheduleNext();  // 继续执行
+        }
+      },
+      pause: () => {
+        isPaused = true;  // 暂停执行
+      },
+    };
+  };
 
   useEffect(() => {
+    if (dataMode === "OFFLINE") {
+      return () => {
+      }
+    }
+
     const search = window.location.search
     const params = new URLSearchParams(search)
     const testConfigId = params.get('testConfigId')
@@ -83,7 +139,12 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     }
   }, [])
 
+  // 处理在线数据源头
   useEffect(() => {
+    if (dataMode === "OFFLINE") {
+      return () => {
+      }
+    }
     const socket = new WebSocket('http://localhost:8080/ws');
     socket.onopen = () => {
       socketRef.current = socket
@@ -93,25 +154,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     }
 
     socket.onmessage = (event) => {
-      const currentData = {
-        time: new Date().getTime(),
-        data: JSON.parse(event.data)
-      }
-
-      history.current.historyData.push(currentData)
-
-      const keys = Object.keys(JSON.parse(event.data))
-      keys.forEach((key) => {
-
-        if (netDataRecorder.has(key)) {
-          netDataRecorder.set(key, [...netDataRecorder.get(key), JSON.parse(event.data)[key]])
-        } else {
-          netDataRecorder.set(key, [JSON.parse(event.data)[key]])
-        }
-
-      })
-      // 更新触发状态更新
-      setNetDataRecorder(new Map(netDataRecorder))
+      updateDataRecorder(event.data)
     };
 
     // 清理 WebSocket 连接
@@ -119,6 +162,33 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       socket.close();
     };
   }, []);
+
+  // 处理离线数据源头
+  useEffect(() => {
+    if (dataMode === "ONLINE") {
+      return;
+    }
+
+    // 收到一个文件
+    window.onmessage = (event) => {
+      if (history.current.historyData.length !== 0) {
+        return
+      }
+      if (!(event.data instanceof File)) {
+        return
+      }
+      // 把文件放给worker处理
+      const worker = getFileToHistoryWorker()
+      worker.onmessage = (event) => {
+        const historyData = event.data as IHistory
+        setDragItems(transferITemplateToDragItems(historyData.template))
+        history.current.historyData = historyData.historyData
+        historyManagers.current = startOfflineData(historyData.historyData)
+      }
+      worker.postMessage(event.data)
+    }
+
+  }, [])
 
   const [, drop] = useDrop<{ id: string } & IDraggleComponent>({
     accept: 'box',
@@ -250,6 +320,30 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   }
 
   const renderManageButton = () => {
+    if (dataMode === "OFFLINE") {
+      return <Space>
+        <Button onClick={() => {
+          if (dragItems.length === 0) {
+            message.error('请等待数据加载完成,或重新载入数据')
+            return
+          }
+          if (historyManagers.current) {
+            console.log(historyManagers.current)
+            historyManagers.current.start()
+          }
+        }}>开始离线数据</Button>
+        <Button onClick={() => {
+          if (historyManagers.current) {
+            historyManagers.current.pause()
+          }
+        }}>暂停</Button>
+        <Button onClick={() => {
+          if (historyManagers.current) {
+            historyManagers.current.reset()
+          }
+        }}>重置</Button>
+      </Space>
+    }
 
     const confirmChangeConfig = () => {
       const config = Object.assign({}, testConfig)
@@ -375,7 +469,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       <div className="dd_body">
         <div className="dd_drop_container" ref={ref}>
           <ConfigDropContainer
-            banModify={mode === "COLLECTING"}
+            banModify={mode === "COLLECTING" || dataMode === "OFFLINE"}
             items={dragItems}
             testConfig={testConfig}
 

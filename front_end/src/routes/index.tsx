@@ -80,13 +80,13 @@ export const my_router = createBrowserRouter([
       //测试模板配置
       path: '/test-template-for-config',
       element: <DndProvider backend={HTML5Backend}>
-        <TestTemplateForConfig/>,
+        <TestTemplateForConfig dataMode={"ONLINE"}/>,
       </DndProvider>
     },
     {
       path: '/offline-show',
       element: <DndProvider backend={HTML5Backend}>
-        <TestTemplateForConfig/>,
+        <TestTemplateForConfig dataMode={"OFFLINE"}/>,
       </DndProvider>
     },
     {
