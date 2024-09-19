@@ -4,48 +4,84 @@ import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx"
 
 
 export enum ProtocolType {
-    FlexRay = 'FlexRay',
-    CAN = 'CAN',
-    Serial = "Serial",
-    Analog = "Analog",
-    Digital = "Digital"
+  FlexRay = 'FlexRay',
+  CAN = 'CAN',
+  MIC = 'MIC',
+  B1552B = 'B1552B',
+  Serial422 = "Serial422",
+  Serial232 = "Serial232",
+  Analog = "Analog",
+  Digital = "Digital"
 }
 
 export interface ICanBaseConfig {
-    baudRate: number
+  baudRate: number
 }
 
 export interface IFlexRayBaseConfig {
-    microticksPerCycle: number
-    macroticksPerCycle: number
-    transmissionStartTime: number
-    staticFramepayload: number
-    staticSlotsCount: number
-    dynamicSlotCount: number
-    dynamicSlotLength: number
-    setAsSyncNode: number
+  microticksPerCycle: number
+  macroticksPerCycle: number
+  transmissionStartTime: number
+  staticFramepayload: number
+  staticSlotsCount: number
+  dynamicSlotCount: number
+  dynamicSlotLength: number
+  setAsSyncNode: number
+}
+
+export interface ISerialBaseConfig {
+  // 波特率、停止位、是否校验、校验类型
+  baudRate: number
+  stopBits: number
+  check: number
+  checkType: number
+}
+
+// 模拟量和数字量
+export interface IAIOBaseConfig {
+  dataUpdateRate: number
+  voltageRange: number
+}
+
+export interface IMICBaseConfig {
+  nctc: number
+  btc: number
+  nrtc: number
+  modadd: number
+  dataUpdateRate: number
+}
+
+export interface IB1552BBaseConfig{
+  listenAddress: number
 }
 
 
+/// -------- 信号解析配置 --------
+
+
 export interface IProtocol {
-    id?: number
-    protocolName: string
-    protocolType: ProtocolType
-    baseConfig: ICanBaseConfig | IFlexRayBaseConfig
-    signalsParsingConfig: {
-        frameNumber: string,
-        frameId: string,
-        cycleNumber?:number
-        signals: IProtocolSignal[]
-    }[]
+  id?: number
+  protocolName: string
+  protocolType: ProtocolType
+  baseConfig: ICanBaseConfig | IFlexRayBaseConfig  | IAIOBaseConfig | IMICBaseConfig | IB1552BBaseConfig | ISerialBaseConfig
+  signalsParsingConfig: {
+    frameNumber: string,
+    frameId: string,
+    cycleNumber?: number
+    modadd?: number
+    devId?: number
+    rtAddress?: number
+    childAddress?: number
+    signals: IProtocolSignal[]
+  }[]
 }
 
 
 export const getProtocols = async () => {
-    const api = PROTOCOL_API.getProtocolList;
-    return request({
-        api: api
-    });
+  const api = PROTOCOL_API.getProtocolList;
+  return request({
+    api: api
+  });
 }
 
 /**
@@ -53,11 +89,11 @@ export const getProtocols = async () => {
  * @param iProtocol
  */
 export const createProtocol = async (iProtocol: IProtocol) => {
-    const api = PROTOCOL_API.createProtocol;
-    return request({
-        api: api,
-        params: iProtocol
-    });
+  const api = PROTOCOL_API.createProtocol;
+  return request({
+    api: api,
+    params: iProtocol
+  });
 
 }
 
@@ -67,12 +103,12 @@ export const createProtocol = async (iProtocol: IProtocol) => {
  * @param iProtocol
  */
 export const updateProtocol = async (id: number, iProtocol: IProtocol) => {
-    const api = {...PROTOCOL_API.updateProtocol};
-    api.url = api.url.replace(':id', id.toString());
-    return request({
-        api: api,
-        params: iProtocol
-    });
+  const api = {...PROTOCOL_API.updateProtocol};
+  api.url = api.url.replace(':id', id.toString());
+  return request({
+    api: api,
+    params: iProtocol
+  });
 }
 
 /**
@@ -80,12 +116,12 @@ export const updateProtocol = async (id: number, iProtocol: IProtocol) => {
  * @param id
  */
 export const getProtocolById = async (id: number) => {
-    const api = {...PROTOCOL_API.getProtocolById};
-    api.url = api.url.replace(':id', id.toString());
-    return request({
-        api: api,
-        params: {id: id}
-    });
+  const api = {...PROTOCOL_API.getProtocolById};
+  api.url = api.url.replace(':id', id.toString());
+  return request({
+    api: api,
+    params: {id: id}
+  });
 }
 
 /**
@@ -93,10 +129,10 @@ export const getProtocolById = async (id: number) => {
  * @param id
  */
 export const deleteProtocolApi = async (id: number) => {
-    const api = {...PROTOCOL_API.deleteProtocol};
-    api.url = api.url.replace(':id', id.toString());
-    return request({
-        api: api,
-        params: {id: id}
-    });
+  const api = {...PROTOCOL_API.deleteProtocol};
+  api.url = api.url.replace(':id', id.toString());
+  return request({
+    api: api,
+    params: {id: id}
+  });
 }

@@ -1,21 +1,5 @@
 import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from "sequelize-typescript";
 import {Col} from "sequelize/types/utils";
-
-// Flexray01,CAN02,MIC03,1552B04,串口：422为05，232为06，模拟量07，数字量08
-
-export enum ProtocolType {
-    FlexRay = 'FlexRay',
-    CAN = 'CAN',
-    MIC = 'MIC',
-    B1552B = '1552B',
-    Serial = "Serial",
-    A422 = '422',
-    A232 = '232',
-    Analog = "Analog",
-    Digital = "Digital"
-}
-
-
 export interface IProtocolSignal {
     id: string
     name: string
@@ -24,6 +8,17 @@ export interface IProtocolSignal {
     length: string
     slope: string
     offset: string
+}
+
+export enum ProtocolType {
+    FlexRay = 'FlexRay',
+    CAN = 'CAN',
+    MIC = 'MIC',
+    B1552B = 'B1552B',
+    Serial422 = "Serial422",
+    Serial232 = "Serial232",
+    Analog = "Analog",
+    Digital = "Digital"
 }
 
 export interface ICanBaseConfig {
@@ -41,33 +36,49 @@ export interface IFlexRayBaseConfig {
     setAsSyncNode: number
 }
 
-//模拟量
-export interface IAnalogBaseConfig {
+export interface ISerialBaseConfig {
+    // 波特率、停止位、是否校验、校验类型
+    baudRate: number
+    stopBits: number
+    check: number
+    checkType: number
+}
+
+// 模拟量和数字量
+export interface IAIOBaseConfig {
     dataUpdateRate: number
     voltageRange: number
 }
 
-//数字量
-export interface IDigitalBaseConfig {
+export interface IMICBaseConfig {
+    nctc: number
+    btc: number
+    nrtc: number
+    modadd: number
     dataUpdateRate: number
-    voltageRange: number
+}
+
+export interface IB1552BBaseConfig{
+    listenAddress: number
 }
 
 
-/**
- * Protocol 协议
- * 只存储协议类型、协议名称
- * 其中协议结果是在前端拼接好的
- */
+/// -------- 信号解析配置 --------
+
+
 export interface IProtocolModel {
     id?: number
     protocolName: string
     protocolType: ProtocolType
-    baseConfig: ICanBaseConfig | IFlexRayBaseConfig
+    baseConfig: ICanBaseConfig | IFlexRayBaseConfig  | IAIOBaseConfig | IMICBaseConfig | IB1552BBaseConfig | ISerialBaseConfig
     signalsParsingConfig: {
         frameNumber: string,
         frameId: string,
-        cycleNumber?:number
+        cycleNumber?: number
+        modadd?: number
+        devId?: number
+        rtAddress?: number
+        childAddress?: number
         signals: IProtocolSignal[]
     }[]
 }
@@ -95,7 +106,11 @@ export default class Protocol extends Model<IProtocolModel> {
     signalsParsingConfig!: {
         frameNumber: string,
         frameId: string,
-        cycleNumber?:number
+        cycleNumber?: number
+        modadd?: number
+        devId?: number
+        rtAddress?: number
+        childAddress?: number
         signals: IProtocolSignal[]
     }[]
 }

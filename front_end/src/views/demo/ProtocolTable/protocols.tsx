@@ -1,12 +1,12 @@
-import {Button, Divider, Form, Input, message, Modal, Row, Select, Space} from "antd";
+import {Divider, Form, Input, message, Modal, Select} from "antd";
 import React, {useEffect} from "react";
 import {createProtocol, IProtocol, ProtocolType} from "@/apis/request/protocol.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {
-    AnalogBaseConfig, AnalogSignalsParsingForm,
+    AnalogBaseConfig, AnalogSignalsParsingForm, B1552BaseConfig, B1552BSignalParsingForm,
     CanBaseConfig,
     CanSignalsParsingForm, DigitalBaseConfig, DigitalSignalsParsingForm,
-    FlexRayBaseConfig, FlexRaySignalsParsingForm, SerialBaseConfig, SerialSignalsParsingForm
+    FlexRayBaseConfig, FlexRaySignalsParsingForm, MICBaseConfig, MICSignalsParsingForm, Serial232BaseConfig, Serial232SignalsParsingForm, Serial422BaseConfig, Serial422SignalsParsingForm
 } from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 import {v4 as uuid} from "uuid"
 
@@ -22,9 +22,15 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
 
     useEffect(() => {
         form.setFieldValue("protocolType", ProtocolType.CAN)
+        // 给form添加一个信号解析配置
+        form.setFieldsValue({
+            signalsParsingConfig: [{
+                signals: []
+            }]
+        })
+
         // 初始化为initValue
         if (initValue) {
-            console.log(initValue)
             form.setFieldsValue(initValue)
             setProtocolType(initValue.protocolType)
         }
@@ -33,6 +39,17 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
             form.resetFields()
         }
     }, [form, initValue])
+
+    // 每次更改协议类型，都要重新设置信号解析配置
+    useEffect(() => {
+        console.log(protocolType)
+        console.log(ProtocolType[protocolType])
+        form.setFieldsValue({
+            signalsParsingConfig: [{
+                signals: []
+            }]
+        })
+    }, [form, protocolType])
 
     const handleOk = () => {
         // 检查是否合法
@@ -62,7 +79,6 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
                       disabled={initValue !== undefined}
                       onFinish={() => {
                           const value = form.getFieldsValue() as IProtocol
-                          // console.log(values)
                           value.signalsParsingConfig.forEach((item) => {
                               item.signals.forEach((signal) => {
                                   signal.id = uuid()
@@ -99,13 +115,19 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
                     <Divider>基础配置</Divider>
                     {protocolType === ProtocolType.CAN && <CanBaseConfig/>}
                     {protocolType === ProtocolType.FlexRay && <FlexRayBaseConfig/>}
-                    {protocolType === ProtocolType.Serial && <SerialBaseConfig/>}
+                    {protocolType === ProtocolType.MIC && <MICBaseConfig/>}
+                    {protocolType === ProtocolType.B1552B && <B1552BaseConfig/>}
+                    {protocolType === ProtocolType.Serial422 && <Serial422BaseConfig/>}
+                    {protocolType === ProtocolType.Serial232 && <Serial232BaseConfig/>}
                     {protocolType === ProtocolType.Analog && <AnalogBaseConfig/>}
                     {protocolType === ProtocolType.Digital && <DigitalBaseConfig/>}
                     <Divider>信号解析配置</Divider>
                     {protocolType === ProtocolType.CAN && <CanSignalsParsingForm/>}
                     {protocolType === ProtocolType.FlexRay && <FlexRaySignalsParsingForm/>}
-                    {protocolType === ProtocolType.Serial && <SerialSignalsParsingForm/>}
+                    {protocolType === ProtocolType.MIC && <MICSignalsParsingForm/>}
+                    {protocolType === ProtocolType.B1552B && <B1552BSignalParsingForm/>}
+                    {protocolType === ProtocolType.Serial422 && <Serial422SignalsParsingForm/>}
+                    {protocolType === ProtocolType.Serial232 && <Serial232SignalsParsingForm/>}
                     {protocolType === ProtocolType.Analog && <AnalogSignalsParsingForm/>}
                     {protocolType === ProtocolType.Digital && <DigitalSignalsParsingForm/>}
                 </Form>

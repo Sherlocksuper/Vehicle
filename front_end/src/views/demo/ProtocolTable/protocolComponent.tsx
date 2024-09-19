@@ -1,5 +1,5 @@
 import {Button, Col, Form, Input, Row, Space} from "antd";
-import React from "react";
+import React, {useEffect} from "react";
 import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 
 export interface IProtocolSignal {
@@ -96,21 +96,75 @@ export const FlexRayBaseConfig = () => {
   )
 }
 
-// 串口基础配置
-export const SerialBaseConfig = () => {
-  //					reserved	波特率				停止位	是否校验	校验类型
-  // 0xff	0x00	0x02	422->0x05,232->0x06	0xC1		32位波特率				0-7	0不校验1校验	0偶校验1奇校验
-
+// MIC配置
+export const MICBaseConfig = () => {
+  // NCTC、BTC、NRTC、MODADD
   return (
     <Row gutter={[8, 0]}>
       <Col className="gutter-row" span={6}>
         <Form.Item
-          name={["baseConfig", "reserved"]}
-          rules={[{required: true, message: "请输入保留位"}]}
+          name={["baseConfig", "nctc"]}
+          rules={[{required: true, message: "请输入NCTC"}]}
         >
-          <Input type="number" placeholder="保留位"/>
+          <Input placeholder="NCTC"/>
         </Form.Item>
       </Col>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
+          name={["baseConfig", "btc"]}
+          rules={[{required: true, message: "请输入BTC"}]}
+        >
+          <Input placeholder="BTC"/>
+        </Form.Item>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
+          name={["baseConfig", "nrtc"]}
+          rules={[{required: true, message: "请输入NRTC"}]}
+        >
+          <Input placeholder="NRTC"/>
+        </Form.Item>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
+          name={["baseConfig", "modadd"]}
+          rules={[{required: true, message: "请输入MODADD"}]}
+        >
+          <Input placeholder="MODADD"/>
+        </Form.Item>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
+          name={["baseConfig", "dataUpdateRate"]}
+          rules={[{required: true, message: "请输入数据更新速率"}]}
+        >
+          <Input placeholder="数据更新速率"/>
+        </Form.Item>
+      </Col>
+    </Row>
+  )
+}
+
+// 1552b
+export const B1552BaseConfig = () => {
+  // 选择监听的地址
+  return (
+    <Row gutter={[8, 0]}>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
+          name={["baseConfig", "listenAddress"]}
+          rules={[{required: true, message: "请输入监听地址"}]}
+        >
+          <Input placeholder="监听地址"/>
+        </Form.Item>
+      </Col>
+    </Row>
+  )
+}
+
+export const Serial422BaseConfig = () => {
+  return (
+    <Row gutter={[8, 0]}>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "baudRate"]}
@@ -147,17 +201,12 @@ export const SerialBaseConfig = () => {
   )
 }
 
+export const Serial232BaseConfig = Serial422BaseConfig
+
+// 模拟量
 export const AnalogBaseConfig = () => {
   return (
     <Row gutter={[8, 0]}>
-      <Col className="gutter-row" span={6}>
-        <Form.Item
-          name={["baseConfig", "reserved"]}
-          rules={[{required: true, message: "请输入保留位"}]}
-        >
-          <Input type="number" placeholder="保留位"/>
-        </Form.Item>
-      </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "dataUpdateRate"]}
@@ -180,8 +229,29 @@ export const AnalogBaseConfig = () => {
 
 // 数字量
 export const DigitalBaseConfig = () => {
-  return null
+  return (
+    <Row gutter={[8, 0]}>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
+          name={["baseConfig", "dataUpdateRate"]}
+          rules={[{required: true, message: "请输入数据更新速率"}]}
+        >
+          <Input type="number" placeholder="数据更新速率"/>
+        </Form.Item>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
+          name={["baseConfig", "voltageRange"]}
+          rules={[{required: true, message: "请输入电压范围"}]}
+        >
+          <Input type="number" placeholder="电压范围"/>
+        </Form.Item>
+      </Col>
+    </Row>
+  )
 }
+
+///------------------信号解析配置-------------------
 
 export const CanSignalsParsingForm = () => (
   <Form.List name="signalsParsingConfig">
@@ -264,12 +334,128 @@ export const FlexRaySignalsParsingForm = () => (
 );
 
 
-export const SerialSignalsParsingForm = CanSignalsParsingForm
+// MIC信号解析配置
+export const MICSignalsParsingForm = () => {
+  return (
+    <Form.List name="signalsParsingConfig">
+      {(fields) => {
+        return (
+          <>
+            {fields.map(({key, name, ...restField}) => (
+              <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
+                <Space key={key} style={{display: 'flex'}} align="baseline">
+                  <Form.Item  {...restField} name={[name, 'frameNumber']}
+                              rules={[{required: true, message: '请输入帧编号'}]}>
+                    <Input type="number" placeholder="帧编号"/>
+                  </Form.Item>
+                  <Form.Item  {...restField} name={[name, 'modadd']}
+                              rules={[{required: true, message: '请输入MODADD'}]}>
+                    <Input type="number" placeholder="MODADD"/>
+                  </Form.Item>
+                  <Form.Item  {...restField} name={[name, 'devid']}
+                              rules={[{required: true, message: '请输入DEVID'}]}>
+                    <Input type="number" placeholder="DEVID"/>
+                  </Form.Item>
+                </Space>
+              </Space>
+            ))}
+          </>
+        );
+      }}
+    </Form.List>
+  )
+}
 
+export const B1552BSignalParsingForm = () => {
+  return (
+    <Form.List name="signalsParsingConfig">
+      {(fields ) => (
+        <>
+          {fields.map(({key, name, ...restField}) => (
+            <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
+              <Space key={key} style={{display: 'flex'}} align="baseline">
+                <Form.Item  {...restField} name={[name, 'frameNumber']}
+                            rules={[{required: true, message: '请输入帧编号'}]}>
+                  <Input type="number" placeholder="帧编号"/>
+                </Form.Item>
+                <Form.Item  {...restField} name={[name, 'rtAddress']}
+                            rules={[{required: true, message: '请输入RT地址'}]}>
+                  <Input type="number" placeholder="RT地址"/>
+                </Form.Item>
+                <Form.Item  {...restField} name={[name, 'childAddress']}
+                            rules={[{required: true, message: '请输入子地址'}]}>
+                  <Input type="number" placeholder="子地址"/>
+                </Form.Item>
+              </Space>
+            </Space>
+          ))}
+        </>
+      )}
+    </Form.List>
+  )
+}
+
+// 串口
+export const Serial422SignalsParsingForm = () => (
+  <Form.List name="signalsParsingConfig">
+    {(fields) => (
+      <>
+        {fields.map(({key, name}) => (
+          <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
+            <Form.List name={[name, 'signals']}>
+              {(signalFields, {add: addSignal, remove: removeSignal}) => (
+                <SignalForm fields={signalFields} add={() => {
+                  addSignal()
+                }} remove={(index) => {
+                  removeSignal(index)
+                }}/>
+              )}
+            </Form.List>
+          </Space>
+        ))}
+        {/*<Form.Item>*/}
+        {/*  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>*/}
+        {/*    添加解析配置*/}
+        {/*  </Button>*/}
+        {/*</Form.Item>*/}
+      </>
+    )}
+  </Form.List>
+);
+
+export const Serial232SignalsParsingForm = () => (
+  <Form.List name="signalsParsingConfig">
+    {(fields) => (
+      <>
+        {fields.map(({key, name}) => (
+          <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
+            <Form.List name={[name, 'signals']}>
+              {(signalFields, {add: addSignal, remove: removeSignal}) => (
+                <SignalForm fields={signalFields} add={() => {
+                  addSignal()
+                }} remove={(index) => {
+                  removeSignal(index)
+                }}/>
+              )}
+            </Form.List>
+          </Space>
+        ))}
+        {/*<Form.Item>*/}
+        {/*  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>*/}
+        {/*    添加解析配置*/}
+        {/*  </Button>*/}
+        {/*</Form.Item>*/}
+      </>
+    )}
+  </Form.List>
+);
+
+// 模拟量
 export const AnalogSignalsParsingForm = () => {
   return null
 }
 
+//数字量
 export const DigitalSignalsParsingForm = () => {
   return null
 }
