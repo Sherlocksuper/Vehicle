@@ -92,14 +92,14 @@ class TestConfigService {
   }
 
   async initTestConfig() {
-    const targetData = {
-      "id": 4,
-      "name": "车辆数据采集test",
+    const targetData =  {
+      "id": 1,
+      "name": "testConfig1",
       "configs": [
         {
           "vehicle": {
-            "id": 7,
-            "createdAt": "2024-09-16T00:40:09.000Z",
+            "id": 8,
+            "createdAt": "2024-09-19T13:53:14.000Z",
             "protocols": [
               {
                 "core": {
@@ -112,7 +112,7 @@ class TestConfigService {
                 "protocol": {
                   "id": 6,
                   "createdAt": "2024-09-16T00:36:34.000Z",
-                  "updatedAt": "2024-09-16T00:36:34.000Z",
+                  "updatedAt": "2024-09-19T10:59:16.000Z",
                   "baseConfig": {
                     "baudRate": "800"
                   },
@@ -197,7 +197,7 @@ class TestConfigService {
                 "protocol": {
                   "id": 7,
                   "createdAt": "2024-09-16T00:38:54.000Z",
-                  "updatedAt": "2024-09-16T00:38:54.000Z",
+                  "updatedAt": "2024-09-19T10:59:16.000Z",
                   "baseConfig": {
                     "setAsSyncNode": "8",
                     "dynamicSlotCount": "6",
@@ -273,24 +273,200 @@ class TestConfigService {
                   ]
                 },
                 "collector": {
-                  "id": 2,
+                  "id": 1,
                   "userId": null,
                   "isDisabled": false,
-                  "collectorName": "zx-96-1",
-                  "collectorAddress": "2"
+                  "collectorName": "zx-04A-1",
+                  "collectorAddress": "1"
+                }
+              },
+              {
+                "core": {
+                  "id": 1,
+                  "userId": null,
+                  "isDisabled": false,
+                  "controllerName": "hx-04A-1",
+                  "controllerAddress": "192.168.0.101"
+                },
+                "protocol": {
+                  "id": 11,
+                  "createdAt": "2024-09-19T13:50:40.000Z",
+                  "updatedAt": "2024-09-19T13:50:40.000Z",
+                  "baseConfig": {
+                    "btc": "2",
+                    "nctc": "1",
+                    "nrtc": "3",
+                    "modadd": "4",
+                    "dataUpdateRate": "5"
+                  },
+                  "protocolName": "MIC-1",
+                  "protocolType": "MIC",
+                  "signalsParsingConfig": [
+                    {
+                      "devid": "8",
+                      "modadd": "7",
+                      "signals": [
+                        {
+                          "id": "148cf292-9cd0-446e-b25e-666680912310",
+                          "name": "速度",
+                          "dimension": "km/h"
+                        }
+                      ],
+                      "frameNumber": "6"
+                    }
+                  ]
+                },
+                "collector": {
+                  "id": 1,
+                  "userId": null,
+                  "isDisabled": false,
+                  "collectorName": "zx-04A-1",
+                  "collectorAddress": "1"
+                }
+              },
+              {
+                "core": {
+                  "id": 1,
+                  "userId": null,
+                  "isDisabled": false,
+                  "controllerName": "hx-04A-1",
+                  "controllerAddress": "192.168.0.101"
+                },
+                "protocol": {
+                  "id": 12,
+                  "createdAt": "2024-09-19T13:51:24.000Z",
+                  "updatedAt": "2024-09-19T13:51:24.000Z",
+                  "baseConfig": {
+                    "listenAddress": "0"
+                  },
+                  "protocolName": "B1552B-1",
+                  "protocolType": "B1552B",
+                  "signalsParsingConfig": [
+                    {
+                      "signals": [
+                        {
+                          "id": "dde2d89b-3021-4e88-aafd-642026e9c63f",
+                          "name": "B1552B-1里程",
+                          "dimension": "km"
+                        }
+                      ],
+                      "rtAddress": "2",
+                      "frameNumber": "1",
+                      "childAddress": "3"
+                    }
+                  ]
+                },
+                "collector": {
+                  "id": 1,
+                  "userId": null,
+                  "isDisabled": false,
+                  "collectorName": "zx-04A-1",
+                  "collectorAddress": "1"
+                }
+              },
+              {
+                "core": {
+                  "id": 1,
+                  "userId": null,
+                  "isDisabled": false,
+                  "controllerName": "hx-04A-1",
+                  "controllerAddress": "192.168.0.101"
+                },
+                "protocol": {
+                  "id": 13,
+                  "createdAt": "2024-09-19T13:52:03.000Z",
+                  "updatedAt": "2024-09-19T13:52:03.000Z",
+                  "baseConfig": {
+                    "check": "2",
+                    "stopBit": "1",
+                    "baudRate": "800",
+                    "checkType": "3"
+                  },
+                  "protocolName": "Serial422-1",
+                  "protocolType": "Serial422",
+                  "signalsParsingConfig": [
+                    {
+                      "signals": [
+                        {
+                          "id": "15bfb988-efdb-4d52-8965-a652eef95f4d",
+                          "name": "Serial422-1电压",
+                          "slope": "02",
+                          "length": "01",
+                          "offset": "03",
+                          "dimension": "km",
+                          "startPoint": "00"
+                        }
+                      ],
+                      "rtAddress": "2",
+                      "frameNumber": "1",
+                      "childAddress": "3"
+                    }
+                  ]
+                },
+                "collector": {
+                  "id": 1,
+                  "userId": null,
+                  "isDisabled": false,
+                  "collectorName": "zx-04A-1",
+                  "collectorAddress": "1"
+                }
+              },
+              {
+                "core": {
+                  "id": 1,
+                  "userId": null,
+                  "isDisabled": false,
+                  "controllerName": "hx-04A-1",
+                  "controllerAddress": "192.168.0.101"
+                },
+                "protocol": {
+                  "id": 14,
+                  "createdAt": "2024-09-19T13:52:35.000Z",
+                  "updatedAt": "2024-09-19T13:52:35.000Z",
+                  "baseConfig": {
+                    "voltageRange": "2",
+                    "dataUpdateRate": "1"
+                  },
+                  "protocolName": "Analog-1",
+                  "protocolType": "Analog",
+                  "signalsParsingConfig": [
+                    {
+                      "signals": [
+                        {
+                          "id": "49540541-1a22-4c25-aa6c-0edad471b21e",
+                          "name": "Analog-1油量",
+                          "slope": "02",
+                          "length": "01",
+                          "offset": "03",
+                          "dimension": "L",
+                          "startPoint": "00"
+                        }
+                      ],
+                      "rtAddress": "2",
+                      "frameNumber": "1",
+                      "childAddress": "3"
+                    }
+                  ]
+                },
+                "collector": {
+                  "id": 1,
+                  "userId": null,
+                  "isDisabled": false,
+                  "collectorName": "zx-04A-1",
+                  "collectorAddress": "1"
                 }
               }
             ],
-            "updatedAt": "2024-09-16T00:40:09.000Z",
+            "updatedAt": "2024-09-19T13:53:14.000Z",
             "isDisabled": false,
-            "vehicleName": "车辆test"
+            "vehicleName": "车辆fortest"
           },
           "projects": [
             {
-              "name": "车辆1的项目1",
+              "name": "projectName",
               "indicators": [
                 {
-                  "name": "速度",
+                  "name": "indicator",
                   "signal": {
                     "id": "63c7df50-3598-4645-bc55-221c1f73ac87",
                     "name": "速度",
@@ -300,66 +476,6 @@ class TestConfigService {
                     "dimension": "km/h",
                     "startPoint": "1"
                   }
-                },
-                {
-                  "name": "历程",
-                  "signal": {
-                    "id": "db06679c-e84e-43b1-888f-1d07fd64e878",
-                    "name": "里程",
-                    "slope": "7",
-                    "length": "6",
-                    "offset": "8",
-                    "dimension": "km",
-                    "startPoint": "5"
-                  }
-                },
-                {
-                  "name": "电压",
-                  "signal": {
-                    "id": "f2ad17c7-e374-43bf-a7c7-6038baac3837",
-                    "name": "电压",
-                    "slope": "11",
-                    "length": "10",
-                    "offset": "12",
-                    "dimension": "V",
-                    "startPoint": "9"
-                  }
-                },
-                {
-                  "name": "速度-2",
-                  "signal": {
-                    "id": "eabe53ec-d764-48d2-99dc-e97e1d7da858",
-                    "name": "速度-2",
-                    "slope": "15",
-                    "length": "14",
-                    "offset": "16",
-                    "dimension": "km/h",
-                    "startPoint": "13"
-                  }
-                },
-                {
-                  "name": "Flex-速度",
-                  "signal": {
-                    "id": "1d413c9c-f14f-473b-bb97-6ac6fb450e2c",
-                    "name": "速度",
-                    "slope": "3",
-                    "length": "2",
-                    "offset": "4",
-                    "dimension": "km/h",
-                    "startPoint": "1"
-                  }
-                },
-                {
-                  "name": "Flex-电压",
-                  "signal": {
-                    "id": "82091432-d1c3-4f36-81af-7fb07c3d81ee",
-                    "name": "电压",
-                    "slope": "11",
-                    "length": "10",
-                    "offset": "12",
-                    "dimension": "V",
-                    "startPoint": "9"
-                  }
                 }
               ]
             }
@@ -367,8 +483,8 @@ class TestConfigService {
         }
       ],
       "template": null,
-      "createdAt": "2024-09-16T00:45:02.000Z",
-      "updatedAt": "2024-09-16T00:45:02.000Z"
+      "createdAt": "2024-09-19T13:53:42.000Z",
+      "updatedAt": "2024-09-19T13:53:42.000Z"
     }
     const testConfig = await TestConfig.findByPk(targetData.id);
     if (testConfig) {
@@ -401,9 +517,10 @@ class TestConfigService {
 
     const message: ILongMessageType = {
       type: LongMessage.STARTCOLLECT,
-      body: testConfig
+      body: res.resultMessages
     }
     const result = sendToLong(message)
+
     if (result !== undefined) {
       this.currentTestConfig = null
     }

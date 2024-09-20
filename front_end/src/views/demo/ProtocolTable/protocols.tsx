@@ -3,10 +3,22 @@ import React, {useEffect} from "react";
 import {createProtocol, IProtocol, ProtocolType} from "@/apis/request/protocol.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {
-    AnalogBaseConfig, AnalogSignalsParsingForm, B1552BaseConfig, B1552BSignalParsingForm,
-    CanBaseConfig,
-    CanSignalsParsingForm, DigitalBaseConfig, DigitalSignalsParsingForm,
-    FlexRayBaseConfig, FlexRaySignalsParsingForm, MICBaseConfig, MICSignalsParsingForm, Serial232BaseConfig, Serial232SignalsParsingForm, Serial422BaseConfig, Serial422SignalsParsingForm
+  AnalogBaseConfig,
+  AnalogSignalsParsingForm,
+  B1552BaseConfig,
+  B1552BSignalParsingForm,
+  CanBaseConfig,
+  CanSignalsParsingForm,
+  DigitalBaseConfig,
+  DigitalSignalsParsingForm,
+  FlexRayBaseConfig,
+  FlexRaySignalsParsingForm,
+  MICBaseConfig,
+  MICSignalsParsingForm,
+  Serial232BaseConfig,
+  Serial232SignalsParsingForm,
+  Serial422BaseConfig,
+  Serial422SignalsParsingForm
 } from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 import {v4 as uuid} from "uuid"
 
@@ -18,10 +30,9 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
     onOk?: () => void,
 }) => {
     const [form] = Form.useForm();
-    const [protocolType, setProtocolType] = React.useState<ProtocolType>(ProtocolType.CAN)
+    const [protocolType, setProtocolType] = React.useState<ProtocolType>(undefined)
 
     useEffect(() => {
-        form.setFieldValue("protocolType", ProtocolType.CAN)
         // 给form添加一个信号解析配置
         form.setFieldsValue({
             signalsParsingConfig: [{
@@ -32,7 +43,7 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
         // 初始化为initValue
         if (initValue) {
             form.setFieldsValue(initValue)
-            setProtocolType(initValue.protocolType)
+          setProtocolType(initValue.protocolType)
         }
 
         return () => {
@@ -40,27 +51,15 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
         }
     }, [form, initValue])
 
-    // 每次更改协议类型，都要重新设置信号解析配置
-    useEffect(() => {
-        console.log(protocolType)
-        console.log(ProtocolType[protocolType])
-        form.setFieldsValue({
-            signalsParsingConfig: [{
-                signals: []
-            }]
-        })
-    }, [form, protocolType])
 
     const handleOk = () => {
         // 检查是否合法
-        console.log(form.getFieldsValue())
         form.validateFields().then(() => {
             form.submit()
         })
     };
 
     const handleCancel = () => {
-        // 如果是ADD模式，重置表单
         close()
     };
 
@@ -99,7 +98,7 @@ export const ProtocolModel = ({open, close, onOk, initValue}: {
                     <Form.Item name={"protocolName"} rules={[{required: true, message: "请输入协议名称"}]}>
                         <Input placeholder="为协议命名"/>
                     </Form.Item>
-                    <Form.Item name={"protocolType"} initialValue={ProtocolType.CAN}>
+                    <Form.Item name={"protocolType"} initialValue={protocolType}>
                         <Select placeholder="请选择协议" onSelect={(value) => {
                             form.setFieldsValue({protocolType: value})
                             setProtocolType(value)

@@ -119,7 +119,7 @@ const getMICSpConfig = (protocol: IPro) => {
   // 只有一个signalParsingConfig
   let a: Buffer = Buffer.from(middleHeader)
   const spConfig = protocol.protocol.signalsParsingConfig[0]
-  a = Buffer.concat([a, Buffer.from([Number(spConfig.frameId), Number(spConfig.modadd), Number(spConfig.devId)])])
+  a = Buffer.concat([a, Buffer.from([Number(spConfig.frameNumber), Number(spConfig.modadd), Number(spConfig.devId)])])
 
   const key = getSignalMapKey(targetId, 0)
 
@@ -149,7 +149,7 @@ const getB1552BSpConfig = (protocol: IPro) => {
   // 只有一个signalParsingConfig
   let a: Buffer = Buffer.from(middleHeader)
   const spConfig = protocol.protocol.signalsParsingConfig[0]
-  a = Buffer.concat([a, Buffer.from([Number(spConfig.frameId), Number(spConfig.rtAddress), Number(spConfig.childAddress)])])
+  a = Buffer.concat([a, Buffer.from([Number(spConfig.frameNumber), Number(spConfig.rtAddress), Number(spConfig.childAddress)])])
 
   const key = getSignalMapKey(targetId, 0)
 
@@ -180,7 +180,7 @@ const getSerialSpConfig = (protocol: IPro) => {
     let a: Buffer = Buffer.from(middleHeader)
     a = Buffer.concat([a, Buffer.from([0x00 , Number(spConfig.signals.length)])])
 
-    const key = getSignalMapKey(targetId, Number(spConfig.frameId))
+    const key = getSignalMapKey(targetId)
 
     spConfig.signals.forEach(signal => {
       if (signalsMap.has(key)) {

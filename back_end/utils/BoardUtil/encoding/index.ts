@@ -2,6 +2,7 @@ import {ITestConfig} from "../../../app/model/TestConfig";
 import {getBaseConfig, IPro} from "./baseConfig";
 import {getSpConfig} from "./spConfig";
 import {ProtocolType} from "../../../app/model/PreSet/Protocol.model";
+
 export const middleHeader = [0xff, 0x00]
 
 //Flexray01,CAN02,MIC03,1552B04,422为05，232为06，模拟量07，数字量08
@@ -26,6 +27,25 @@ export const getCollectItem = (protocol: IPro) => {
   }
 }
 
+export const transferTo8 = (num: number) => {
+  const buffer = Buffer.alloc(1);
+  buffer.writeUInt8(num, 0);
+  return buffer
+}
+
+// 把一个数字转化为16位的buffer
+export const transferTo16 = (num: number) => {
+  const buffer = Buffer.alloc(2);
+  buffer.writeUInt16BE(num, 0);
+  return buffer
+}
+
+export const transferTo32 = (num: number) => {
+  const buffer = Buffer.alloc(4);
+  buffer.writeUInt32BE(num, 0);
+  return buffer
+}
+
 
 export const getConfigBoardMessage = (config: ITestConfig) => {
   const result: Buffer[] = []
@@ -33,9 +53,12 @@ export const getConfigBoardMessage = (config: ITestConfig) => {
 
   config.configs.forEach((config) => {
     config.vehicle.protocols.forEach((protocol) => {
+      console.log(JSON.stringify(protocol.protocol))
+      console.log(protocol.protocol.protocolName, "的基础配置为", getBaseConfig(protocol))
       result.push(getBaseConfig(protocol))
 
       const spConfigResult = getSpConfig(protocol)
+      console.log(protocol.protocol.protocolName, "的信号解析配置为", getSpConfig(protocol))
 
       result.push(...spConfigResult.resultMessages)
       spConfigResult.signalsMap.forEach((value, key) => {

@@ -357,6 +357,16 @@ export const MICSignalsParsingForm = () => {
                     <Input type="number" placeholder="DEVID"/>
                   </Form.Item>
                 </Space>
+                <Form.List name={[name, 'signals']}>
+                  {(signalFields, {add: addSignal, remove: removeSignal}) => (
+                    <SignalForm fields={signalFields} add={() => {
+                      addSignal()
+                    }} remove={(index) => {
+                      removeSignal(index)
+                    }} onlyName={true}
+                    />
+                  )}
+                </Form.List>
               </Space>
             ))}
           </>
@@ -369,7 +379,7 @@ export const MICSignalsParsingForm = () => {
 export const B1552BSignalParsingForm = () => {
   return (
     <Form.List name="signalsParsingConfig">
-      {(fields ) => (
+      {(fields) => (
         <>
           {fields.map(({key, name, ...restField}) => (
             <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
@@ -386,6 +396,18 @@ export const B1552BSignalParsingForm = () => {
                             rules={[{required: true, message: '请输入子地址'}]}>
                   <Input type="number" placeholder="子地址"/>
                 </Form.Item>
+              </Space>
+              <Space>
+                <Form.List name={[name, 'signals']}>
+                  {(signalFields, {add: addSignal, remove: removeSignal}) => (
+                    <SignalForm fields={signalFields} add={() => {
+                      addSignal()
+                    }} remove={(index) => {
+                      removeSignal(index)
+                    }} onlyName={true}
+                    />
+                  )}
+                </Form.List>
               </Space>
             </Space>
           ))}
@@ -435,7 +457,8 @@ export const Serial232SignalsParsingForm = () => (
                   addSignal()
                 }} remove={(index) => {
                   removeSignal(index)
-                }}/>
+                }}
+                />
               )}
             </Form.List>
           </Space>
@@ -452,12 +475,61 @@ export const Serial232SignalsParsingForm = () => (
 
 // 模拟量
 export const AnalogSignalsParsingForm = () => {
-  return null
+  return <Form.List name="signalsParsingConfig">
+    {(fields) => (
+      <>
+        {fields.map(({key, name}) => (
+          <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
+            <Form.List name={[name, 'signals']}>
+              {(signalFields, {add: addSignal, remove: removeSignal}) => (
+                <SignalForm fields={signalFields} add={() => {
+                  addSignal()
+                }} remove={(index) => {
+                  removeSignal(index)
+                }} onlyName={true}
+                />
+              )}
+            </Form.List>
+          </Space>
+        ))}
+        {/*<Form.Item>*/}
+        {/*  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>*/}
+        {/*    添加解析配置*/}
+        {/*  </Button>*/}
+        {/*</Form.Item>*/}
+      </>
+    )}
+  </Form.List>
+
 }
 
 //数字量
 export const DigitalSignalsParsingForm = () => {
-  return null
+  return <Form.List name="signalsParsingConfig">
+    {(fields) => (
+      <>
+        {fields.map(({key, name}) => (
+          <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
+            <Form.List name={[name, 'signals']}>
+              {(signalFields, {add: addSignal, remove: removeSignal}) => (
+                <SignalForm fields={signalFields} add={() => {
+                  addSignal()
+                }} remove={(index) => {
+                  removeSignal(index)
+                }} onlyName={true}
+                />
+              )}
+            </Form.List>
+          </Space>
+        ))}
+        {/*<Form.Item>*/}
+        {/*  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>*/}
+        {/*    添加解析配置*/}
+        {/*  </Button>*/}
+        {/*</Form.Item>*/}
+      </>
+    )}
+  </Form.List>
 }
 
 /**
@@ -468,42 +540,71 @@ export const DigitalSignalsParsingForm = () => {
  * 功能：信号表单
  * 属性：信号名称、信号量纲、起点、长度、斜率、偏移
  */
-export const SignalForm = ({fields, add, remove}) => (
-  <>
-    {fields.map(({key, name, ...restField}) => {
-      return (
-        <Space key={key} style={{display: 'flex'}} align="baseline">
-          <Form.Item {...restField} name={[name, 'name']}
-                     rules={[{required: true, message: `请输入信号${key + 1}名称`}]}>
-            <Input placeholder="信号名称"/>
-          </Form.Item>
-          <Form.Item {...restField} name={[name, 'dimension']}
-                     rules={[{required: true, message: `请输入信号${key + 1}量纲`}]}>
-            <Input placeholder="信号量纲"/>
-          </Form.Item>
-          <Form.Item {...restField} name={[name, 'startPoint']}
-                     rules={[{required: true, message: '请输入起点'}]}>
-            <Input type="number" placeholder="起点" maxLength={2}/>
-          </Form.Item>
-          <Form.Item {...restField} name={[name, 'length']} rules={[{required: true, message: '请输入长度'}]}>
-            <Input type="number" placeholder="长度、斜率乘/除、偏移正/负" style={{width: 200}} maxLength={2}/>
-          </Form.Item>
-          <Form.Item {...restField} name={[name, 'slope']} rules={[{required: true, message: '请输入斜率'}]}>
-            <Input type="number" placeholder="斜率" maxLength={2}/>
-          </Form.Item>
-          <Form.Item {...restField} name={[name, 'offset']} rules={[{required: true, message: '请输入偏移'}]}>
-            <Input type="number" placeholder="偏移" maxLength={2}/>
-          </Form.Item>
-          <MinusCircleOutlined onClick={() => remove(name)}/>
-        </Space>
-      )
-    })}
-    <Form.Item>
-      <Button type="dashed" onClick={add} block icon={<PlusOutlined/>}>
-        添加信号
-      </Button>
-    </Form.Item>
-  </>
-);
+export const SignalForm = ({fields, add, remove, onlyName = false}) => {
+  if (onlyName) {
+    return (
+      <>
+        {fields.map(({key, name, ...restField}) => {
+          return (
+            <Space key={key} style={{display: 'flex'}} align="baseline">
+              <Form.Item {...restField} name={[name, 'name']}
+                         rules={[{required: true, message: `请输入信号${key + 1}名称`}]}>
+                <Input placeholder="信号名称"/>
+              </Form.Item>
+              <Form.Item {...restField} name={[name, 'dimension']}
+                         rules={[{required: true, message: `请输入信号${key + 1}量纲`}]}>
+                <Input placeholder="信号量纲"/>
+              </Form.Item>
+              <MinusCircleOutlined onClick={() => remove(name)}/>
+            </Space>
+          )
+        })}
+        <Form.Item>
+          <Button type="dashed" onClick={add} block icon={<PlusOutlined/>}>
+            添加信号
+          </Button>
+        </Form.Item>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {fields.map(({key, name, ...restField}) => {
+        return (
+          <Space key={key} style={{display: 'flex'}} align="baseline">
+            <Form.Item {...restField} name={[name, 'name']}
+                       rules={[{required: true, message: `请输入信号${key + 1}名称`}]}>
+              <Input placeholder="信号名称"/>
+            </Form.Item>
+            <Form.Item {...restField} name={[name, 'dimension']}
+                       rules={[{required: true, message: `请输入信号${key + 1}量纲`}]}>
+              <Input placeholder="信号量纲"/>
+            </Form.Item>
+            <Form.Item {...restField} name={[name, 'startPoint']}
+                       rules={[{required: true, message: '请输入起点'}]}>
+              <Input type="number" placeholder="起点" maxLength={2}/>
+            </Form.Item>
+            <Form.Item {...restField} name={[name, 'length']} rules={[{required: true, message: '请输入长度'}]}>
+              <Input type="number" placeholder="长度、斜率乘/除、偏移正/负" style={{width: 200}} maxLength={2}/>
+            </Form.Item>
+            <Form.Item {...restField} name={[name, 'slope']} rules={[{required: true, message: '请输入斜率'}]}>
+              <Input type="number" placeholder="斜率" maxLength={2}/>
+            </Form.Item>
+            <Form.Item {...restField} name={[name, 'offset']} rules={[{required: true, message: '请输入偏移'}]}>
+              <Input type="number" placeholder="偏移" maxLength={2}/>
+            </Form.Item>
+            <MinusCircleOutlined onClick={() => remove(name)}/>
+          </Space>
+        )
+      })}
+      <Form.Item>
+        <Button type="dashed" onClick={add} block icon={<PlusOutlined/>}>
+          添加信号
+        </Button>
+      </Form.Item>
+    </>
+  );
+}
 
 

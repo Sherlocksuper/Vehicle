@@ -6,7 +6,6 @@ import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {getVehicles} from "@/apis/request/vehicle.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {createTestConfig} from "@/apis/request/testConfig.ts";
-import protocolTable from "@/views/demo/ProtocolTable";
 import {parseToObject} from "@/utils";
 
 export const TestConfigModel = ({open, close, onOk, initValue}: {
@@ -100,7 +99,9 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
         title="动态添加信号"
         open={open}
         onOk={handleOk}
-        onCancel={handleCancel}
+        onCancel={()=>{
+          handleCancel()
+        }}
         okText="确定"
         cancelText="取消"
         width={"80%"}

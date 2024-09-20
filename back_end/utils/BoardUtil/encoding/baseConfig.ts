@@ -1,7 +1,7 @@
 import {IAIOBaseConfig, IB1552BBaseConfig, ICanBaseConfig, IFlexRayBaseConfig, IMICBaseConfig, IProtocolModel, ISerialBaseConfig, ProtocolType} from "../../../app/model/PreSet/Protocol.model";
 import {IControllerModel} from "../../../app/model/BoardManage/Controller.model";
 import {ICollectorModel} from "../../../app/model/BoardManage/Collector.model";
-import {getCollectItem} from "./index";
+import {getCollectItem, transferTo16, transferTo32, transferTo8} from "./index";
 
 export const totalHeader = [0xff, 0x00]
 
@@ -43,16 +43,16 @@ const getFlexrayBaseConfig = (protocol: IPro) => {
   result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
   const flexConfig = (protocol.protocol.baseConfig as IFlexRayBaseConfig)
   const buffer = Buffer.alloc(12);
-  buffer.writeUInt16BE(flexConfig.microticksPerCycle, 0);
-  buffer.writeUInt16BE(flexConfig.macroticksPerCycle, 2);
-  buffer.writeUInt8(flexConfig.transmissionStartTime, 4);
-  buffer.writeUInt8(flexConfig.staticFramepayload, 5);
-  buffer.writeUInt16BE(flexConfig.staticSlotsCount, 6);
-  buffer.writeUInt16BE(flexConfig.dynamicSlotCount, 8);
-  buffer.writeUInt8(flexConfig.dynamicSlotLength, 10);
-  buffer.writeUInt8(flexConfig.setAsSyncNode, 11);
-  result = Buffer.concat([result, buffer])
+  const microticksPerCycle = transferTo16(flexConfig.microticksPerCycle)
+  const macroticksPerCycle = transferTo16(flexConfig.macroticksPerCycle)
+  const transmissionStartTime = transferTo8(flexConfig.transmissionStartTime)
+  const staticFramepayload = transferTo8(flexConfig.staticFramepayload)
+  const staticSlotsCount = transferTo16(flexConfig.staticSlotsCount)
+  const dynamicSlotCount = transferTo16(flexConfig.dynamicSlotCount)
+  const dynamicSlotLength = transferTo8(flexConfig.dynamicSlotLength)
+  const setAsSyncNode = transferTo8(flexConfig.setAsSyncNode)
 
+  result = Buffer.concat([result, microticksPerCycle, macroticksPerCycle, transmissionStartTime, staticFramepayload, staticSlotsCount, dynamicSlotCount, dynamicSlotLength, setAsSyncNode])
   return result
 }
 
@@ -63,8 +63,12 @@ const getCanBaseConfig = (protocol: IPro) => {
   const functionCode = 0xc1
   const reversed = 0x00
   result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
+
   const canConfig = (protocol.protocol.baseConfig as ICanBaseConfig)
-  result = Buffer.concat([result, Buffer.from([canConfig.baudRate])])
+  const baudRateBuffer = transferTo16(canConfig.baudRate)
+
+  // Concatenate the buffers
+  result = Buffer.concat([result, baudRateBuffer])
   return result
 }
 
@@ -77,17 +81,18 @@ const getMICBaseConfig = (protocol: IPro) => {
   const functionCode = 0xc1
   const reversed = 0x00
 
+  const baseConfig = protocol.protocol.baseConfig as IMICBaseConfig
+
   //NCTC	BTC	NRTC	MODADD
-  const nctc = (protocol.protocol.baseConfig as IMICBaseConfig).nctc
-  const btc = (protocol.protocol.baseConfig as IMICBaseConfig).btc
-  const nrtc = (protocol.protocol.baseConfig as IMICBaseConfig).nrtc
-  const modadd = (protocol.protocol.baseConfig as IMICBaseConfig).modadd
-  const dataUpdateRate = (protocol.protocol.baseConfig as IMICBaseConfig).dataUpdateRate
+  const nctc = transferTo8(baseConfig.nctc)
+  const btc = transferTo8(baseConfig.btc)
+  const nrtc = transferTo8(baseConfig.nrtc)
+  const modadd = transferTo8(baseConfig.modadd)
+  const dataUpdateRate = transferTo8(baseConfig.dataUpdateRate)
 
 
   result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
-  result = Buffer.concat([result, Buffer.from([nctc, btc, nrtc, modadd, dataUpdateRate])])
-  console.log("mic config from", protocol.protocol.protocolName, ":", result)
+  result = Buffer.concat([result, nctc, btc, nrtc, modadd, dataUpdateRate])
   return result
 }
 
@@ -100,9 +105,8 @@ const get1552BBaseConfig = (protocol: IPro) => {
   result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
 
   const b1552BConfig = (protocol.protocol.baseConfig as IB1552BBaseConfig)
-  const listenAddress = b1552BConfig.listenAddress
-  result = Buffer.concat([result, Buffer.from([listenAddress])])
-
+  const listenAddress = transferTo32(b1552BConfig.listenAddress)
+  result = Buffer.concat([result, listenAddress])
   return result
 }
 
