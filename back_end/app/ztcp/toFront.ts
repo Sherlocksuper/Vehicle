@@ -18,7 +18,7 @@ export const removeWebSocket = (ws: WebSocket) => {
 
 export const sendMessageToFront = (message: IFrontMessage) => {
   webSockets.forEach(ws => {
-    ws.send(message)
+    ws.send(JSON.stringify(message))
   })
 }
 

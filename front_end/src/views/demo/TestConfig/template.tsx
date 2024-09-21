@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useDrop} from 'react-dnd';
 import DraggableComponent, {
   IBooleanChartExtra,
@@ -134,6 +134,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       }
     })
   }
+
+  // TODO 清除之前记录的逻辑和定时下载的逻辑
   //
   // const clearFileData = () => {
   //   history.current.startTime = Date.now()
@@ -210,7 +212,12 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     }
 
     socket.onmessage = (event) => {
-      updateDataRecorder(event.data)
+      const message = JSON.parse(event.data)
+      if (message.type === "DATA") {
+        updateDataRecorder(message.message)
+      } else if (message.type === "NOTIFICATION") {
+        message.info(message.message)
+      }
     };
 
     // 清理 WebSocket 连接
@@ -432,6 +439,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
             downFile(file, testConfig.name, 'ACTIVE')
           }
 
+          // TODO 是否保留以前的数据
           history.current.endTime = Date.now()
           worker.postMessage(history.current)
           history.current.startTime = Date.now()

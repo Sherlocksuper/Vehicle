@@ -102,7 +102,6 @@ const OfflineDate = () => {
     {
       (file) && <>
         <FileInfo file={file}/>
-        总时长:{formatTime(history.endTime - history.startTime)}
         操作时间段：
         <Slider range
                 defaultValue={[history.startTime, history.endTime]}
@@ -132,9 +131,12 @@ const OfflineDate = () => {
       }}/>
         <br/>
         <Space style={{marginTop: '20px'}}>
-          <FunctionButton type={'EXPORT'} selectTime={period} buttonFunction={buttonFunction}
-                          fileName={name}/>
-          <FunctionButton type={'SHOW'} selectTime={period} buttonFunction={buttonFunction} fileName={name}/>
+          <ExportButton selectTime={period} buttonFunction={() => {
+            buttonFunction('EXPORT')
+          }} fileName={name}/>
+          <ShowButton selectTime={period} buttonFunction={() => {
+            buttonFunction('SHOW')
+          }}/>
         </Space>
       </>
     }
@@ -155,22 +157,24 @@ const FileInfo = (props: { file: File }) => {
   );
 }
 
-const FunctionButton = (props: {
-  type: 'EXPORT' | 'SHOW',
+const ExportButton = (props: {
   selectTime: number[],
-  buttonFunction: (type: 'EXPORT' | 'SHOW') => void,
+  buttonFunction: () => void,
   fileName: string
 }) => {
-
   const [open, setOpen] = useState(false)
 
   return <>
     <Button onClick={() => {
+      if (props.fileName === '') {
+        message.error('文件名不能为空')
+        return
+      }
       setOpen(true)
-    }}>{props.type === 'EXPORT' ? '导出文件' : '开始展示'}</Button>
+    }}>导出文件</Button>
 
-    <Modal title={props.type === 'EXPORT' ? '导出文件' : '开始展示'} open={open} onOk={() => {
-      props.buttonFunction(props.type)
+    <Modal title='导出文件' open={open} onOk={() => {
+      props.buttonFunction()
       setOpen(false)
     }} onCancel={() => {
       setOpen(false)
@@ -178,13 +182,31 @@ const FunctionButton = (props: {
       <Title level={5}>操作时间段：</Title>
       <Text>{formatTime(props.selectTime[0])} - {formatTime(props.selectTime[1])}</Text>
       <br/>
-      {
-        props.type === 'EXPORT' &&
-        <>
-          <Title level={5}>文件名：</Title>
-          <Text>{props.fileName || 'default'}</Text>
-        </>
-      }
+      <Title level={5}>文件名：</Title>
+      <Text>{props.fileName || 'default'}</Text>
+    </Modal>
+  </>
+}
+
+const ShowButton = (props: {
+  selectTime: number[],
+  buttonFunction: () => void,
+}) => {
+  const [open, setOpen] = useState(false)
+
+  return <>
+    <Button onClick={() => {
+      setOpen(true)
+    }}>开始展示</Button>
+
+    <Modal title='开始展示' open={open} onOk={() => {
+      props.buttonFunction()
+      setOpen(false)
+    }} onCancel={() => {
+      setOpen(false)
+    }}>
+      <Title level={5}>操作时间段：</Title>
+      <Text>{formatTime(props.selectTime[0])} - {formatTime(props.selectTime[1])}</Text>
     </Modal>
   </>
 }

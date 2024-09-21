@@ -531,7 +531,7 @@ class TestConfigService {
 
     // 开始模拟板子消息
     // TODO  正常这一步要删掉
-    // startMockBoardMessage(res.signalsMap)
+    startMockBoardMessage(res.signalsMap)
 
     return true
   }

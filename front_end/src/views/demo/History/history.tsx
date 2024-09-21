@@ -8,6 +8,7 @@ interface IHistoryList {
     id?: number
     fatherConfigName: string
     path: string
+    size: number
     createdAt: Date
     updatedAt: Date
 }
@@ -42,6 +43,11 @@ const columns: TableProps<IHistoryList>['columns'] = [
             >{text}</a>
         )
     },
+  {
+    title: "大小",
+    dataIndex: "size",
+    key: "size",
+  },
     {
         title: "创建时间",
         dataIndex: "createdAt",

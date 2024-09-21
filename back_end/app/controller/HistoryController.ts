@@ -10,6 +10,7 @@ import {
 } from "../constants";
 import FileService from "../service/FileService";
 import {IRecordHistory} from "../model/History.model";
+import {transferFileSize} from "../../utils/File";
 
 const historyService = new HistoryService()
 const fileService = new FileService()
@@ -47,7 +48,6 @@ export class HistoryController {
         const file = context.request.files!.file as any
         const filePath = file['filepath']
         const fileName = file['originalFilename']
-        console.log(file)
 
 
         const storePath = await fileService.storeFile(filePath, fileName)
@@ -62,6 +62,7 @@ export class HistoryController {
 
         const record: IRecordHistory = {
             fatherConfigName: fatherConfigName,
+            size: transferFileSize(file.size),
             path: storePath,
         }
 

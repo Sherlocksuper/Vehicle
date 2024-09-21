@@ -4,6 +4,7 @@ export interface IRecordHistory {
     id?: number
     fatherConfigName: string
     path: string
+    size?: string
     createdAt?: Date
     updatedAt?: Date
 }
@@ -19,6 +20,9 @@ export default class HistoryModel extends Model<IRecordHistory> {
 
     @Column(DataType.STRING)
     path!: string;
+
+    @Column(DataType.STRING)
+    size!: string;
 
     @CreatedAt
     @Column(DataType.DATE)
