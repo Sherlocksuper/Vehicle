@@ -31,65 +31,65 @@ export const FlexRayBaseConfig = () => {
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "microticksPerCycle"]}
-          rules={[{required: true, message: "请输入周期微时钟"}]}
+          rules={[{required: true, message: "请输入周期微时钟(microticksPerCycle)"}]}
         >
-          <Input type="number" placeholder="周期微时钟"/>
+          <Input type="number" placeholder="周期微时钟(microticksPerCycle)"/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "macroticksPerCycle"]}
-          rules={[{required: true, message: "请输入周期宏时钟"}]}
+          rules={[{required: true, message: "请输入周期宏时钟(macroticksPerCycle)"}]}
         >
-          <Input type="number" placeholder="周期宏时钟"/>
+          <Input type="number" placeholder="周期宏时钟(macroticksPerCycle)"/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "transmissionStartTime"]}
-          rules={[{required: true, message: "请输入传输开始时间"}]}
+          rules={[{required: true, message: "请输入传输开始时间(transmissionStartTime)"}]}
         >
-          <Input type="number" placeholder="传输开始时间"/>
+          <Input type="number" placeholder="传输开始时间(transmissionStartTime)"/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "staticFramepayload"]}
-          rules={[{required: true, message: "请输入静态帧负载"}]}
+          rules={[{required: true, message: "请输入静态帧负载(staticFramepayload)"}]}
         >
-          <Input type="number" placeholder="静态帧负载"/>
+          <Input type="number" placeholder="静态帧负载(staticFramepayload)"/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "staticSlotsCount"]}
-          rules={[{required: true, message: "请输入静态槽"}]}
+          rules={[{required: true, message: "请输入静态槽(staticSlotsCount)"}]}
         >
-          <Input type="number" placeholder="静态槽"/>
+          <Input type="number" placeholder="静态槽(staticSlotsCount)"/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "dynamicSlotCount"]}
-          rules={[{required: true, message: "请输入动态槽"}]}
+          rules={[{required: true, message: "请输入动态槽(dynamicSlotCount)"}]}
         >
-          <Input type="number" placeholder="动态槽"/>
+          <Input type="number" placeholder="动态槽(dynamicSlotCount)"/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "dynamicSlotLength"]}
-          rules={[{required: true, message: "请输入动态槽长度"}]}
+          rules={[{required: true, message: "请输入动态槽长度(dynamicSlotLength)"}]}
         >
-          <Input type="number" placeholder="动态槽长度"/>
+          <Input type="number" placeholder="动态槽长度(dynamicSlotLength)"/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
           name={["baseConfig", "setAsSyncNode"]}
-          rules={[{required: true, message: "请输入设置为同步节点"}]}
+          rules={[{required: true, message: "请输入设置为同步节点(setAsSyncNode)"}]}
         >
-          <Input type="number" placeholder="设置为同步节点"/>
+          <Input type="number" placeholder="设置为同步节点(setAsSyncNode)"/>
         </Form.Item>
       </Col>
     </Row>
@@ -215,14 +215,14 @@ export const AnalogBaseConfig = () => {
           <Input type="number" placeholder="数据更新速率"/>
         </Form.Item>
       </Col>
-      <Col className="gutter-row" span={6}>
-        <Form.Item
-          name={["baseConfig", "voltageRange"]}
-          rules={[{required: true, message: "请输入电压范围"}]}
-        >
-          <Input type="number" placeholder="电压范围"/>
-        </Form.Item>
-      </Col>
+      {/*<Col className="gutter-row" span={6}>*/}
+      {/*  <Form.Item*/}
+      {/*    name={["baseConfig", "voltageRange"]}*/}
+      {/*    rules={[{required: true, message: "请输入电压范围"}]}*/}
+      {/*  >*/}
+      {/*    <Input type="number" placeholder="电压范围"/>*/}
+      {/*  </Form.Item>*/}
+      {/*</Col>*/}
     </Row>
   )
 }
@@ -239,14 +239,14 @@ export const DigitalBaseConfig = () => {
           <Input type="number" placeholder="数据更新速率"/>
         </Form.Item>
       </Col>
-      <Col className="gutter-row" span={6}>
-        <Form.Item
-          name={["baseConfig", "voltageRange"]}
-          rules={[{required: true, message: "请输入电压范围"}]}
-        >
-          <Input type="number" placeholder="电压范围"/>
-        </Form.Item>
-      </Col>
+      {/*<Col className="gutter-row" span={6}>*/}
+      {/*  <Form.Item*/}
+      {/*    name={["baseConfig", "voltageRange"]}*/}
+      {/*    rules={[{required: true, message: "请输入电压范围"}]}*/}
+      {/*  >*/}
+      {/*    <Input type="number" placeholder="电压范围"/>*/}
+      {/*  </Form.Item>*/}
+      {/*</Col>*/}
     </Row>
   )
 }
