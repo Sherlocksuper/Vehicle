@@ -120,11 +120,11 @@ const getSerial422BaseConfig = (protocol: IPro) => {
   result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
 
   const serial422Config = (protocol.protocol.baseConfig as ISerialBaseConfig)
-  const baudRate = serial422Config.baudRate
+  const baudRate = transferTo32(serial422Config.baudRate)
   const stopBits = serial422Config.stopBits
   const check = serial422Config.check
   const checkType = serial422Config.checkType
-  result = Buffer.concat([result, Buffer.from([baudRate, stopBits, check, checkType])])
+  result = Buffer.concat([result, baudRate, Buffer.from([stopBits, check, checkType])])
 
   return result
 }
@@ -139,11 +139,11 @@ const getSerial232BaseConfig = (protocol: IPro) => {
   result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
 
   const serial422Config = (protocol.protocol.baseConfig as ISerialBaseConfig)
-  const baudRate = serial422Config.baudRate
+  const baudRate = transferTo32(serial422Config.baudRate)
   const stopBits = serial422Config.stopBits
   const check = serial422Config.check
   const checkType = serial422Config.checkType
-  result = Buffer.concat([result, Buffer.from([baudRate, stopBits, check, checkType])])
+  result = Buffer.concat([result, baudRate, Buffer.from([stopBits, check, checkType])])
 
   return result
 }
