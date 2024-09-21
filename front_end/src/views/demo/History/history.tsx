@@ -73,7 +73,7 @@ const HistoryData = () => {
         getTestsHistory().then(res => {
           if (res.code === FAIL_CODE) return
           setHistoryData(res.data)
-          message.success('获取历史数据')
+          message.success('获取历史数据',0.5)
         })
     }
 

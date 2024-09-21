@@ -117,12 +117,14 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   };
 
   const downFile = (file, configName, mode: 'ACTIVE' | 'SCHEDULED', index = 0) => {
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(file)
-    const mod = mode === 'ACTIVE' ? '主动下载' : '定时下载'
-    a.download = configName + '-' + index + '-' + mod + '.json'
-    downFileIndex.current++
-    a.click()
+    // TODO 是否要从浏览器下载一份
+    // const a = document.createElement('a')
+    // a.href = URL.createObjectURL(file)
+    // const mod = mode === 'ACTIVE' ? '主动下载' : '定时下载'
+    // a.download = configName + '-' + index + '-' + mod + '.json'
+    // downFileIndex.current++
+    // a.click()
+
     addTestsHistory({
       fatherConfigName: configName,
       file: file
@@ -203,6 +205,10 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       return () => {
       }
     }
+    window.onbeforeunload = function() {
+      return "你确定要离开吗？";
+    }
+
     const socket = new WebSocket('http://localhost:8080/ws');
     socket.onopen = () => {
       socketRef.current = socket
