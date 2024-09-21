@@ -14,7 +14,7 @@ const splitBufferByDelimiter = (buffer: Buffer, delimiter: Buffer): Buffer[] => 
 interface IReceiveData {
   moduleId: number;
   collectType: number;
-  collectCategory: number;
+  busType: number;
   timestamp: number;
   frameId: number;
   signalCount: number;
@@ -42,7 +42,7 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   // 采集的类型，0表示总线采集，1表示数模采集
   result.collectType = buffer[3] >> 4;
   // 总线种类,如果是总线采集，表示总线种类，如果是数模采集，表示A还是D
-  result.collectCategory = buffer[3] & 0x0f;
+  result.busType = buffer[3] & 0x0f;
   // 时间戳 4、5
   result.timestamp = buffer[4] << 8 | buffer[5]
   // 帧id 6、7、8、9

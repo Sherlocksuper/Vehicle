@@ -27,6 +27,35 @@ export const getCollectItem = (protocol: IPro) => {
   }
 }
 
+export const getCollectType = (protocol:IPro) => {
+  if (protocol.protocol.protocolType === ProtocolType.Analog ||
+    protocol.protocol.protocolType === ProtocolType.Digital) {
+    return 0x00
+  }
+  return 0x01
+}
+
+export const getBusCategory = (protocol: IPro) => {
+  switch (protocol.protocol.protocolType) {
+    case ProtocolType.FlexRay:
+      return 0x02
+    case ProtocolType.CAN:
+      return 0x01
+    case ProtocolType.MIC:
+      return 0x03
+    case ProtocolType.B1552B:
+      return 0x04
+    case ProtocolType.Serial422:
+      return 0x05
+    case ProtocolType.Serial232:
+      return 0x06
+    case ProtocolType.Analog:
+      return 0x07
+    case ProtocolType.Digital:
+      return 0x08
+  }
+}
+
 export const transferTo8 = (num: number) => {
   const buffer = Buffer.alloc(1);
   buffer.writeUInt8(num, 0);
