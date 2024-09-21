@@ -82,12 +82,12 @@ export const getConfigBoardMessage = (config: ITestConfig) => {
 
   config.configs.forEach((config) => {
     config.vehicle.protocols.forEach((protocol) => {
-      console.log(JSON.stringify(protocol.protocol))
-      console.log(protocol.protocol.protocolName, "的基础配置为", getBaseConfig(protocol))
+      // console.log(JSON.stringify(protocol.protocol))
+      // console.log(protocol.protocol.protocolName, "的基础配置为", getBaseConfig(protocol))
       result.push(getBaseConfig(protocol))
 
       const spConfigResult = getSpConfig(protocol)
-      console.log(protocol.protocol.protocolName, "的信号解析配置为", getSpConfig(protocol))
+      // console.log(protocol.protocol.protocolName, "的信号解析配置为", getSpConfig(protocol))
 
       result.push(...spConfigResult.resultMessages)
       spConfigResult.signalsMap.forEach((value, key) => {

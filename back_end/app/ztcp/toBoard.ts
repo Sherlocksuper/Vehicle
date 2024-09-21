@@ -16,6 +16,9 @@ export const connectWithBoard = (port: number, host: string) => {
 
     client.on('data', (data) => {
       const message = decodingBoardMessage(data);
+      const result = decodingBoardMessageWithMap(message);
+      console.log("decodingBoardMessageWith Map result ", result)
+
       // TODO 获取message的key值
       sendMessageToFront({
         type: 'DATA',

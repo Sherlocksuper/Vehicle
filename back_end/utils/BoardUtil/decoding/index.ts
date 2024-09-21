@@ -1,3 +1,5 @@
+import {getSignalMapKey} from "../encoding/spConfig";
+
 const splitBufferByDelimiter = (buffer: Buffer, delimiter: Buffer): Buffer[] => {
   let start = 0;
   const result: Buffer[] = [];
@@ -36,9 +38,9 @@ let currentDataMapDecoding = new Map<string, string[]>();
 
 // 处理一个
 export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
-  const result = {} as IReceiveData, moduleId = buffer[2];
+  const result = {} as IReceiveData;
   // 模块id
-  result.moduleId = moduleId;
+  result.moduleId = buffer[2];
   // 采集的类型，0表示总线采集，1表示数模采集
   result.collectType = buffer[3] >> 4;
   // 总线种类,如果是总线采集，表示总线种类，如果是数模采集，表示A还是D
@@ -70,10 +72,33 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
 
 export const setCurrentDataMapDecoding = (map: Map<string, string[]>) => {
   currentDataMapDecoding = map;
+  console.log(map)
+}
+
+export const getCurrentDataMapDecoding = () => {
+  return currentDataMapDecoding;
+}
+
+export const clearCurrentDataMapDecoding = () => {
+  currentDataMapDecoding.clear();
 }
 
 // 做一个数据映射
-export const decodingBoardMessageWithMap = (key: string, values: number[]): Map<string, number> => {
+// 把接收到的数据映射为一个object，key为getSignalKey，value为信号值
+export const decodingBoardMessageWithMap = (receiveData: IReceiveData): Map<string, number> => {
+  const key = getSignalMapKey(
+    receiveData.moduleId,
+    receiveData.collectType,
+    receiveData.busType,
+    receiveData.frameId
+  )
+
+  const values: number[] = []
+
+  receiveData.signals.forEach(signal => {
+    values.push(signal.value);
+  })
+
   const result = new Map<string, number>();
   // 序列
   const signalOrder = currentDataMapDecoding.get(key);
@@ -95,7 +120,8 @@ const decodingOneSignal = (buffer: Buffer): IReceiveSignal => {
   const sign = buffer[1] & 0x01;
   const integer = buffer[2] << 16 | buffer[3] << 8 | buffer[4] >> 4;
   const decimal = (buffer[4] & 0x0f) << 8 | buffer[5];
-  const value = integer + decimal / 1000;
+  // 0表示正数，1表示负数
+  const value = integer + decimal / 1000 * (sign === 1 ? -1 : 1);
 
   return {
     signalId,

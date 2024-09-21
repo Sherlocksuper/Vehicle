@@ -6,8 +6,9 @@ import TestConfig, {ITestConfig} from "../model/TestConfig";
 import {ITestProcessNModel} from "../model/1TestProcessN";
 import {ILongMessageType, LongMessage} from "../ztcp/type";
 import {getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
-import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
+import {sendMessageToFront, startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
 import {connectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
+import {clearCurrentDataMapDecoding, getCurrentDataMapDecoding, setCurrentDataMapDecoding} from "../../utils/BoardUtil/decoding";
 
 class TestConfigService {
 
@@ -509,7 +510,6 @@ class TestConfigService {
 
     // 解析下发的配置，获取需要下发的信息、信号的映射
     const res = getConfigBoardMessage(testConfig!)
-    this.currentTestConfig = testConfig
 
     // TODO
     //
@@ -529,6 +529,9 @@ class TestConfigService {
     //   return false
     // }
 
+    this.currentTestConfig = testConfig
+    setCurrentDataMapDecoding(res.signalsMap)
+
     // 开始模拟板子消息
     // TODO  正常这一步要删掉
     startMockBoardMessage(res.signalsMap)
@@ -541,6 +544,7 @@ class TestConfigService {
    */
   async stopCurrentTestConfig() {
     this.currentTestConfig = null
+    clearCurrentDataMapDecoding()
     stopMockBoardMessage()
     return true
   }
