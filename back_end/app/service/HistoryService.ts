@@ -1,4 +1,5 @@
 import HistoryModel, {IRecordHistory} from "../model/History.model";
+import * as fs from "fs";
 
 
 export default class HistoryService {
@@ -13,6 +14,15 @@ export default class HistoryService {
     }
 
     async deleteHistory(recordId: number) {
+        const deleteFile = await HistoryModel.findOne({
+            where: {
+                id: recordId
+            }
+        })
+
+        // 删除deleteFile.path
+        fs.unlinkSync(deleteFile!.path)
+
         const res = await HistoryModel.destroy({
             where: {
                 id: recordId

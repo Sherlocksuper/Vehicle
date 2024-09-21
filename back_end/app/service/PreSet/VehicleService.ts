@@ -18,8 +18,8 @@ class VehicleService {
   async updateVehicle(id: number, newVehicle: IVehicleModel): Promise<Vehicle | null> {
     const vehicle = await Vehicle.findByPk(id);
     if (vehicle) {
-      vehicle.vehicleName = newVehicle.vehicleName;
-      vehicle.isDisabled = newVehicle.isDisabled
+      await vehicle.update(newVehicle);
+
       await vehicle.save();
       return vehicle;
     }

@@ -23,14 +23,18 @@ const TestConfig = () => {
       message.error('请先停止当前下发');
       return;
     }
+    message.loading('下发中', 0);
     downTestConfig(record.id).then(res => {
+      console.log(res)
       if (res.code === FAIL_CODE) {
+        message.destroy()
         message.error("下发失败:" + res.msg + "请检查网络");
       } else {
+        message.destroy()
         message.success('下发成功');
         setCurrentDownConfig(record);
       }
-    });
+    })
   }
 
   const fetchConfigs = () => {

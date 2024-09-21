@@ -9,11 +9,20 @@ const ProtocolTable = () => {
     const [protocols, setProtocols] = React.useState<IProtocol[]>([]);
     const [openProtocolModal, setOpenProtocolModal] = React.useState<boolean>(false);
     const [currentRecord, setCurrentRecord] = React.useState<IProtocol | undefined>(undefined);
+    const [modelMode , setModelMode] = React.useState<"EDIT" | "ADD" | "SHOW">("EDIT");
 
+    // 展示詳情,不允許編輯
     const handleShowDetail = (record: IProtocol) => {
         setCurrentRecord(record);
+        setModelMode("SHOW");
         setOpenProtocolModal(true);
     };
+
+    const updateProtocol = (record: IProtocol) => {
+        setCurrentRecord(record);
+        setModelMode("EDIT");
+        setOpenProtocolModal(true);
+    }
 
     const columns: TableProps<IProtocol>['columns'] = [
         {
@@ -32,17 +41,13 @@ const ProtocolTable = () => {
             key: "protocolType",
         },
         {
-            title: "结果",
-            dataIndex: "result",
-            key: "result",
-        },
-        {
             title: "操作",
             key: "action",
             render: (text, record) => (
                 <Space>
                     <a onClick={() => deleteProtocol(record.id!)}>删除</a>
                     <Button type={"link"} onClick={() => handleShowDetail(record)}>查看详情</Button>
+                    <Button type={"link"} onClick={() => updateProtocol(record)}>编辑</Button>
                 </Space>
             ),
         },
@@ -78,6 +83,7 @@ const ProtocolTable = () => {
                 <Button type={"primary"} onClick={() => {
                     setCurrentRecord(undefined);
                     setOpenProtocolModal(true);
+                    setModelMode("ADD");
                 }}>添加协议</Button>
             </Row>
             <Table
@@ -89,6 +95,7 @@ const ProtocolTable = () => {
             />
             <ProtocolModel
                 open={openProtocolModal}
+                mode={modelMode}
                 close={() => {
                     setCurrentRecord(undefined)
                     setOpenProtocolModal(false);

@@ -1,6 +1,6 @@
 import TestProcessN, {ITestProcessNModel} from "../model/1TestProcessN";
-import {sendToLong} from "../ztcp/sender";
 import {ILongMessageType, LongMessage} from "../ztcp/type";
+import {disconnectWithBoard} from "../ztcp/toBoard";
 
 class TestProcessNService {
     /**
@@ -103,27 +103,16 @@ class TestProcessNService {
             type: LongMessage.STARTCOLLECT,
             body: testProcessN
         }
-        const result = sendToLong(message)
-        if (result !== undefined) {
-            this.currentTestProcessN = null
-        }
-        return result === undefined ? true : result
+        return true
     }
 
     /**
      * 停止当前下发
      */
     async stopCurrentTestProcessN() {
-        const message: ILongMessageType = {
-            type: LongMessage.STOPCOLLECT,
-            body: null
-        }
-        const result = sendToLong(message)
-        if (result !== undefined) {
-            return result
-        }
+        disconnectWithBoard()
         this.currentTestProcessN = null
-        return result
+        return true
     }
 }
 

@@ -1,6 +1,6 @@
 import {Divider, Form, Input, message, Modal, Select} from "antd";
 import React, {useEffect} from "react";
-import {createProtocol, IProtocol, ProtocolType} from "@/apis/request/protocol.ts";
+import {createProtocol, IProtocol, ProtocolType, updateProtocol} from "@/apis/request/protocol.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {
   AnalogBaseConfig,
@@ -22,117 +22,131 @@ import {
 } from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 import {v4 as uuid} from "uuid"
 
-export const ProtocolModel = ({open, close, onOk, initValue}: {
-    // 外面的状态
-    open: boolean,
-    close: () => void
-    initValue?: IProtocol
-    onOk?: () => void,
+export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
+  // 外面的状态
+  open: boolean,
+  close: () => void
+  initValue?: IProtocol
+  mode?: "EDIT" | "ADD" | "SHOW",
+  onOk?: () => void,
 }) => {
-    const [form] = Form.useForm();
-    const [protocolType, setProtocolType] = React.useState<ProtocolType>(undefined)
+  const [form] = Form.useForm();
+  const [protocolType, setProtocolType] = React.useState<ProtocolType>(undefined)
 
-    useEffect(() => {
-        // 给form添加一个信号解析配置
-        form.setFieldsValue({
-            signalsParsingConfig: [{
-                signals: []
-            }]
-        })
+  useEffect(() => {
+    // 给form添加一个信号解析配置
+    form.setFieldsValue({
+      signalsParsingConfig: [{
+        signals: []
+      }]
+    })
 
-        // 初始化为initValue
-        if (initValue) {
-            form.setFieldsValue(initValue)
-          setProtocolType(initValue.protocolType)
-        }
+    // 初始化为initValue
+    if (initValue) {
+      form.setFieldsValue(initValue)
+      setProtocolType(initValue.protocolType)
+    }
 
-        return () => {
-            form.resetFields()
-        }
-    }, [form, initValue])
+    return () => {
+      form.resetFields()
+    }
+  }, [form, initValue])
 
 
-    const handleOk = () => {
-        // 检查是否合法
-        form.validateFields().then(() => {
-            form.submit()
-        })
-    };
+  const handleOk = () => {
+    // 检查是否合法
+    form.validateFields().then(() => {
+      form.submit()
+    })
+  };
 
-    const handleCancel = () => {
-        close()
-    };
+  const handleCancel = () => {
+    close()
+  };
 
-    return (
-        <>
-            <Modal
-                title="动态添加信号"
-                open={open}
-                onOk={handleOk}
-                onCancel={handleCancel}
-                okText="确定"
-                cancelText="取消"
-                width={"80%"}
-            >
-                <Form layout="vertical" form={form}
-                      disabled={initValue !== undefined}
-                      onFinish={() => {
-                          const value = form.getFieldsValue() as IProtocol
-                          value.signalsParsingConfig.forEach((item) => {
-                              item.signals.forEach((signal) => {
-                                  signal.id = uuid()
-                              })
-                          })
+  return (
+    <>
+      <Modal
+        title="动态添加信号"
+        open={open}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="确定"
+        cancelText="取消"
+        width={"80%"}
+      >
+        <Form layout="vertical" form={form}
+              disabled={mode === "SHOW"}
+              onFinish={() => {
+                const value = form.getFieldsValue() as IProtocol
+                value.signalsParsingConfig.forEach((item) => {
+                  item.signals.forEach((signal) => {
+                    signal.id = uuid()
+                  })
+                })
 
-                          createProtocol(value as IProtocol).then((res) => {
-                              if (res.code === SUCCESS_CODE) {
-                                  message.success("添加成功")
-                                  onOk && onOk()
-                                  close()
-                              } else {
-                                  message.error("添加失败：", res.message)
-                              }
-                          })
-                      }}
-                >
-                    <Form.Item name={"protocolName"} rules={[{required: true, message: "请输入协议名称"}]}>
-                        <Input placeholder="为协议命名"/>
-                    </Form.Item>
-                    <Form.Item name={"protocolType"} initialValue={protocolType}>
-                        <Select placeholder="请选择协议" onSelect={(value) => {
-                            form.setFieldsValue({protocolType: value})
-                            setProtocolType(value)
-                        }}>
-                            {
-                                Object.values(ProtocolType).map((item) => {
-                                    return <Select.Option key={item} value={item}>{item}</Select.Option>
-                                })
-                            }
-                        </Select>
-                    </Form.Item>
+                if (mode === "ADD") {
+                  createProtocol(value as IProtocol).then((res) => {
+                    if (res.code === SUCCESS_CODE) {
+                      message.success("添加成功")
+                      onOk && onOk()
+                      close()
+                    } else {
+                      message.error("添加失败：", res.message)
+                    }
+                  })
+                } else if (mode === "EDIT") {
+                  value.id = initValue.id
+                  updateProtocol(value as IProtocol).then((res) => {
+                    if (res.code === SUCCESS_CODE) {
+                      message.success("添加成功")
+                      onOk && onOk()
+                      close()
+                    } else {
+                      message.error("添加失败：", res.message)
+                    }
+                  })
+                }
+              }}
+        >
+          <Form.Item name={"protocolName"} rules={[{required: true, message: "请输入协议名称"}]}>
+            <Input placeholder="为协议命名"/>
+          </Form.Item>
+          <Form.Item name={"protocolType"} initialValue={protocolType}>
+            <Select placeholder="请选择协议" onSelect={(value) => {
+              form.setFieldsValue({protocolType: value})
+              setProtocolType(value)
+            }}>
+              {
+                Object.values(ProtocolType).map((item) => {
+                  return <Select.Option key={item} value={item}>{item}</Select.Option>
+                })
+              }
+            </Select>
+          </Form.Item>
 
-                    <Divider>基础配置</Divider>
-                    {protocolType === ProtocolType.CAN && <CanBaseConfig/>}
-                    {protocolType === ProtocolType.FlexRay && <FlexRayBaseConfig/>}
-                    {protocolType === ProtocolType.MIC && <MICBaseConfig/>}
-                    {protocolType === ProtocolType.B1552B && <B1552BaseConfig/>}
-                    {protocolType === ProtocolType.Serial422 && <Serial422BaseConfig/>}
-                    {protocolType === ProtocolType.Serial232 && <Serial232BaseConfig/>}
-                    {protocolType === ProtocolType.Analog && <AnalogBaseConfig/>}
-                    {protocolType === ProtocolType.Digital && <DigitalBaseConfig/>}
-                    <Divider>信号解析配置</Divider>
-                    {protocolType === ProtocolType.CAN && <CanSignalsParsingForm/>}
-                    {protocolType === ProtocolType.FlexRay && <FlexRaySignalsParsingForm/>}
-                    {protocolType === ProtocolType.MIC && <MICSignalsParsingForm/>}
-                    {protocolType === ProtocolType.B1552B && <B1552BSignalParsingForm/>}
-                    {protocolType === ProtocolType.Serial422 && <Serial422SignalsParsingForm/>}
-                    {protocolType === ProtocolType.Serial232 && <Serial232SignalsParsingForm/>}
-                    {protocolType === ProtocolType.Analog && <AnalogSignalsParsingForm/>}
-                    {protocolType === ProtocolType.Digital && <DigitalSignalsParsingForm/>}
-                </Form>
-            </Modal>
-        </>
-    );
+          <Divider>基础配置</Divider>
+          {protocolType === ProtocolType.CAN && <CanBaseConfig/>}
+          {protocolType === ProtocolType.FlexRay && <FlexRayBaseConfig/>}
+          {protocolType === ProtocolType.MIC && <MICBaseConfig/>}
+          {protocolType === ProtocolType.B1552B && <B1552BaseConfig/>}
+          {protocolType === ProtocolType.Serial422 && <Serial422BaseConfig/>}
+          {protocolType === ProtocolType.Serial232 && <Serial232BaseConfig/>}
+          {protocolType === ProtocolType.Analog && <AnalogBaseConfig/>}
+          {protocolType === ProtocolType.Digital && <DigitalBaseConfig/>}
+          <Divider>信号解析配置</Divider>
+          {protocolType === ProtocolType.CAN && <CanSignalsParsingForm/>}
+          {protocolType === ProtocolType.FlexRay && <FlexRaySignalsParsingForm/>}
+          {protocolType === ProtocolType.MIC && <MICSignalsParsingForm/>}
+          {protocolType === ProtocolType.B1552B && <B1552BSignalParsingForm/>}
+          {protocolType === ProtocolType.Serial422 && <Serial422SignalsParsingForm/>}
+          {protocolType === ProtocolType.Serial232 && <Serial232SignalsParsingForm/>}
+          {protocolType === ProtocolType.Analog && <AnalogSignalsParsingForm/>}
+          {protocolType === ProtocolType.Digital && <DigitalSignalsParsingForm/>}
+        </Form>
+      </Modal>
+    </>
+  );
 };
 
 

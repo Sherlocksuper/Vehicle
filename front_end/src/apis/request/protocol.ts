@@ -102,8 +102,9 @@ export const createProtocol = async (iProtocol: IProtocol) => {
  * @param id
  * @param iProtocol
  */
-export const updateProtocol = async (id: number, iProtocol: IProtocol) => {
+export const updateProtocol = async (iProtocol: IProtocol) => {
   const api = {...PROTOCOL_API.updateProtocol};
+  const id = iProtocol.id!;
   api.url = api.url.replace(':id', id.toString());
   return request({
     api: api,

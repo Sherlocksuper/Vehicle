@@ -5,9 +5,9 @@
 import TestConfig, {ITestConfig} from "../model/TestConfig";
 import {ITestProcessNModel} from "../model/1TestProcessN";
 import {ILongMessageType, LongMessage} from "../ztcp/type";
-import {sendToLong} from "../ztcp/sender";
 import {getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
-import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/ws";
+import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
+import {connectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
 
 class TestConfigService {
 
@@ -92,7 +92,7 @@ class TestConfigService {
   }
 
   async initTestConfig() {
-    const targetData =  {
+    const targetData = {
       "id": 1,
       "name": "testConfig1",
       "configs": [
@@ -506,25 +506,34 @@ class TestConfigService {
   async downTestConfig(testConfigId: number) {
     const testConfig = await this.getTestConfigById(testConfigId);
     if (this.currentTestConfig) return false
+
+    // 解析下发的配置，获取需要下发的信息、信号的映射
+    const res = getConfigBoardMessage(testConfig!)
     this.currentTestConfig = testConfig
 
-    // 解析所有的message
-    const res = getConfigBoardMessage(testConfig!)
-    console.log(res.resultMessages)
-    // signalMap是用来解析下位机传上来的数据，通过模块id、帧号id来解析，如果信号id、帧id相同，那么按照顺序映射
-    console.log(res.signalsMap)
-    startMockBoardMessage(res.signalsMap)
+    // TODO
+    //
+    // // 连接板子
+    // try {
+    //   await connectWithBoard(66, '192.168.1.66')
+    // } catch (e) {
+    //   console.log("wrong1", e)
+    //   return false
+    // }
+    //
+    // // 发送所有消息给板子
+    // try {
+    //   await sendMultipleMessagesBoard(res.resultMessages, 200)
+    // } catch (e) {
+    //   console.log("wrong2", e)
+    //   return false
+    // }
 
-    const message: ILongMessageType = {
-      type: LongMessage.STARTCOLLECT,
-      body: res.resultMessages
-    }
-    const result = sendToLong(message)
+    // 开始模拟板子消息
+    // TODO  正常这一步要删掉
+    // startMockBoardMessage(res.signalsMap)
 
-    if (result !== undefined) {
-      this.currentTestConfig = null
-    }
-    return result === undefined ? true : result
+    return true
   }
 
   /**

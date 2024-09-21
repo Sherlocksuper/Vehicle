@@ -31,8 +31,11 @@ interface IReceiveSignal {
   value: number;
 }
 
+// 当前数据映射表/Map
+let currentDataMapDecoding = new Map<string, string[]>();
+
 // 处理一个
-export const decoding = (buffer: Buffer): IReceiveData => {
+export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   const result = {} as IReceiveData, moduleId = buffer[2];
   // 模块id
   result.moduleId = moduleId;
@@ -64,6 +67,27 @@ export const decoding = (buffer: Buffer): IReceiveData => {
 
   return result;
 }
+
+export const setCurrentDataMapDecoding = (map: Map<string, string[]>) => {
+  currentDataMapDecoding = map;
+}
+
+// 做一个数据映射
+export const decodingBoardMessageWithMap = (key: string, values: number[]): Map<string, number> => {
+  const result = new Map<string, number>();
+  // 序列
+  const signalOrder = currentDataMapDecoding.get(key);
+  if (!signalOrder) {
+    return result;
+  }
+
+  for (let i = 0; i < signalOrder.length; i++) {
+    result.set(signalOrder[i], values[i]);
+  }
+
+  return result
+}
+
 
 const decodingOneSignal = (buffer: Buffer): IReceiveSignal => {
   const signalId = buffer[0];

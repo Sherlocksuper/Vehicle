@@ -8,9 +8,8 @@ import fileServer from 'koa-static';
 import path from 'node:path';
 import bodyparser from 'koa-body';
 import serve from 'koa-static';
-import {createConnectionToLong} from './ztcp/sender';
 import * as http from 'http';
-import {addWebSocket, removeWebSocket, sendMessage} from "./ztcp/ws";
+import {addWebSocket, removeWebSocket, sendMessageToFront} from "./ztcp/toFront";
 
 const app = new Koa();
 
@@ -58,9 +57,6 @@ server.on('upgrade', (request, socket, head) => {
     socket.destroy(); // 如果不是 WebSocket 请求，则销毁连接
   }
 });
-
-// 创建 TCP 长连接
-createConnectionToLong();
 
 const run = async (port: string): Promise<Server> => {
   await DB.connectDB();

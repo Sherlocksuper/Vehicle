@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useDrop} from 'react-dnd';
 import DraggableComponent, {
   IBooleanChartExtra,
@@ -16,6 +16,7 @@ import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
 import {getFileToHistoryWorker, getHistoryToFileWorker} from "@/worker/app.ts";
 import {IHistory} from "@/apis/standard/history.ts";
+import {addTestsHistory} from "@/apis/request/testhistory.ts";
 
 export interface IDragItem {
   id: string
@@ -59,6 +60,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   })
   const [netDataRecorder, setNetDataRecorder] = useState<Map<string, number[]>>(new Map())
   const historyManagers = useRef(undefined)
+  const downFileIndex = useRef(0)
 
   const updateDataRecorder = (data, time = undefined) => {
     const currentData = {
@@ -114,6 +116,60 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     };
   };
 
+  const downFile = (file, configName, mode: 'ACTIVE' | 'SCHEDULED', index = 0) => {
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(file)
+    const mod = mode === 'ACTIVE' ? '主动下载' : '定时下载'
+    a.download = configName + '-' + index + '-' + mod + '.json'
+    downFileIndex.current++
+    a.click()
+    addTestsHistory({
+      fatherConfigName: configName,
+      file: file
+    }).then((res) => {
+      if (res.code === SUCCESS_CODE) {
+        message.success('上传成功')
+      } else {
+        message.error('上传失败')
+      }
+    })
+  }
+  //
+  // const clearFileData = () => {
+  //   history.current.startTime = Date.now()
+  //   history.current.historyData = []
+  //   setNetDataRecorder(new Map())
+  // }
+  //
+  // const downFileIndex = useRef(0)
+  // const downFileInterval = useRef<any>(0)
+  //
+  // // 设置一个internal，ONLINE模式下每半个小时自动下载当前文件
+  // useEffect(() => {
+  //   if (!testConfig) {
+  //     return
+  //   }
+  //   if (dataMode !== "ONLINE") {
+  //     return;
+  //   }
+  //   console.log("开始定时下载")
+  //   downFileInterval.current = setInterval(() => {
+  //     const worker = getHistoryToFileWorker()
+  //     worker.onmessage = (event) => {
+  //       const file = event.data
+  //       downFile(file, testConfig.name, 'SCHEDULED', downFileIndex.current)
+  //     }
+  //
+  //     history.current.endTime = Date.now()
+  //     worker.postMessage(history.current)
+  //     clearFileData()
+  //   }, 3000)
+  //   return () => {
+  //     clearInterval(downFileInterval.current)
+  //   }
+  // }, [dataMode, testConfig?.name])
+
+  // 在线数据的时候获取testConfig
   useEffect(() => {
     if (dataMode === "OFFLINE") {
       return () => {
@@ -373,14 +429,13 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
           const worker = getHistoryToFileWorker()
           worker.onmessage = (event) => {
             const file = event.data
-            const a = document.createElement('a')
-            a.href = URL.createObjectURL(file)
-            a.download = 'history.json'
-            a.click()
+            downFile(file, testConfig.name, 'ACTIVE')
           }
 
           history.current.endTime = Date.now()
           worker.postMessage(history.current)
+          history.current.startTime = Date.now()
+          history.current.historyData = []
         }}>下载收集数据</Button>
       </Space>
     }

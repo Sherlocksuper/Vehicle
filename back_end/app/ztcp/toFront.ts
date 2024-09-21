@@ -1,8 +1,12 @@
 // @ts-ignore
-import WebSocket from 'ws';
-import {removeListener} from "process";
+import WebSocket from 'app/ztcp/toFront';
 
 export let webSockets: Set<WebSocket> = new Set()
+
+export interface IFrontMessage {
+  type: "NOTIFICATION" | "DATA"
+  message: string | Buffer
+}
 
 export const addWebSocket = (ws: WebSocket) => {
   webSockets.add(ws)
@@ -12,7 +16,7 @@ export const removeWebSocket = (ws: WebSocket) => {
   webSockets.delete(ws)
 }
 
-export const sendMessage = (message: string) => {
+export const sendMessageToFront = (message: IFrontMessage) => {
   webSockets.forEach(ws => {
     ws.send(message)
   })
@@ -32,7 +36,10 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
       values.forEach((value) => {
         message[value] = Math.random() * 100
       })
-      sendMessage(JSON.stringify(message))
+      sendMessageToFront({
+        type: "DATA",
+        message: JSON.stringify(message)
+      })
     }, Math.random() * 1000 + 1000)
     publicIntervalRecords.push(record)
   })

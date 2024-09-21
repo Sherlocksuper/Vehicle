@@ -11,7 +11,7 @@ import {sleep} from "@/utils/index.ts";
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
-    timeout: 5000
+    timeout: 0
 })
 
 //规则

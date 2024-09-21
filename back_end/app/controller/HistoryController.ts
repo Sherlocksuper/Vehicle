@@ -47,6 +47,7 @@ export class HistoryController {
         const file = context.request.files!.file as any
         const filePath = file['filepath']
         const fileName = file['originalFilename']
+        console.log(file)
 
 
         const storePath = await fileService.storeFile(filePath, fileName)

@@ -1,4 +1,4 @@
-import {Space, Table, TableProps} from "antd";
+import {Button, Card, message, Space, Table, TableProps} from "antd";
 import React, {useEffect} from "react";
 import {deleteTestsHistory, getTestsHistory} from "@/apis/request/testhistory.ts";
 import {FAIL_CODE} from "@/constants";
@@ -27,11 +27,25 @@ const columns: TableProps<IHistoryList>['columns'] = [
         title: "路径",
         dataIndex: "path",
         key: "path",
+        // 可复制
+        render: (text) => (
+            <a
+              onClick={() => {
+                  const input = document.createElement('input');
+                  input.value = text;
+                  document.body.appendChild(input);
+                  input.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(input);
+                  message.success('复制成功');
+              }}
+            >{text}</a>
+        )
     },
     {
-        title: "更新时间",
-        dataIndex: "updatedAt",
-        key: "updatedAt",
+        title: "创建时间",
+        dataIndex: "createdAt",
+        key: "createdAt",
         render: (text) => new Date(text).toLocaleString()
     },
     {
@@ -46,15 +60,14 @@ const HistoryData = () => {
     columns[columns.length - 1].render = (text, record) => (
         <Space>
             <a onClick={() => deleteHistory(record.id!)}>删除</a>
-            <a href={record.path}
-               download={record.fatherConfigName + '.json'}
-            >下载</a>
         </Space>
     )
 
     const fetchHistoryData = () => {
         getTestsHistory().then(res => {
-            setHistoryData(res.data)
+          if (res.code === FAIL_CODE) return
+          setHistoryData(res.data)
+          message.success('获取历史数据')
         })
     }
 
@@ -70,13 +83,20 @@ const HistoryData = () => {
     }, [])
 
     return (
-        <div>
+        <Card
+            title="历史数据"
+            extra={<Button onClick={fetchHistoryData}>刷新</Button>}
+            style={{
+              height: "100vh",
+              overflow: "scroll",
+            }}
+        >
             <Table
                 columns={columns}
                 dataSource={historyData}
                 rowKey="id"
             />
-        </div>
+        </Card>
     )
 }
 
