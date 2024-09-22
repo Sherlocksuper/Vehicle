@@ -28,20 +28,21 @@ export const getCollectItem = (protocol: IPro) => {
   }
 }
 
+// 如果是数模采集，返回0x01，如果是总线采集，返回0x00
 export const getCollectType = (protocol: IPro) => {
   if (protocol.protocol.protocolType === ProtocolType.Analog ||
     protocol.protocol.protocolType === ProtocolType.Digital) {
-    return 0x00
+    return 0x01
   }
-  return 0x01
+  return 0x00
 }
 
 export const getBusCategory = (protocol: IPro) => {
   switch (protocol.protocol.protocolType) {
     case ProtocolType.FlexRay:
-      return 0x02
-    case ProtocolType.CAN:
       return 0x01
+    case ProtocolType.CAN:
+      return 0x02
     case ProtocolType.MIC:
       return 0x03
     case ProtocolType.B1552B:

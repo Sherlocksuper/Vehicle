@@ -7,65 +7,63 @@ let client: net.Socket;
 let reconnectInterval = 5000; // 重连间隔 5 秒
 let isManuallyClosed = false; // 是否主动断开
 
+const mapToJson = (map: Map<string, number>) => {
+  const obj: { [key: string]: number } = {};
+  map.forEach((value, key) => {
+    obj[key] = value;
+  })
+  return JSON.stringify(obj);
+}
+
 // 创建 TCP 客户端并处理连接、断开、重连等逻辑
 export const connectWithBoard = (port: number, host: string) => {
   return new Promise<void>((resolve, reject) => {
     client = net.connect({
         port,
         host,
-        localPort: 5000
       }, () => {
         console.log(port, host, "建立鏈接成功")
-      // @ts-ignore
-      client.on = function (event, listener) {
-        console.log(event)
-        console.log(listener)
-      }
+        // @ts-ignore
+        client.on('data', (data) => {
+          // 1/ 解析数据,这里获得IReceiveData
+          const message = decodingBoardMessage(data);
+          // 2. 解析数据，这里把IReceiveData转换为Map<string, number>,每个string（signalId）对应他的value值
+          const result = decodingBoardMessageWithMap(message);
+          // 3. 把message推入CurrentReceiveData，之后留作处理
+          TestConfigService.pushReceiveData(message);
 
-        // client.on('data', (data) => {
-        //   console.log(data)
-        //   console.log(data.toString())
-        //   // 1/ 解析数据,这里获得IReceiveData
-        //   const message = decodingBoardMessage(data);
-        //   // 2. 解析数据，这里把IReceiveData转换为Map<string, number>,每个string（signalId）对应他的value值
-        //   const result = decodingBoardMessageWithMap(message);
-        //   // 3. 把message推入CurrentReceiveData，之后留作处理
-        //   TestConfigService.pushReceiveData(message);
-        //
-        //   console.log("decodingBoardMessageWith Map result ", result)
-        //
-        //   // TODO 获取message的key值
-        //   sendMessageToFront({
-        //     type: 'DATA',
-        //     message: message.toString()
-        //   });
-        // });
-        //
-        // client.on('end', () => {
-        //   console.log('Connection ended');
-        //   if (!isManuallyClosed) {
-        //     setTimeout(() => {
-        //       reconnectWithBoard(port, host);
-        //     }, reconnectInterval);
-        //   }
-        // });
-        //
-        // client.on('error', (err) => {
-        //   console.log('Connection error: ' + err)
-        //   sendMessageToFront({
-        //     type: 'NOTIFICATION',
-        //     message: '连接下位机失败: ' + err
-        //   })
-        //   client.end();
-        //   reject(err);
-        // });
+          console.log("decodingBoardMessageWith Map result ", result)
+
+          // TODO 获取message的key值
+          sendMessageToFront({
+            type: 'DATA',
+            message: mapToJson(result)
+          });
+        });
+
+        client.on('end', () => {
+          console.log('Connection ended');
+          if (!isManuallyClosed) {
+            setTimeout(() => {
+              reconnectWithBoard(port, host);
+            }, reconnectInterval);
+          }
+        });
+
+        client.on('error', (err) => {
+          console.log('Connection error: ' + err)
+          sendMessageToFront({
+            type: 'NOTIFICATION',
+            message: '连接下位机失败: ' + err
+          })
+          client.end();
+          reject(err);
+        });
 
         isManuallyClosed = false;
         resolve();
       }
     );
-    console.log(client.on.toString())
-
   })
 }
 

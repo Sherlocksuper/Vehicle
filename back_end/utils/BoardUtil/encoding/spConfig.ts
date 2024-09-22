@@ -102,7 +102,7 @@ const getCanSpConfig = (protocol: IPro) => {
   protocol.protocol.signalsParsingConfig.forEach(spConfig => {
     let a: Buffer = Buffer.from(middleHeader)
 
-    const frameNumber = transferTo16(Number(spConfig.frameNumber))
+    const frameNumber = transferTo8(Number(spConfig.frameNumber))
     const frameId = transferTo32(Number(spConfig.frameId))
     const signalLength = transferTo8(spConfig.signals.length!)
 

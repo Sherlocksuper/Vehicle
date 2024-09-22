@@ -79,6 +79,9 @@ export const decodingBoardMessageWithMap = (receiveData: IReceiveData): Map<stri
     receiveData.busType,
     receiveData.frameId
   )
+  console.log(key)
+  console.log("mapping realtionship",TestConfigService.signalsMappingRelation)
+  console.log(TestConfigService.signalsMappingRelation.get(key))
 
   const values: number[] = []
 
