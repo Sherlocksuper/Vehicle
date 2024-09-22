@@ -1,6 +1,6 @@
-import {Button, Col, Form, Input, Row, Space} from "antd";
-import React, {useEffect} from "react";
-import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {Button, Col, Form, Input, Row, Space, Tooltip} from "antd";
+import React from "react";
+import {MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 
 export interface IProtocolSignal {
   id: string
@@ -338,7 +338,7 @@ export const FlexRaySignalsParsingForm = () => (
 export const MICSignalsParsingForm = () => {
   return (
     <Form.List name="signalsParsingConfig">
-      {(fields) => {
+      {(fields, {add, remove}) => {
         return (
           <>
             {fields.map(({key, name, ...restField}) => (
@@ -356,6 +356,14 @@ export const MICSignalsParsingForm = () => {
                               rules={[{required: true, message: '请输入DEVID'}]}>
                     <Input type="number" placeholder="DEVID"/>
                   </Form.Item>
+                  <MinusCircleOutlined onClick={() => remove(name)}/>
+
+                  <Form.Item>
+                    <Tooltip title="信号解析配置按照Dev Select由大位到小位的顺序进行解析">
+                      <QuestionCircleOutlined/>
+                    </Tooltip>
+                  </Form.Item>
+
                 </Space>
                 <Form.List name={[name, 'signals']}>
                   {(signalFields, {add: addSignal, remove: removeSignal}) => (
@@ -369,6 +377,11 @@ export const MICSignalsParsingForm = () => {
                 </Form.List>
               </Space>
             ))}
+            <Form.Item>
+              <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
+                添加解析配置
+              </Button>
+            </Form.Item>
           </>
         );
       }}
@@ -379,7 +392,7 @@ export const MICSignalsParsingForm = () => {
 export const B1552BSignalParsingForm = () => {
   return (
     <Form.List name="signalsParsingConfig">
-      {(fields) => (
+      {(fields,{add,remove}) => (
         <>
           {fields.map(({key, name, ...restField}) => (
             <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
@@ -396,6 +409,12 @@ export const B1552BSignalParsingForm = () => {
                             rules={[{required: true, message: '请输入子地址'}]}>
                   <Input type="number" placeholder="子地址"/>
                 </Form.Item>
+                <MinusCircleOutlined onClick={() => remove(name)}/>
+                <Form.Item>
+                  <Tooltip title="信号解析配置按照子地址由大位到小位的顺序进行解析">
+                    <QuestionCircleOutlined/>
+                  </Tooltip>
+                </Form.Item>
               </Space>
               <Space>
                 <Form.List name={[name, 'signals']}>
@@ -411,6 +430,11 @@ export const B1552BSignalParsingForm = () => {
               </Space>
             </Space>
           ))}
+          <Form.Item>
+            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
+              添加解析配置
+            </Button>
+          </Form.Item>
         </>
       )}
     </Form.List>

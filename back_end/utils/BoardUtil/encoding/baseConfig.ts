@@ -1,7 +1,7 @@
 import {IAIOBaseConfig, IB1552BBaseConfig, ICanBaseConfig, IFlexRayBaseConfig, IMICBaseConfig, IProtocolModel, ISerialBaseConfig, ProtocolType} from "../../../app/model/PreSet/Protocol.model";
 import {IControllerModel} from "../../../app/model/BoardManage/Controller.model";
 import {ICollectorModel} from "../../../app/model/BoardManage/Collector.model";
-import {getCollectItem, transferTo16, transferTo32, transferTo8} from "./index";
+import {getCollectItem, transferTo16, transferTo24, transferTo32, transferTo8} from "./index";
 
 export const totalHeader = [0xff, 0x00]
 
@@ -66,6 +66,7 @@ const getCanBaseConfig = (protocol: IPro) => {
 
   const canConfig = (protocol.protocol.baseConfig as ICanBaseConfig)
   const baudRateBuffer = transferTo16(canConfig.baudRate)
+  // const baudRateBuffer = transferTo24(canConfig.baudRate)
 
   // Concatenate the buffers
   result = Buffer.concat([result, baudRateBuffer])

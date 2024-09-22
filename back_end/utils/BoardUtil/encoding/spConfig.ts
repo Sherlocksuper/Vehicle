@@ -1,6 +1,6 @@
 import {IProtocolSignal, ProtocolType} from "../../../app/model/PreSet/Protocol.model";
 import {IPro} from "./baseConfig";
-import {getBusCategory, getCollectItem, getCollectType, transferTo32, transferTo8} from "./index";
+import {getBusCategory, getCollectItem, getCollectType, transferTo16, transferTo32, transferTo8} from "./index";
 
 
 export const totalHeader = [0xff, 0x00]
@@ -101,7 +101,12 @@ const getCanSpConfig = (protocol: IPro) => {
 
   protocol.protocol.signalsParsingConfig.forEach(spConfig => {
     let a: Buffer = Buffer.from(middleHeader)
-    a = Buffer.concat([a, Buffer.from([Number(spConfig.frameNumber), Number(spConfig.frameId), Number(spConfig.signals.length)])])
+
+    const frameNumber = transferTo16(Number(spConfig.frameNumber))
+    const frameId = transferTo32(Number(spConfig.frameId))
+    const signalLength = transferTo8(spConfig.signals.length!)
+
+    a = Buffer.concat([a, frameNumber, frameId, signalLength])
 
     const collectType = getCollectType(protocol)
     const collectCategory = getBusCategory(protocol)

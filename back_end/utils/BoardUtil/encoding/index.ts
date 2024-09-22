@@ -2,6 +2,7 @@ import {ITestConfig} from "../../../app/model/TestConfig";
 import {getBaseConfig, IPro} from "./baseConfig";
 import {getSpConfig} from "./spConfig";
 import {ProtocolType} from "../../../app/model/PreSet/Protocol.model";
+import {getBanConfig} from "./banConfig";
 
 export const middleHeader = [0xff, 0x00]
 
@@ -27,7 +28,7 @@ export const getCollectItem = (protocol: IPro) => {
   }
 }
 
-export const getCollectType = (protocol:IPro) => {
+export const getCollectType = (protocol: IPro) => {
   if (protocol.protocol.protocolType === ProtocolType.Analog ||
     protocol.protocol.protocolType === ProtocolType.Digital) {
     return 0x00
@@ -69,6 +70,12 @@ export const transferTo16 = (num: number) => {
   return buffer
 }
 
+export const transferTo24 = (num: number) => {
+  const buffer = Buffer.alloc(3);
+  buffer.writeUIntBE(num, 0, 3);
+  return buffer
+}
+
 export const transferTo32 = (num: number) => {
   const buffer = Buffer.alloc(4);
   buffer.writeUInt32BE(num, 0);
@@ -78,17 +85,16 @@ export const transferTo32 = (num: number) => {
 
 export const getConfigBoardMessage = (config: ITestConfig) => {
   const result: Buffer[] = []
+  const banMessages: Buffer[] = []
   const signalsMap = new Map<string, string[]>()
 
   config.configs.forEach((config) => {
     config.vehicle.protocols.forEach((protocol) => {
-      // console.log(JSON.stringify(protocol.protocol))
-      // console.log(protocol.protocol.protocolName, "的基础配置为", getBaseConfig(protocol))
-      result.push(getBaseConfig(protocol))
+      const baseConfig = getBaseConfig(protocol)
+      result.push(baseConfig)
 
+      // NOTE:推入信号解析配置
       const spConfigResult = getSpConfig(protocol)
-      // console.log(protocol.protocol.protocolName, "的信号解析配置为", getSpConfig(protocol))
-
       result.push(...spConfigResult.resultMessages)
       spConfigResult.signalsMap.forEach((value, key) => {
         if (signalsMap.has(key)) {
@@ -100,10 +106,13 @@ export const getConfigBoardMessage = (config: ITestConfig) => {
 
       const enableConfig = getEnableConfig(protocol)
       result.push(enableConfig)
+
+      const banConfig = getBanConfig(protocol)
+      banMessages.push(banConfig)
     })
   })
 
-  return {resultMessages: result, signalsMap}
+  return {resultMessages: result, signalsMap: signalsMap, banMessages: banMessages}
 }
 
 // 使能：ff 00 02(目标ID，Flexray、CAN、MIC、1552B、串口为02，模拟量、数字量为03) 02(采集项，Flexray01,CAN02,MIC03,1552B04,串口：422为05，232为06，模拟量07，数字量08)

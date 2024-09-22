@@ -1,4 +1,5 @@
 import {getSignalMapKey} from "../encoding/spConfig";
+import TestConfigService from "../../../app/service/TestConfig"
 
 const splitBufferByDelimiter = (buffer: Buffer, delimiter: Buffer): Buffer[] => {
   let start = 0;
@@ -13,7 +14,7 @@ const splitBufferByDelimiter = (buffer: Buffer, delimiter: Buffer): Buffer[] => 
   return result;
 }
 
-interface IReceiveData {
+export interface IReceiveData {
   moduleId: number;
   collectType: number;
   busType: number;
@@ -33,8 +34,7 @@ interface IReceiveSignal {
   value: number;
 }
 
-// 当前数据映射表/Map
-let currentDataMapDecoding = new Map<string, string[]>();
+// 当前数据映射表 通过key值把信号id与信号值对应起来
 
 // 处理一个
 export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
@@ -70,19 +70,6 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   return result;
 }
 
-export const setCurrentDataMapDecoding = (map: Map<string, string[]>) => {
-  currentDataMapDecoding = map;
-  console.log(map)
-}
-
-export const getCurrentDataMapDecoding = () => {
-  return currentDataMapDecoding;
-}
-
-export const clearCurrentDataMapDecoding = () => {
-  currentDataMapDecoding.clear();
-}
-
 // 做一个数据映射
 // 把接收到的数据映射为一个object，key为getSignalKey，value为信号值
 export const decodingBoardMessageWithMap = (receiveData: IReceiveData): Map<string, number> => {
@@ -101,7 +88,7 @@ export const decodingBoardMessageWithMap = (receiveData: IReceiveData): Map<stri
 
   const result = new Map<string, number>();
   // 序列
-  const signalOrder = currentDataMapDecoding.get(key);
+  const signalOrder = TestConfigService.signalsMappingRelation.get(key)
   if (!signalOrder) {
     return result;
   }

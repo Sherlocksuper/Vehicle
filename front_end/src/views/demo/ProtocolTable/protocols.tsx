@@ -114,8 +114,10 @@ export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
           </Form.Item>
           <Form.Item name={"protocolType"} initialValue={protocolType}>
             <Select placeholder="请选择协议" onSelect={(value) => {
+              form.resetFields(["signalsParsingConfig"])
               form.setFieldsValue({protocolType: value})
-              setProtocolType(value)
+              setProtocolType(value
+              )
             }}>
               {
                 Object.values(ProtocolType).map((item) => {
