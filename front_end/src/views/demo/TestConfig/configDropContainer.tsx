@@ -127,12 +127,15 @@ const UpdateItemModal: React.FC<{
   }, [form, itemConfig, open])
 
   const handleUpdate = () => {
+    console.log(itemConfig)
     const newConfig = form.getFieldsValue()
     newConfig.requestSignals = newConfig.requestSignals.map((signal: string) => {
       return JSON.parse(signal)
     })
     itemConfig.requestSignals = newConfig.requestSignals
     itemConfig.title = newConfig.title
+    itemConfig.min = newConfig.min
+    itemConfig.max = newConfig.max
     setOpenItemId("");
     updateDragItem(item.id, itemConfig);
   };
@@ -166,6 +169,18 @@ const UpdateItemModal: React.FC<{
             ))}
           </Select>
         </Form.Item>
+        {
+          item.type === DragItemType.NUMBER && (
+            <>
+              <Form.Item label="最小值" name="min" initialValue={0}>
+                <Input/>
+              </Form.Item>
+              <Form.Item label="最大值" name="max" initialValue={100}>
+                <Input/>
+              </Form.Item>
+            </>
+          )
+        }
       </Form>
     </Modal>
   );

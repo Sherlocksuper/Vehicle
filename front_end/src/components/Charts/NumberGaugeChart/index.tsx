@@ -2,6 +2,7 @@ import * as echarts from "echarts"
 import {useCallback, useEffect, useRef, useState} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
 
+// 仪表盘图
 const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
 
 
@@ -11,6 +12,9 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
   const {
     requestSignals,
     currentTestChartData,
+
+    min,
+    max,
 
     unit,
     title,
@@ -43,6 +47,9 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
     chartRef.current?.setOption({
       series: [
         {
+          min : min,
+          max : max,
+          splitNumber: 10,
           data: [
             {
               value: value[value.length - 1],
