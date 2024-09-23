@@ -61,7 +61,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       requestSignals.forEach((item) => {
         dataRef.current.push({
           id: item.id,
-          name: item.name,
+          name: item.belongVehicle !== '' ? item.belongVehicle + '-' + item.name : item.name,
           type: 'line',
           stack: 'Total',
           symbol: 'none',

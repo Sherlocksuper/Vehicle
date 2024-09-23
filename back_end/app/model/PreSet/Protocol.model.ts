@@ -3,6 +3,7 @@ import {Col} from "sequelize/types/utils";
 export interface IProtocolSignal {
     id: string
     name: string
+    belongVehicle: string
     dimension: string
     startPoint: string
     length: string

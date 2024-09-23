@@ -171,13 +171,16 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
                                                       >
                                                         {
                                                           vehicleHasSelected.find(vehicle => vehicle.id === parseToObject(form.getFieldValue(['configs', configIndex, 'vehicle']))?.id)?.protocols.map(protocol => {
-                                                            console.log(protocol)
+                                                            const vehicle =  vehicleHasSelected.find(vehicle => vehicle.id === parseToObject(form.getFieldValue(['configs', configIndex, 'vehicle']))?.id)
                                                             return (
                                                               protocol.protocol.signalsParsingConfig.map(parsingConfig => (
-                                                                parsingConfig.signals.map(signal => (
-                                                                  <Select.Option key={signal.id}
-                                                                                 value={JSON.stringify(signal)}>{ protocol.protocol.protocolName + ": " + signal.name}</Select.Option>
-                                                                ))
+                                                                parsingConfig.signals.map(signal => {
+                                                                  signal.belongVehicle = vehicle.vehicleName
+                                                                  return (
+                                                                    <Select.Option key={signal.id}
+                                                                                   value={JSON.stringify(signal)}>{ protocol.protocol.protocolName + ": " + signal.name}</Select.Option>
+                                                                  )
+                                                                })
                                                               ))
                                                             )
                                                           })
