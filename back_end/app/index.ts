@@ -60,7 +60,7 @@ server.on('upgrade', (request, socket, head) => {
 
 const run = async (port: string): Promise<Server> => {
   await DB.connectDB();
-  // await DB.initDB();
+  await DB.initDB();
   return server.listen(port, () => {
     console.log(`HTTP server running at http://localhost:${port}`);
   });

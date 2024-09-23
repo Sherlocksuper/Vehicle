@@ -72,3 +72,41 @@ export default class TestConfig extends Model<ITestConfig> {
   @Column
   updatedAt!: Date
 }
+
+
+
+@Table({
+  tableName: 'current_test_config'
+})
+export class CurrentTestConfig extends Model<ITestConfig> {
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
+  id!: number;
+
+  @Column(DataType.STRING)
+  name!: string;
+
+  @Column(DataType.JSON)
+  configs!: {
+    vehicle: IVehicleModel,
+    projects: {
+      name: string,
+      indicators: {
+        name: string,
+        signal: IProtocolSignal
+      }[]
+    }[]
+  }[]
+
+  @Column(DataType.JSON)
+  template!: ITemplate
+
+  @CreatedAt
+  @Column
+  createdAt!: Date
+
+  @UpdatedAt
+  @Column
+  updatedAt!: Date
+}

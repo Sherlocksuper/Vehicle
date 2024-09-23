@@ -18,7 +18,7 @@ import HistoryModel from "../model/History.model";
 import VehicleService from "../service/PreSet/VehicleService";
 import ProjectService from "../service/PreSet/ProjectService";
 import Protocol from "../model/PreSet/Protocol.model";
-import TestConfig from "../model/TestConfig";
+import TestConfig, {CurrentTestConfig} from "../model/TestConfig";
 import ProtocolService from "../service/PreSet/ProtocolService";
 import TestConfigService from "../service/TestConfig";
 
@@ -29,7 +29,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     dialect: 'mysql',
     port: DB_PORT,
     logging: false,
-    models: [User, TokenBlackListItem, Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel, Protocol, TestConfig]
+    models: [User, TokenBlackListItem, Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, TestProcessN, HistoryModel, Protocol, TestConfig, CurrentTestConfig]
 });
 
 const DB_OPT = {
@@ -43,23 +43,25 @@ const DB_OPT = {
     },
     async initDB() {
         try {
-            await sequelize.sync({force: true})
-            // 初始化核心板卡
-            await ControllerService.initControllers()
-            // 初始化采集板卡
-            await CollectorService.initCollectors()
-            // 初始化采集信号
-            await SignalService.initSignals()
-            // 初始化超级用户表
-            await UserService.initRootUser()
-            // 初始化测试项目
-            // await ProjectService.initProject(10)
-            // 初始化Protocol协议
-            await ProtocolService.initProtocol()
-            // 初始化车辆
-            await VehicleService.initVehicleData()
-            // 初始化测试配置
-            await TestConfigService.initTestConfig()
+            // await sequelize.sync({force: true})
+            // // 初始化核心板卡
+            // await ControllerService.initControllers()
+            // // 初始化采集板卡
+            // await CollectorService.initCollectors()
+            // // 初始化采集信号
+            // await SignalService.initSignals()
+            // // 初始化超级用户表
+            // await UserService.initRootUser()
+            // // 初始化测试项目
+            // // await ProjectService.initProject(10)
+            // // 初始化Protocol协议
+            // await ProtocolService.initProtocol()
+            // // 初始化车辆
+            // await VehicleService.initVehicleData()
+            // // 初始化测试配置
+            // await TestConfigService.initTestConfig()
+
+            await TestConfigService.tryRecoverConfig()
             console.log('The database table has been initialized.');
         } catch (error) {
             console.error('Description Database table initialization failed:', error);

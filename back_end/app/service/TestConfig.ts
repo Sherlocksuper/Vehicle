@@ -2,7 +2,7 @@
  * create by lby
  */
 
-import TestConfig, {ITestConfig} from "../model/TestConfig";
+import TestConfig, {CurrentTestConfig, ITestConfig} from "../model/TestConfig";
 import {getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
 import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
 import {connectWithBoard, disconnectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
@@ -75,7 +75,7 @@ class TestConfigService {
   async getTestConfigById(id: number): Promise<ITestConfig | null> {
     try {
       const testConfig = await TestConfig.findByPk(id)
-      return testConfig
+      return testConfig?.dataValues!
     } catch (error) {
       console.log(error);
       return null
@@ -108,8 +108,9 @@ class TestConfigService {
    * 下发测试流程，设置当前的测试流程为testPrdcessN
    */
   async downTestConfig(testConfigId: number) {
-    const testConfig = await this.getTestConfigById(testConfigId);
     if (this.currentTestConfig) return false
+    const testConfig = await this.getTestConfigById(testConfigId);
+    if (!testConfig) return false
 
     // 解析下发的配置，获取需要下发的信息、信号的映射
     const res = getConfigBoardMessage(testConfig!)
@@ -118,28 +119,20 @@ class TestConfigService {
     this.signalsMappingRelation = res.signalsMap
     this.banMessage = res.banMessages
     this.currentTestConfig = testConfig
+    await this.storeCurrentConfigToSql(testConfig!)
 
-    // TODO
-    // 连接板子
-    try {
-      await connectWithBoard(66, '192.168.1.66')
-    } catch (e) {
-      this.clearCurrent()
-      return false
-    }
-
+    // try {
+    //   await connectWithBoard(66, '192.168.1.66')
+    // } catch (e) {
+    //   return false
+    // }
+    //
     // 发送所有消息给板子
-    try {
-      await sendMultipleMessagesBoard(res.resultMessages, 1000)
-    } catch (e) {
-      this.clearCurrent()
-      return false
-    }
-
-    // 开始模拟板子消息
-    // TODO  正常这一步要删掉
-    // startMockBoardMessage(res.signalsMap)
-
+    // try {
+    //   await sendMultipleMessagesBoard(res.resultMessages, 1000)
+    // } catch (e) {
+    //   return false
+    // }
     return true
   }
 
@@ -148,10 +141,7 @@ class TestConfigService {
    */
   async stopCurrentTestConfig() {
     await sendMultipleMessagesBoard(this.banMessage, 200)
-
-    // TODO,正常要删掉
-    // stopMockBoardMessage()
-    this.clearCurrent()
+    await this.clearCurrent()
     return true
   }
 
@@ -159,13 +149,51 @@ class TestConfigService {
     this.currentTestConfigReceiveData.push(data)
   }
 
-  clearCurrent() {
+  async clearCurrent() {
     this.currentTestConfig = null
     this.signalsMappingRelation.clear()
     this.currentTestConfigReceiveData = []
     this.resultMessages = []
     this.banMessage = []
     disconnectWithBoard()
+    await this.deleteCurrentConfigFromSql()
+  }
+
+  async storeCurrentConfigToSql(config:ITestConfig) {
+    await this.deleteCurrentConfigFromSql()
+    console.log(config)
+    await CurrentTestConfig.create(config)
+  }
+
+  async getCurrentConfigFromSql() {
+    // 使用findOne方法获取第一条记录
+    const config = await CurrentTestConfig.findOne({
+      order: [
+        ['id', 'ASC'] // 按照id升序排序
+      ]
+    });
+    return config;
+  }
+
+  async deleteCurrentConfigFromSql() {
+    try {
+      await CurrentTestConfig.destroy({
+        where: {}, // 不传入任何条件，将删除所有记录
+        truncate: true // 这将重置自增ID
+      });
+      console.log('Table CurrentTestConfig has been cleared.');
+    } catch (error) {
+      console.error('Failed to clear the table CurrentTestConfig:', error);
+    }
+  }
+
+  // 尝试恢复之前下发配置
+  async tryRecoverConfig() {
+    const config = await this.getCurrentConfigFromSql()
+    if (config) {
+      console.log("之前的数据为", config)
+      await this.downTestConfig(config.id)
+    }
   }
 
   downReceiveDataToXlsx() {
