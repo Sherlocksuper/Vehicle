@@ -133,18 +133,17 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
     const boardType = type === 'controller' ? '核心板卡' : '采集板卡'
 
     const checkValid = () => {
-        const addresses = address.split(".");
-        if (addresses.length !== 4) {
-            message.error("板卡地址格式错误");
-            return false;
-        }
-        addresses.forEach((i: string) => {
-            if (isNaN(Number(i)) || Number(i) < 0 || Number(i) > 255) {
-                message.error("板卡地址格式错误");
-                return false;
-            }
-        });
-
+        // const addresses = address.split(".");
+        // if (addresses.length !== 4) {
+        //     message.error("板卡地址格式错误");
+        //     return false;
+        // }
+        // addresses.forEach((i: string) => {
+        //     if (isNaN(Number(i)) || Number(i) < 0 || Number(i) > 255) {
+        //         message.error("板卡地址格式错误");
+        //         return false;
+        //     }
+        // });
         return true;
     };
 
