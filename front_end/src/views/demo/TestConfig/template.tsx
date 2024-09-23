@@ -10,7 +10,7 @@ import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import GridLayout from "react-grid-layout";
 import {DEFAULT_TITLE, SUCCESS_CODE} from "@/constants";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
-import {getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig.ts";
+import {downHistoryDataAsJson, getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
@@ -439,17 +439,26 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
           }}>切换到配置模式</Button>
 
         <Button onClick={() => {
-          const worker = getHistoryToFileWorker()
-          worker.onmessage = (event) => {
-            const file = event.data
-            downFile(file, testConfig.name, 'ACTIVE')
-          }
+          // const worker = getHistoryToFileWorker()
+          // worker.onmessage = (event) => {
+          //   const file = event.data
+          //   downFile(file, testConfig.name, 'ACTIVE')
+          // }
+
+          downHistoryDataAsJson().then((res) => {
+            if (res.code === SUCCESS_CODE) {
+              // downFile(res.data, testConfig.name, 'ACTIVE')
+              message.success('下载成功')
+            } else {
+              message.error('下载失败,请重试')
+            }
+          })
 
           // TODO 是否保留以前的数据
-          history.current.endTime = Date.now()
-          worker.postMessage(history.current)
-          history.current.startTime = Date.now()
-          history.current.historyData = []
+          // history.current.endTime = Date.now()
+          // worker.postMessage(history.current)
+          // history.current.startTime = Date.now()
+          // history.current.historyData = []
         }}>下载收集数据</Button>
       </Space>
     }
