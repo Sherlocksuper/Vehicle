@@ -175,7 +175,7 @@ export const Serial422BaseConfig = () => {
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
-          name={["baseConfig", "stopBit"]}
+          name={["baseConfig", "stopBits"]}
           rules={[{required: true, message: "请输入停止位"}]}
         >
           <Input type="number" placeholder="停止位"/>
@@ -392,7 +392,7 @@ export const MICSignalsParsingForm = () => {
 export const B1552BSignalParsingForm = () => {
   return (
     <Form.List name="signalsParsingConfig">
-      {(fields,{add,remove}) => (
+      {(fields, {add, remove}) => (
         <>
           {fields.map(({key, name, ...restField}) => (
             <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
@@ -444,7 +444,7 @@ export const B1552BSignalParsingForm = () => {
 // 串口
 export const Serial422SignalsParsingForm = () => (
   <Form.List name="signalsParsingConfig">
-    {(fields) => (
+    {(fields, {add, remove}) => (
       <>
         {fields.map(({key, name}) => (
           <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
@@ -459,11 +459,15 @@ export const Serial422SignalsParsingForm = () => (
             </Form.List>
           </Space>
         ))}
-        {/*<Form.Item>*/}
-        {/*  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>*/}
-        {/*    添加解析配置*/}
-        {/*  </Button>*/}
-        {/*</Form.Item>*/}
+        {
+          fields.length === 0 && (
+            <Form.Item>
+              <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
+                添加解析配置
+              </Button>
+            </Form.Item>
+          )
+        }
       </>
     )}
   </Form.List>
@@ -471,7 +475,7 @@ export const Serial422SignalsParsingForm = () => (
 
 export const Serial232SignalsParsingForm = () => (
   <Form.List name="signalsParsingConfig">
-    {(fields) => (
+    {(fields, {add}) => (
       <>
         {fields.map(({key, name}) => (
           <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
@@ -487,11 +491,15 @@ export const Serial232SignalsParsingForm = () => (
             </Form.List>
           </Space>
         ))}
-        {/*<Form.Item>*/}
-        {/*  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>*/}
-        {/*    添加解析配置*/}
-        {/*  </Button>*/}
-        {/*</Form.Item>*/}
+        {
+          fields.length === 0 && (
+            <Form.Item>
+              <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
+                添加解析配置
+              </Button>
+            </Form.Item>
+          )
+        }
       </>
     )}
   </Form.List>
