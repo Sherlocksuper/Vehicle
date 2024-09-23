@@ -17,6 +17,11 @@ const mapToJson = (map: Map<string, number>) => {
 
 // 创建 TCP 客户端并处理连接、断开、重连等逻辑
 export const connectWithBoard = (port: number, host: string) => {
+  if (client) {
+    console.log('Client already exists');
+    return;
+  }
+
   return new Promise<void>((resolve, reject) => {
       client = net.connect({
           port,
@@ -73,14 +78,16 @@ export const connectWithBoard = (port: number, host: string) => {
 }
 
 // 重连逻辑
-export const reconnectWithBoard = (port: number, host: string) => {
+export const reconnectWithBoard = async (port: number, host: string) => {
   if (!isManuallyClosed) {
     console.log("重连中")
     sendMessageToFront({
       type: 'NOTIFICATION',
       message: '正在尝试与下位机重新连接...'
     })
-    connectWithBoard(port, host);
+    // 重连的时候尝试下发之前的配置
+    await TestConfigService.tryRecoverConfig();
+    await connectWithBoard(port, host);
   } else {
     console.log("不重连")
   }

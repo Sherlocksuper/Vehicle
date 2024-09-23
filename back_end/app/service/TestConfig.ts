@@ -121,18 +121,18 @@ class TestConfigService {
     this.currentTestConfig = testConfig
     await this.storeCurrentConfigToSql(testConfig!)
 
-    // try {
-    //   await connectWithBoard(66, '192.168.1.66')
-    // } catch (e) {
-    //   return false
-    // }
-    //
+    try {
+      await connectWithBoard(66, '192.168.1.66')
+    } catch (e) {
+      return false
+    }
+
     // 发送所有消息给板子
-    // try {
-    //   await sendMultipleMessagesBoard(res.resultMessages, 1000)
-    // } catch (e) {
-    //   return false
-    // }
+    try {
+      await sendMultipleMessagesBoard(res.resultMessages, 1000)
+    } catch (e) {
+      return false
+    }
     return true
   }
 
