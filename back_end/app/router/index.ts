@@ -159,5 +159,7 @@ router.post('/updateTestConfig/:id', TestConfigController.updateTestConfigById);
 router.post('/downTestConfig', TestConfigController.downTestConfig);
 router.get('/getCurrentTestConfig', TestConfigController.getCurrentTestConfig);
 router.get('/stopCurrentTestConfig', TestConfigController.stopCurrentTestConfig);
+//async downHistoryDataAsJson() {
+router.get('/downHistoryDataAsJson', TestConfigController.downHistoryDataAsJson);
 
 export default router

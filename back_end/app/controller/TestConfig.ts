@@ -140,32 +140,20 @@ class TestConfigController {
     })
   }
 
-  async startConnection(ctx: Context) {
 
-    const res = ctx.res;
-    ctx.res.setHeader('Content-Type', 'text/event-stream');
-    ctx.res.setHeader('Cache-Control', 'no-cache');
-    ctx.res.setHeader('Connection', 'keep-alive');
-    ctx.res.setHeader('Access-Control-Allow-Origin', '*');
-
-    // @ts-ignore
-    res.end = undefined
-
-    let startTime = Date.now();
-
-    const sendEvent = () => {
-      if (Date.now() - startTime >= 10000) {
-        res.write('event: close\ndata: {}\n\n');//发送一个特殊事件通知客户端关闭
-        return;
-      }
-
-      const data = {message: 'Hello World', timestamp: new Date()};
-      res.write(`data:${JSON.stringify(data)}\n\n`);
-
-      setTimeout(sendEvent, 2000);
-    };
-
-    sendEvent();
+  // async downHistoryDataAsJson() {
+  async downHistoryDataAsJson(ctx: Context) {
+    const res = await TestConfigService.downHistoryDataAsJson();
+    res && ((ctx.body as IResBody) = {
+      code: SUCCESS_CODE,
+      msg: SEARCH_SUCCESS_MSG,
+      data: null
+    })
+    !res && ((ctx.body as IResBody) = {
+      code: FAIL_CODE,
+      msg: SEARCH_FAIL_MSG,
+      data: null
+    })
   }
 }
 

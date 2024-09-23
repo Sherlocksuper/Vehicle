@@ -1,5 +1,6 @@
 // @ts-ignore
 import WebSocket from 'app/ztcp/toFront';
+import TestConfigService from "../service/TestConfig";
 
 export let webSockets: Set<WebSocket> = new Set()
 
@@ -36,6 +37,12 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
       values.forEach((value) => {
         message[value] = Math.random() * 100
       })
+
+      TestConfigService.currentTestConfigHistoryData.push({
+        time: new Date().getTime(),
+        data: message
+      });
+
       sendMessageToFront({
         type: "DATA",
         message: JSON.stringify(message)

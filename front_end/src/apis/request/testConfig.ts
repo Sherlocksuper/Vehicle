@@ -87,3 +87,11 @@ export const updateTestConfigById = async (id: number, iConfig: ITestConfig) => 
     params: iConfig
   });
 }
+
+
+export const downHistoryDataAsJson = async () => {
+  const api = TEST_CONFIG_API.downHistoryDataAsJson;
+  return request({
+    api: api
+  });
+}

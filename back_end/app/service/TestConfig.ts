@@ -7,11 +7,19 @@ import {getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
 import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
 import {connectWithBoard, disconnectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
 import {IReceiveData} from "../../utils/BoardUtil/decoding";
+import HistoryService from "./HistoryService";
+import * as fs from "fs";
 
 class TestConfigService {
 
   currentTestConfig: ITestConfig | null = null
   currentTestConfigReceiveData: IReceiveData[] = []
+  currentTestConfigHistoryData: {
+    time: number
+    data: {
+      [key: number]: number
+    }
+  }[] = []
 
   resultMessages: Buffer[] = []
   signalsMappingRelation: Map<string, string[]> = new Map()
@@ -133,6 +141,8 @@ class TestConfigService {
     } catch (e) {
       return false
     }
+
+    // startMockBoardMessage(this.signalsMappingRelation)
     return true
   }
 
@@ -140,6 +150,7 @@ class TestConfigService {
    * 停止当前下发
    */
   async stopCurrentTestConfig() {
+    stopMockBoardMessage()
     await sendMultipleMessagesBoard(this.banMessage, 200)
     await this.clearCurrent()
     return true
@@ -159,7 +170,7 @@ class TestConfigService {
     await this.deleteCurrentConfigFromSql()
   }
 
-  async storeCurrentConfigToSql(config:ITestConfig) {
+  async storeCurrentConfigToSql(config: ITestConfig) {
     await this.deleteCurrentConfigFromSql()
     console.log(config)
     await CurrentTestConfig.create(config)
@@ -194,6 +205,45 @@ class TestConfigService {
       console.log("之前的数据为", config)
       await this.downTestConfig(config.id)
     }
+  }
+
+  async downHistoryDataAsJson() {
+    const currentTestConfigId = this.currentTestConfig?.id!
+    //获取当前测试配置的历史数据
+    const testConfig = await this.getTestConfigById(currentTestConfigId)
+
+    console.log(this.currentTestConfigHistoryData)
+
+    const historyName = (testConfig?.name ?? "默认名称") + new Date().getHours() + new Date().getMinutes()
+
+    const history = {
+      // 月、日、时、分
+      historyName: historyName,
+      configName: this.currentTestConfig?.name ?? "默认名称",
+      startTime: this.currentTestConfigHistoryData[0].time,
+      endTime: this.currentTestConfigHistoryData[this.currentTestConfigHistoryData.length - 1].time,
+      template: testConfig?.template,
+      historyData: this.currentTestConfigHistoryData
+    }
+
+    const dir = '../public/uploads/' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
+    // 年-月-日
+    const path = dir + '/' + historyName + '.json'
+    // 确保文件夹存在
+    try {
+      fs.mkdirSync(dir, {recursive: true});
+
+      // 创建一个文件
+      fs.writeFile(path, JSON.stringify(history, null, 2), (err) => {
+        if (err) {
+          console.error('Failed to write file:', err);
+        }
+      });
+    } catch (error) {
+      console.error('Failed to write file:', error);
+      return false
+    }
+    return true
   }
 
   downReceiveDataToXlsx() {
