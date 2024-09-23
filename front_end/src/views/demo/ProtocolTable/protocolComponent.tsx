@@ -508,7 +508,7 @@ export const Serial232SignalsParsingForm = () => (
 // 模拟量
 export const AnalogSignalsParsingForm = () => {
   return <Form.List name="signalsParsingConfig">
-    {(fields) => (
+    {(fields,{add}) => (
       <>
         {fields.map(({key, name}) => (
           <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
@@ -524,11 +524,15 @@ export const AnalogSignalsParsingForm = () => {
             </Form.List>
           </Space>
         ))}
-        {/*<Form.Item>*/}
-        {/*  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>*/}
-        {/*    添加解析配置*/}
-        {/*  </Button>*/}
-        {/*</Form.Item>*/}
+        {
+          fields.length === 0 && (
+            <Form.Item>
+              <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined/>}>
+                添加解析配置
+              </Button>
+            </Form.Item>
+          )
+        }
       </>
     )}
   </Form.List>
