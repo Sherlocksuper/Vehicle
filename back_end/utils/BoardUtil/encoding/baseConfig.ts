@@ -142,6 +142,7 @@ const getSerial232BaseConfig = (protocol: IPro) => {
   const serial422Config = (protocol.protocol.baseConfig as ISerialBaseConfig)
   const baudRate = transferTo32(serial422Config.baudRate)
   const stopBits = serial422Config.stopBits
+  console.log("stopBits is ",stopBits)
   const check = serial422Config.check
   const checkType = serial422Config.checkType
   result = Buffer.concat([result, baudRate, Buffer.from([stopBits, check, checkType])])
