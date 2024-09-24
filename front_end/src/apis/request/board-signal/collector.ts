@@ -32,3 +32,11 @@ export const updateCollector = async (collector: ICollector) => {
         params: collector,
     });
 }
+
+export const deleteCollector = async (collector: ICollector) => {
+    const api = MyUrl.TEST.deleteCollector
+    return request({
+        api: api,
+        params: collector,
+    });
+}

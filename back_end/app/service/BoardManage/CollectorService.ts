@@ -57,6 +57,12 @@ class CollectorService {
             where: {id: data.id}
         })
     }
+
+    async deleteCollector(id: number) {
+        return await Collector.destroy({
+            where: {id}
+        })
+    }
 }
 
 export default new CollectorService

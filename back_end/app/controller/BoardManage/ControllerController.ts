@@ -105,6 +105,29 @@ class ControllerController {
             }
         }
     }
+
+    async deleteController(ctx: Context) {
+        try {
+            const controller = ctx.request.body as IControllerModel
+            const result = await ControllerService.deleteController(controller.id!)
+            if (result) {
+                (ctx.body as IResBody) = {
+                    code: SUCCESS_CODE,
+                    msg: '删除核心板卡成功',
+                    data: null
+                }
+            } else {
+                throw new Error('删除核心板卡失败')
+            }
+        } catch (error) {
+            (ctx.body as IResBody) = {
+                code: FAIL_CODE,
+                msg: (error as Error).toString(),
+                data: null
+
+            }
+        }
+    }
 }
 
 export default new ControllerController

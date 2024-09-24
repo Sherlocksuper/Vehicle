@@ -9,11 +9,13 @@ export const TEST: UrlMap = {
     getControllerList: ControllerMap.getControllerList,
     getAllControllerList: ControllerMap.getAllControllerList,
     updateController: ControllerMap.updateController,
+    deleteController: ControllerMap.deleteController,
 
     createCollector: CollectorMap.createCollector,
     getCollectorList: CollectorMap.getCollectorList,
     getAllCollectorList: CollectorMap.getAllCollectorList,
     updateCollector: CollectorMap.updateCollector,
+    deleteCollector: CollectorMap.deleteCollector,
 
     getSignalListByCollectorId: SignalMap.getSignalListByCollectorId,
     createSignal: SignalMap.createSignal

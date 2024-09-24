@@ -19,5 +19,10 @@ export const ControllerMap: UrlMap = {
         url: '/updateController',
         method: Method.POST,
         format: ContentType.JSON
+    },
+    deleteController: {
+        url: '/deleteController',
+        method: Method.POST,
+        format: ContentType.JSON
     }
 }

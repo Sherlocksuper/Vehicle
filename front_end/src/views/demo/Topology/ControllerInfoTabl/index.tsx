@@ -1,8 +1,9 @@
 import {Button, message, Space, Table} from "antd";
 import {IController} from "../PhyTopology.tsx";
 import {NOT_ON_USED, ENABLE, ON_USED, USED_INFO, DISABLE} from "@/constants/board.ts";
-import {updateController} from "@/apis/request/board-signal/controller.ts";
+import {deleteController, updateController} from "@/apis/request/board-signal/controller.ts";
 import {SUCCESS_CODE} from "@/constants";
+import {confirmDelete} from "@/utils";
 
 const ControllerInfoTable: React.FC<{
     dataSource: IController[],
@@ -44,6 +45,19 @@ const ControllerInfoTable: React.FC<{
                         })
                     }}>
                         {record.isDisabled ? ENABLE : DISABLE}
+                    </Button>
+                    <Button type="primary" danger onClick={() => {
+                        if (!confirmDelete())return;
+                        const newController = {...record} as IController
+                        deleteController(newController).then((res) => {
+                            if (res.code === SUCCESS_CODE) {
+                                reload()
+                            } else {
+                                message.error(res.msg)
+                            }
+                        })
+                    }}>
+                        删除
                     </Button>
                 </Space>
             }

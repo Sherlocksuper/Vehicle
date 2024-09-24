@@ -61,13 +61,13 @@ export const routeItems: RouteItem[] = [
     label: '历史数据管理',
     element: <HistoryData/>
   },
-  userUtils.isRootUser() ? {
-    key: '/User-management',
-    label: '用户管理',
-    element: <UserManage/>
-  } : {
-    key: '', label: '', element: <></>
-  },
+  // userUtils.isRootUser() ? {
+  //   key: '/User-management',
+  //   label: '用户管理',
+  //   element: <UserManage/>
+  // } : {
+  //   key: '', label: '', element: <></>
+  // },
 ].filter(item => item.key !== '')
 
 

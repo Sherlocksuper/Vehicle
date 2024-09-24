@@ -57,5 +57,11 @@ class ControllerService {
             where: { id: data.id }
         })
     }
+
+    async deleteController(id: number) {
+        return await Controller.destroy({
+            where: { id }
+        })
+    }
 }
 export default new ControllerService

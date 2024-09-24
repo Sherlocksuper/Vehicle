@@ -32,3 +32,11 @@ export const updateController = async (controller: IController) => {
         params: controller,
     });
 }
+
+export const deleteController = async (controller: IController) => {
+    const api = MyUrl.TEST.deleteController
+    return request({
+        api: api,
+        params: controller,
+    });
+}

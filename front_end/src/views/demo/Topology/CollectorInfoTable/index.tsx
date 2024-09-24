@@ -1,8 +1,10 @@
-import {Button, Space, Table} from "antd";
-import {ICollector} from "../PhyTopology.tsx";
-import {updateCollector} from "@/apis/request/board-signal/collector.ts";
+import {Button, message, Space, Table} from "antd";
+import {ICollector, IController} from "../PhyTopology.tsx";
+import {deleteCollector, updateCollector} from "@/apis/request/board-signal/collector.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {NOT_ON_USED, ON_USED, USED_INFO} from "@/constants/board.ts";
+import {confirmDelete} from "@/utils";
+import {deleteController} from "@/apis/request/board-signal/controller.ts";
 
 const CollectorInfoTable: React.FC<{
     dataSource: ICollector[],
@@ -43,6 +45,19 @@ const CollectorInfoTable: React.FC<{
                         })
                     }}>
                         {record.isDisabled ? '启用' : '禁用'}
+                    </Button>
+                    <Button type="primary" danger onClick={() => {
+                        if (!confirmDelete())return;
+                        const collector = {...record} as ICollector
+                        deleteCollector(collector).then((res) => {
+                            if (res.code === SUCCESS_CODE) {
+                                reload()
+                            } else {
+                                console.error(res.msg)
+                            }
+                        })
+                    }}>
+                        删除
                     </Button>
                 </Space>
             }

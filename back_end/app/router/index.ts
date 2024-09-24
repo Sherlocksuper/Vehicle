@@ -44,6 +44,7 @@ router.post('/createController', BaseInfoController.createController)
 router.get('/getControllerList', BaseInfoController.getActiveControllerList)
 router.get('/getAllControllerList', BaseInfoController.getAllControllerList)
 router.post('/updateController', BaseInfoController.updateController)
+router.post('/deleteController', BaseInfoController.deleteController)
 
 /**
  * 采集卡相关接口
@@ -52,6 +53,7 @@ router.post('/createCollector', BaseInfoController.createCollector)
 router.get('/getCollectorList', BaseInfoController.getActiveCollectorList)
 router.get('/getAllCollectorList', BaseInfoController.getAllCollectorList)
 router.post('/updateCollector', BaseInfoController.updateCollector)
+router.post('/deleteCollector', BaseInfoController.deleteCollector)
 
 
 /**

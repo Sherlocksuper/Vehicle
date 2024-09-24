@@ -19,6 +19,7 @@ class BaseInfoController {
     getActiveControllerList = Controller.getActiveControllerList
     getAllControllerList = Controller.getAllControllerList
     updateController = Controller.updateController
+    deleteController = Controller.deleteController
 
     /**
      * 采集卡创建、获取
@@ -29,6 +30,7 @@ class BaseInfoController {
     getActiveCollectorList = Collector.getActiveCollectorList
     getAllCollectorList = Collector.getAllCollectorList
     updateCollector = Collector.updateCollector
+    deleteCollector = Collector.deleteCollector
 
 
     /**

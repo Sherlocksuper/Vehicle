@@ -20,5 +20,10 @@ export const CollectorMap: UrlMap = {
         url: '/updateCollector',
         method: Method.POST,
         format: ContentType.JSON
+    },
+    deleteCollector: {
+        url: '/deleteCollector',
+        method: Method.POST,
+        format: ContentType.JSON
     }
 }

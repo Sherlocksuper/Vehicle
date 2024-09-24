@@ -105,6 +105,28 @@ class CollectorController {
             }
         }
     }
+
+    async deleteCollector(ctx: Context) {
+        try {
+            const id = ctx.request.body.id
+            const result = await CollectorService.deleteCollector(id)
+            if (result) {
+                (ctx.body as IResBody) = {
+                    code: SUCCESS_CODE,
+                    msg: '删除采集板卡成功',
+                    data: null
+                }
+            } else {
+                throw new Error('删除采集板卡失败')
+            }
+        } catch (error) {
+            (ctx.body as IResBody) = {
+                code: FAIL_CODE,
+                msg: (error as Error).toString(),
+                data: null
+            }
+        }
+    }
 }
 
 export default new CollectorController()
