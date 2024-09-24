@@ -1,10 +1,27 @@
-import {Button, Col, Form, Input, Row, Space, Tooltip} from "antd";
+import {Button, Col, Form, Input, InputNumber, message, Row, Space, Tooltip} from "antd";
 import React from "react";
 import {MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined} from "@ant-design/icons";
+
+const HexInput = ({hint}: {
+  hint: string
+}) => {
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const hexRegex = /^[0-9a-fA-F]*$/;
+    if (!hexRegex.test(event.target.value)) {
+      event.target.value = event.target.value.slice(0, -1);
+      message.error('请输入十六进制数');
+    }
+    // 打印转化为十进制的数
+    console.log(parseInt(event.target.value, 16));
+  };
+
+  return <Input placeholder={hint} onChange={onInputChange}/>;
+};
 
 export interface IProtocolSignal {
   id: string
   name: string
+  belongVehicle: string
   dimension: string
   startPoint: string
   length: string
