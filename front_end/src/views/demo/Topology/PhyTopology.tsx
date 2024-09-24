@@ -94,11 +94,11 @@ const PreTestManager: React.FC = () => {
             label: '采集板卡描述',
             children: <CollectorInfoTable dataSource={testData?.collectorsConfig || []} reload={reloadData}/>
         },
-        {
-            key: '3',
-            label: '信号描述',
-            children: <SignalInfoTable dataSource={testData?.signalsConfig || []}/>,
-        },
+        // {
+        //     key: '3',
+        //     label: '信号描述',
+        //     children: <SignalInfoTable dataSource={testData?.signalsConfig || []}/>,
+        // },
     ]
 
 
