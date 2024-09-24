@@ -30,6 +30,7 @@ export interface IDragItem {
     height: number
     title: string
     interval: number
+    trueValue?: string
     trueLabel?: string
     falseLabel?: string
     unit?: string

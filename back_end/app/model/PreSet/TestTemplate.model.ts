@@ -26,6 +26,7 @@ export interface ITemplate {
         height: number
         title: string
         interval: number
+        trueValue?: string
         trueLabel?: string
         falseLabel?: string
         unit?: string
@@ -72,6 +73,7 @@ export default class TestTemplate extends Model<ITemplate> {
         height: number
         title: string
         interval: number
+        trueValue?: string
         trueLabel?: string
         falseLabel?: string
         unit?: string

@@ -10,10 +10,11 @@ import {IHistory} from "@/apis/standard/history.ts";
 import PureNumberChart from "@/components/Charts/PureNumberChart/PureNumberChart.tsx";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
-import {Form, Input, Modal, Select} from "antd";
+import {Form, Input, Modal, Select, Space, Tooltip} from "antd";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import {getAllProtocolSignalsFromTestConfig} from "@/utils";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
+import {QuestionCircleOutlined} from "@ant-design/icons";
 
 const ConfigDropContainer: React.FC<{
   banModify: boolean;
@@ -81,7 +82,7 @@ const ConfigDropContainer: React.FC<{
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
-                if (pathRef.current  === "/offline-show"){
+                if (pathRef.current === "/offline-show") {
                   return
                 }
                 if (banModify) {
@@ -117,7 +118,7 @@ const UpdateItemModal: React.FC<{
   const itemConfig = useMemo(() => item.itemConfig, [item])
   const requestSignals = getAllProtocolSignalsFromTestConfig(testConfig)
 
-  const isSingleChart = (type: DragItemType) => !(type === DragItemType.LINES)
+  const isSingleChart = (type: DragItemType) => !(type === DragItemType.LINES) && !(type === DragItemType.PURENUMBER)
 
 
   useEffect(() => {
@@ -136,6 +137,9 @@ const UpdateItemModal: React.FC<{
     itemConfig.title = newConfig.title
     itemConfig.min = newConfig.min
     itemConfig.max = newConfig.max
+    itemConfig.trueValue = newConfig.trueValue
+    itemConfig.trueLabel = newConfig.trueLabel
+    itemConfig.falseLabel = newConfig.falseLabel
     setOpenItemId("");
     updateDragItem(item.id, itemConfig);
   };
@@ -177,6 +181,21 @@ const UpdateItemModal: React.FC<{
               </Form.Item>
               <Form.Item label="最大值" name="max" initialValue={100}>
                 <Input/>
+              </Form.Item>
+            </>
+          )
+        }
+        {
+          item.type === DragItemType.BOOLEAN && (
+            <>
+              <Form.Item label="真值条件" name="trueValue" initialValue={"1"}>
+                <Input placeholder={"请输入真值"}/>
+              </Form.Item>
+              <Form.Item label="真值标签" name="trueLable" initialValue={"是"}>
+                <Input placeholder={"请输入真值标签"}/>
+              </Form.Item>
+              <Form.Item label="非真值标签 " name="falseLabel" initialValue={"否"}>
+                <Input placeholder={"请输入非真值标签"}/>
               </Form.Item>
             </>
           )
@@ -252,7 +271,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
         height={height}
         historyData={[]}
         currentTestChartData={
-        memoizedTestData
+          memoizedTestData
         }
       />
     ),

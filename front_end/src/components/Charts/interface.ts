@@ -19,6 +19,7 @@ export interface IChartInterface {
     width: number
     height: number
     title: string
+    trueValue?: string
     trueLabel?: string
     falseLabel?: string
     unit?: string
