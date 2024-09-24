@@ -9,6 +9,12 @@ import {connectWithBoard, disconnectWithBoard, sendMultipleMessagesBoard} from "
 import {IReceiveData} from "../../utils/BoardUtil/decoding";
 import HistoryService from "./HistoryService";
 import * as fs from "fs";
+import {HistoryController} from "../controller/HistoryController";
+import {transferFileSize} from "../../utils/File";
+import path from "node:path";
+
+
+const historyService = new HistoryService()
 
 class TestConfigService {
 
@@ -226,19 +232,26 @@ class TestConfigService {
       historyData: this.currentTestConfigHistoryData
     }
 
-    const dir = '../public/uploads/' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
+    let dir = '../public/uploads/' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
+    dir = path.resolve(__dirname, dir)
+
     // 年-月-日
-    const path = dir + '/' + historyName + '.json'
+    const targetPath = dir + '/' + historyName + '.json'
     // 确保文件夹存在
     try {
       fs.mkdirSync(dir, {recursive: true});
 
       // 创建一个文件
-      fs.writeFile(path, JSON.stringify(history, null, 2), (err) => {
-        if (err) {
-          console.error('Failed to write file:', err);
-        }
-      });
+      fs.writeFileSync(targetPath, JSON.stringify(history, null, 2));
+
+      const fileSize = fs.statSync(targetPath)
+
+      historyService.addHistory({
+        fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
+        size: transferFileSize(fileSize.size),
+        path: targetPath
+      })
+
     } catch (error) {
       console.error('Failed to write file:', error);
       return false
