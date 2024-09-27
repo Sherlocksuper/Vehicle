@@ -28,6 +28,27 @@ export const getCollectItem = (protocol: IPro) => {
   }
 }
 
+export const getCollectItemFromId = (id: number) => {
+  switch (id) {
+    case 1:
+      return ProtocolType.FlexRay
+    case 2:
+      return ProtocolType.CAN
+    case 3:
+      return ProtocolType.MIC
+    case 4:
+      return ProtocolType.B1552B
+    case 5:
+      return ProtocolType.Serial422
+    case 6:
+      return ProtocolType.Serial232
+    case 7:
+      return ProtocolType.Analog
+    case 8:
+      return ProtocolType.Digital
+  }
+}
+
 // 如果是数模采集，返回0x01，如果是总线采集，返回0x00
 export const getCollectType = (protocol: IPro) => {
   if (protocol.protocol.protocolType === ProtocolType.Analog ||

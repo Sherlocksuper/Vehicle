@@ -3,15 +3,20 @@
  */
 
 import TestConfig, {CurrentTestConfig, ITestConfig} from "../model/TestConfig";
-import {getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
+import {getBusCategory, getCollectItem, getCollectItemFromId, getCollectType, getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
 import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
 import {connectWithBoard, disconnectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
 import {IReceiveData} from "../../utils/BoardUtil/decoding";
 import HistoryService from "./HistoryService";
 import * as fs from "fs";
+import * as XLSX from "xlsx";
 import {HistoryController} from "../controller/HistoryController";
 import {transferFileSize} from "../../utils/File";
 import path from "node:path";
+import Protocol, {ProtocolType} from "../model/PreSet/Protocol.model";
+import {getSignalMapKey} from "../../utils/BoardUtil/encoding/spConfig";
+import {LOGIN_FAIL} from "../constants";
+import {config} from "process";
 
 
 const historyService = new HistoryService()
@@ -29,6 +34,7 @@ class TestConfigService {
 
   resultMessages: Buffer[] = []
   signalsMappingRelation: Map<string, string[]> = new Map()
+  signalsIdNameMap: Map<string, string[]> = new Map()
   banMessage: Buffer[] = []
 
   /**
@@ -117,6 +123,28 @@ class TestConfigService {
     return this.currentTestConfig
   }
 
+  async setTestConfigSignalMapping(testConfig: ITestConfig) {
+    testConfig.configs.forEach(config => {
+      config.vehicle.protocols.forEach(protocol => {
+        protocol.protocol.signalsParsingConfig.forEach(spConfig => {
+
+          const targetId = protocol.collector.collectorAddress!
+          const collectType = getCollectType(protocol)
+          const collectCategory = getBusCategory(protocol)
+
+
+          const key = getSignalMapKey(targetId, collectType, collectCategory, Number(spConfig.frameId))
+          spConfig.signals.forEach(signal => {
+            if (this.signalsIdNameMap.has(key)) {
+              this.signalsIdNameMap.get(key)!.push(signal.name)
+            } else {
+              this.signalsIdNameMap.set(key, [signal.name])
+            }
+          })
+        })
+      })
+    })
+  }
 
   /**
    * 下发测试流程，设置当前的测试流程为testPrdcessN
@@ -134,21 +162,22 @@ class TestConfigService {
     this.banMessage = res.banMessages
     this.currentTestConfig = testConfig
     await this.storeCurrentConfigToSql(testConfig!)
+    await this.setTestConfigSignalMapping(testConfig!)
 
-    try {
-      await connectWithBoard(66, '192.168.1.66')
-    } catch (e) {
-      return false
-    }
+    // try {
+    //   await connectWithBoard(66, '192.168.1.66')
+    // } catch (e) {
+    //   return false
+    // }
+    //
+    // // 发送所有消息给板子
+    // try {
+    //   await sendMultipleMessagesBoard(res.resultMessages, 1000)
+    // } catch (e) {
+    //   return false
+    // }
 
-    // 发送所有消息给板子
-    try {
-      await sendMultipleMessagesBoard(res.resultMessages, 1000)
-    } catch (e) {
-      return false
-    }
-
-    // startMockBoardMessage(this.signalsMappingRelation)
+    startMockBoardMessage(this.signalsMappingRelation)
     return true
   }
 
@@ -174,6 +203,7 @@ class TestConfigService {
     this.banMessage = []
     disconnectWithBoard()
     await this.deleteCurrentConfigFromSql()
+    this.signalsIdNameMap.clear()
   }
 
   async storeCurrentConfigToSql(config: ITestConfig) {
@@ -218,8 +248,6 @@ class TestConfigService {
     //获取当前测试配置的历史数据
     const testConfig = await this.getTestConfigById(currentTestConfigId)
 
-    console.log(this.currentTestConfigHistoryData)
-
     const historyName = (testConfig?.name ?? "默认名称") + new Date().getHours() + new Date().getMinutes()
 
     const history = {
@@ -246,11 +274,13 @@ class TestConfigService {
 
       const fileSize = fs.statSync(targetPath)
 
-      historyService.addHistory({
+      await historyService.addHistory({
         fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
         size: transferFileSize(fileSize.size),
         path: targetPath
       })
+
+      await this.downReceiveDataToXlsx(this.currentTestConfig?.name ?? "默认名称")
 
     } catch (error) {
       console.error('Failed to write file:', error);
@@ -259,7 +289,76 @@ class TestConfigService {
     return true
   }
 
-  downReceiveDataToXlsx() {
+  async downReceiveDataToXlsx(configName: string) {
+    const data: {
+      timeStamp: number,
+      collectType: ProtocolType,
+      frameId: number,
+      signalName: string,
+      value: number
+    }[] = []
+    const testReceiveData: IReceiveData[] = [
+      {
+        moduleId: 2,
+        collectType: 0,
+        busType: 6,
+        timestamp: 1,
+        frameId: -1,
+        signalCount: 1,
+        reserved: 0,
+        signals: [
+          {
+            signalId: 1,
+            signalLength: 2,
+            sign: 1,
+            integer: 1,
+            decimal: 1,
+            value: 2,
+          }
+        ]
+      },
+    ]
+
+    testReceiveData.forEach(item => {
+      item.signals.forEach((signal, index) => {
+        const key = getSignalMapKey(item.moduleId, item.collectType, item.busType, item.frameId)
+        data.push({
+          timeStamp: item.timestamp,
+          collectType: getCollectItemFromId(signal.signalId)!,
+          frameId: item.frameId,
+          signalName: this.signalsIdNameMap.get(key)![index],
+          value: signal.value,
+        })
+      })
+    })
+
+
+    const name = configName + new Date().getHours() + new Date().getMinutes()
+    let dir = '../public/uploads/' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
+    dir = path.resolve(__dirname, dir)
+    const targetPath = dir + '/' + name + '_' + 'output' + '.xlsx'
+
+    // 创建一个新的工作簿
+    const wb = XLSX.utils.book_new();
+
+    // 将数据转换为工作表
+    const ws = XLSX.utils.json_to_sheet(data);
+
+    // 将工作表添加到工作簿
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // 将工作簿写入文件
+    fs.mkdirSync(dir, {recursive: true});
+
+    XLSX.writeFile(wb, targetPath);
+
+    const fileSize = fs.statSync(targetPath)
+    await historyService.addHistory({
+      fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
+      size: transferFileSize(fileSize.size),
+      path: targetPath
+    })
+    return true
   }
 }
 
