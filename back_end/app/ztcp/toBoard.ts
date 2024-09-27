@@ -1,6 +1,6 @@
 import net from "node:net";
 import {decodingBoardMessage, decodingBoardMessageWithMap} from "../../utils/BoardUtil/decoding";
-import {sendMessageToFront} from "./toFront";
+import {IFrontMessage, sendMessageToFront} from "./toFront";
 import TestConfigService from "../service/TestConfig";
 
 let client: net.Socket;
@@ -15,83 +15,91 @@ const mapToJson = (map: Map<string, number>) => {
   return JSON.stringify(obj);
 }
 
-// 创建 TCP 客户端并处理连接、断开、重连等逻辑
-export const connectWithBoard = (port: number, host: string) => {
-  if (client) {
-    console.log('Client already exists');
-    return;
-  }
-
+// 定义一个递归函数来遍历host和port数组
+export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, port: number }>, index = 0) => {
   return new Promise<void>((resolve, reject) => {
-      client = net.connect({
-          port,
-          host,
-        }, () => {
-          console.log(port, host, "建立鏈接成功")
-          resolve();
-        }
-      );
+    if (index >= hostPortList.length) {
+      reject(new Error('所有的连接尝试均失败'));
+      return;
+    }
 
+    const {host, port} = hostPortList[index];
 
-      client.on('data', (data) => {
-        // 1/ 解析数据,这里获得IReceiveData
-        const message = decodingBoardMessage(data);
-        // 2. 解析数据，这里把IReceiveData转换为Map<string, number>,每个string（signalId）对应他的value值
-        const result = decodingBoardMessageWithMap(message);
-        // 3. 把message推入CurrentReceiveData，之后留作处理
-        TestConfigService.pushReceiveData(message);
+    console.log(`尝试连接: ${host}:${port}`);
 
-        console.log("decodingBoardMessageWith Map result ", result)
+    client = net.connect({
+      port,
+      host,
+    }, () => {
+      console.log(`${port} ${host} 建立链接成功`);
+      resolve();
+    });
 
-        // TODO 获取message的key值
-        sendMessageToFront({
-          type: 'DATA',
-          message: mapToJson(result)
-        });
+    client.on('data', (data) => {
+      // 1. 解析数据
+      const message = decodingBoardMessage(data);
+      const result = decodingBoardMessageWithMap(message);
+      TestConfigService.pushReceiveData(message);
+
+      console.log("decodingBoardMessageWith Map result ", result);
+      const msg = mapToJson(result);
+
+      TestConfigService.currentTestConfigHistoryData.push({
+        time: new Date().getTime(),
+        data: JSON.parse(msg)
       });
 
-      client.on('end', () => {
-        console.log('Connection ended');
-        if (!isManuallyClosed) {
-          setTimeout(() => {
-            reconnectWithBoard(port, host);
-          }, reconnectInterval);
-        }
+      // 发送消息给前端
+      sendMessageToFront({
+        type: 'DATA',
+        message: mapToJson(result)
+      });
+    });
+
+    client.on('end', () => {
+      console.log('连接已结束');
+      if (!isManuallyClosed) {
+        setTimeout(() => {
+          reconnectWithMultipleBoards(hostPortList, index);
+        }, reconnectInterval);
+      }
+    });
+
+    client.on('error', (err) => {
+      console.log(`连接错误: ${err.message}`);
+      sendMessageToFront({
+        type: 'NOTIFICATION',
+        message: '连接下位机失败: ' + err.message
       });
 
-      client.on('error', (err) => {
-        console.log('Connection error: ' + err)
-        sendMessageToFront({
-          type: 'NOTIFICATION',
-          message: '连接下位机失败: ' + err
-        })
-        if (!isManuallyClosed) {
-          setTimeout(() => {
-            reconnectWithBoard(port, host);
-          }, reconnectInterval);
-        }
+      if (!isManuallyClosed) {
+        console.log('尝试下一个连接', 'ip:', hostPortList[index].host, 'port:', hostPortList[index].port);
+        connectWithMultipleBoards(hostPortList, index + 1)
+          .then(resolve)
+          .catch(reject);
+      } else {
         client.end();
         reject(err);
-      });
-    }
-  );
-}
+      }
+    });
+  });
+};
 
-// 重连逻辑
-export const reconnectWithBoard = async (port: number, host: string) => {
+// 重连逻辑，使用相同的数组
+export const reconnectWithMultipleBoards = async (hostPortList: Array<{ host: string, port: number }>, index = 0) => {
   if (!isManuallyClosed) {
-    console.log("重连中")
+    console.log("重连中");
     sendMessageToFront({
       type: 'NOTIFICATION',
       message: '正在尝试与下位机重新连接...'
-    })
-    // 重连的时候尝试下发之前的配置
+    });
+    await connectWithMultipleBoards(hostPortList, index);
     await TestConfigService.tryRecoverConfig();
-    await connectWithBoard(port, host);
   } else {
-    console.log("不重连")
+    console.log("不重连");
   }
-}
+};
+
 
 // 主动断开连接
 export const disconnectWithBoard = () => {
@@ -120,10 +128,14 @@ export const sendMultipleMessagesBoard = (messages: Buffer[], interval = 1000) =
   return new Promise<void>((resolve) => {
     function sendNextMessage() {
       if (index < messages.length) {
-        sendMessageToBoard(messages[index]);
-        index++;
-        setTimeout(sendNextMessage, interval); // 递归设置下一条消息的发送时间
-        console.log("發送了", index)
+        try {
+          sendMessageToBoard(messages[index]);
+          index++;
+          setTimeout(sendNextMessage, interval); // 递归设置下一条消息的发送时间
+          console.log("發送了", index)
+        } catch (e) {
+          console.log("發送出錯了", e)
+        }
       } else {
         resolve(); // 所有消息发送完毕，解析Promise
       }
