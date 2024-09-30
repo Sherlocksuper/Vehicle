@@ -1,16 +1,22 @@
 import {getSignalMapKey} from "../encoding/spConfig";
 import TestConfigService from "../../../app/service/TestConfig"
+import {Buffer} from "buffer";
 
-const splitBufferByDelimiter = (buffer: Buffer, delimiter: Buffer): Buffer[] => {
+export const splitBufferByDelimiter = (buffer: Buffer, delimiter: Buffer): Buffer[] => {
   let start = 0;
   const result: Buffer[] = [];
   let index = buffer.indexOf(delimiter);
   while (index !== -1) {
-    result.push(buffer.subarray(start, index));
-    start = index + 1;
+    if (start !== index) {
+      result.push(buffer.subarray(start, index));
+    }
+    start = index + delimiter.length;
     index = buffer.indexOf(delimiter, start);
   }
   result.push(buffer.subarray(start));
+  result.forEach((item, index) => {
+    result[index] = Buffer.concat([delimiter, item]);
+  })
   return result;
 }
 
@@ -58,6 +64,39 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   // 去掉前面11个字节
   const signalsPart = buffer.subarray(12);
 
+
+  const key = getSignalMapKey(
+    result.moduleId,
+    result.collectType,
+    result.busType,
+    result.frameId
+  )
+
+  if (TestConfigService.digitalKeyList.includes(key)) {
+    console.log("is Digital Key")
+    // 第1-8个信号分别是第1-8位置，第9、10个信号是第9、10位置
+    // 比如ff 03,第1-8个信号是ff的二进制1-8位置，都是1
+    // 第9、10个信号是03的二进制1-2位置，都是0
+    const values = [];
+    for (let i = 0; i < 8; i++) {
+      values.push((signalsPart[0] & (1 << i)) === 0 ? 0 : 1);
+    }
+    for (let i = 0; i < 2; i++) {
+      values.push((signalsPart[1] & (1 << i)) === 0 ? 0 : 1);
+    }
+    result.signals = values.map((value, index) => {
+      return {
+        signalId: index,
+        signalLength: 1,
+        sign: 0,
+        integer: value,
+        decimal: 0,
+        value: value
+      }
+    });
+    return result;
+  }
+
   // 每个信号6个字节
   const signalLength = 6;
   const signals = [];
@@ -79,9 +118,6 @@ export const decodingBoardMessageWithMap = (receiveData: IReceiveData): Map<stri
     receiveData.busType,
     receiveData.frameId
   )
-  console.log(key)
-  console.log("mapping realtionship",TestConfigService.signalsMappingRelation)
-  console.log(TestConfigService.signalsMappingRelation.get(key))
 
   const values: number[] = []
 
@@ -108,7 +144,7 @@ const decodingOneSignal = (buffer: Buffer): IReceiveSignal => {
   const signalId = buffer[0];
   const signalLength = buffer[1] >> 1;
   const sign = buffer[1] & 0x01;
-  const integer = buffer[2] << 16 | buffer[3] << 8 | buffer[4] >> 4;
+  const integer = buffer[2] << 12 | buffer[3] << 4 | buffer[4] >> 4;
   const decimal = (buffer[4] & 0x0f) << 8 | buffer[5];
   // 0表示正数，1表示负数
   const value = integer + decimal / 1000 * (sign === 1 ? -1 : 1);
