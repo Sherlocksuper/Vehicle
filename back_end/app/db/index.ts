@@ -61,7 +61,7 @@ const DB_OPT = {
             // // 初始化测试配置
             // await TestConfigService.initTestConfig()
 
-            await TestConfigService.tryRecoverConfig()
+            TestConfigService.tryRecoverConfig()
             console.log('The database table has been initialized.');
         } catch (error) {
             console.error('Description Database table initialization failed:', error);
