@@ -47,8 +47,8 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
     chartRef.current?.setOption({
       series: [
         {
-          min : min,
-          max : max,
+          min: min,
+          max: max,
           splitNumber: 10,
           data: [
             {
@@ -118,7 +118,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
             valueAnimation: true,
             fontSize: Math.min(height, width) / 18,
             offsetCenter: [0, '70%'],
-            formatter: `{value} ${unit}`,
+            formatter: `{value} ${props?.requestSignals[0]?.dimension ?? "-"}`,
             color: 'inherit'
           },
           data: [

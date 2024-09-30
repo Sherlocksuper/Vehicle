@@ -6,7 +6,6 @@ interface ISeries {
   id: string
   name: string
   type: string
-  stack: string
   symbol: string
   data: number[]
 }
@@ -40,7 +39,6 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       id: item.id,
       name: item.name + ' ' + item.name + ' ' + item.name,
       type: 'line',
-      stack: 'Total',
       symbol: 'none',
       data: []
     }
@@ -61,9 +59,8 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       requestSignals.forEach((item) => {
         dataRef.current.push({
           id: item.id,
-          name: item.belongVehicle !== '' ? item.belongVehicle + '-' + item.name : item.name,
+          name: (item.belongVehicle !== '' ? item.belongVehicle + '-' + item.name : item.name) + '/' + item.dimension,
           type: 'line',
-          stack: 'Total',
           symbol: 'none',
           data: []
         });
@@ -74,7 +71,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     xAxis.current.push(new Date(getCurrentTime()).toLocaleTimeString());
 
     // Iterate through each series in dataRef
-    dataRef.current.forEach((seriesItem) => {
+    dataRef.current.forEach((seriesItem, index) => {
       const signalData = data.get(seriesItem.id); // Get data for this particular signal
       const lastExistingValue = seriesItem.data[seriesItem.data.length - 1]; // Last value in the chart series
 
@@ -93,14 +90,18 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       xAxis: {
         data: xAxis.current
       },
+      // yAxis: {
+      //   minInterval: 0.01, // 设置较小的最小间隔，以提高精度
+      // },
       series: dataRef.current
     };
+    // console.log(option.series)
     chartRef.current?.setOption(option);
   }, [requestSignals]);
 
   // 只有存在展示的信息发生变化的时候才更新
   const updateFlag = requestSignals.map((signal) => {
-    if (currentTestChartData.has(signal.id)){
+    if (currentTestChartData.has(signal.id)) {
       return currentTestChartData.get(signal.id).length
     }
     return 0
@@ -160,7 +161,6 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     chartRef.current?.setOption(option)
 
     return () => {
-      console.log("discoonnectefds")
       resizeObserver.disconnect()
       chartRef.current?.dispose()
     }

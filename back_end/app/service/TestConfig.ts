@@ -3,20 +3,17 @@
  */
 
 import TestConfig, {CurrentTestConfig, ITestConfig} from "../model/TestConfig";
-import {getBusCategory, getCollectItem, getCollectItemFromId, getCollectType, getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
-import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
-import {connectWithBoard, disconnectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
+import {getBusCategory, getCollectItemFromId, getCollectType, getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
+import {connectWithMultipleBoards, disconnectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
 import {IReceiveData} from "../../utils/BoardUtil/decoding";
 import HistoryService from "./HistoryService";
 import * as fs from "fs";
 import * as XLSX from "xlsx";
-import {HistoryController} from "../controller/HistoryController";
 import {transferFileSize} from "../../utils/File";
 import path from "node:path";
-import Protocol, {ProtocolType} from "../model/PreSet/Protocol.model";
+import {ProtocolType} from "../model/PreSet/Protocol.model";
 import {getSignalMapKey} from "../../utils/BoardUtil/encoding/spConfig";
-import {LOGIN_FAIL} from "../constants";
-import {config} from "process";
+import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
 
 
 const historyService = new HistoryService()
@@ -36,6 +33,9 @@ class TestConfigService {
   signalsMappingRelation: Map<string, string[]> = new Map()
   signalsIdNameMap: Map<string, string[]> = new Map()
   banMessage: Buffer[] = []
+
+  // 因为digital解析方式比较特殊，所以需要单独处理
+  digitalKeyList: string[] = []
 
   /**
    * 创建测试配置
@@ -123,6 +123,7 @@ class TestConfigService {
     return this.currentTestConfig
   }
 
+  // 获取信号id信号名的映射表
   async setTestConfigSignalMapping(testConfig: ITestConfig) {
     testConfig.configs.forEach(config => {
       config.vehicle.protocols.forEach(protocol => {
@@ -146,6 +147,38 @@ class TestConfigService {
     })
   }
 
+  async getHostPortList(testConfig: ITestConfig) {
+    const result: Array<{ host: string, port: number }> = []
+
+    testConfig.configs.forEach(config => {
+      config.vehicle.protocols.forEach(protocol => {
+        result.push({
+          host: protocol.core.controllerAddress!,
+          port: 66
+        })
+      })
+    })
+    return result
+  }
+
+  async getSpecialDigitalKeyList(testConfig: ITestConfig) {
+    const result: string[] = []
+
+    testConfig.configs.forEach(config => {
+      config.vehicle.protocols.forEach(protocol => {
+        protocol.protocol.signalsParsingConfig.forEach(spConfig => {
+          spConfig.signals.forEach(signal => {
+            const key = getSignalMapKey(protocol.collector.collectorAddress!, getCollectType(protocol), getBusCategory(protocol), Number(spConfig.frameId))
+            if (protocol.protocol.protocolType === ProtocolType.Digital) {
+              result.push(key)
+            }
+          })
+        })
+      })
+    })
+    this.digitalKeyList = result
+  }
+
   /**
    * 下发测试流程，设置当前的测试流程为testPrdcessN
    */
@@ -154,30 +187,33 @@ class TestConfigService {
     const testConfig = await this.getTestConfigById(testConfigId);
     if (!testConfig) return false
 
-    // 解析下发的配置，获取需要下发的信息、信号的映射
     const res = getConfigBoardMessage(testConfig!)
+    const hostPortList = await this.getHostPortList(testConfig)
     console.log("下发的消息", res)
+
+    try {
+      await connectWithMultipleBoards(hostPortList, 0)
+    } catch (e) {
+      return false
+    }
+
+    // 发送所有消息给板子
+    try {
+      await sendMultipleMessagesBoard(res.resultMessages, 1000)
+    } catch (e) {
+      return false
+    }
+
+    // 解析下发的配置，获取需要下发的信息、信号的映射
     this.resultMessages = res.resultMessages
     this.signalsMappingRelation = res.signalsMap
     this.banMessage = res.banMessages
     this.currentTestConfig = testConfig
     await this.storeCurrentConfigToSql(testConfig!)
     await this.setTestConfigSignalMapping(testConfig!)
+    await this.getSpecialDigitalKeyList(testConfig!)
 
-    // try {
-    //   await connectWithBoard(66, '192.168.1.66')
-    // } catch (e) {
-    //   return false
-    // }
-    //
-    // // 发送所有消息给板子
-    // try {
-    //   await sendMultipleMessagesBoard(res.resultMessages, 1000)
-    // } catch (e) {
-    //   return false
-    // }
-
-    startMockBoardMessage(this.signalsMappingRelation)
+    // startMockBoardMessage(this.signalsMappingRelation)
     return true
   }
 
@@ -185,14 +221,14 @@ class TestConfigService {
    * 停止当前下发
    */
   async stopCurrentTestConfig() {
-    stopMockBoardMessage()
+    // stopMockBoardMessage()
     await sendMultipleMessagesBoard(this.banMessage, 200)
     await this.clearCurrent()
     return true
   }
 
-  pushReceiveData(data: IReceiveData) {
-    this.currentTestConfigReceiveData.push(data)
+  pushReceiveData(data: IReceiveData[]) {
+    this.currentTestConfigReceiveData.push(...data)
   }
 
   async clearCurrent() {
@@ -204,6 +240,7 @@ class TestConfigService {
     disconnectWithBoard()
     await this.deleteCurrentConfigFromSql()
     this.signalsIdNameMap.clear()
+    this.digitalKeyList = []
   }
 
   async storeCurrentConfigToSql(config: ITestConfig) {
@@ -280,7 +317,7 @@ class TestConfigService {
         path: targetPath
       })
 
-      await this.downReceiveDataToXlsx(this.currentTestConfig?.name ?? "默认名称")
+      // await this.downReceiveDataToXlsx(this.currentTestConfig?.name ?? "默认名称")
 
     } catch (error) {
       console.error('Failed to write file:', error);
@@ -297,29 +334,8 @@ class TestConfigService {
       signalName: string,
       value: number
     }[] = []
-    const testReceiveData: IReceiveData[] = [
-      {
-        moduleId: 2,
-        collectType: 0,
-        busType: 6,
-        timestamp: 1,
-        frameId: -1,
-        signalCount: 1,
-        reserved: 0,
-        signals: [
-          {
-            signalId: 1,
-            signalLength: 2,
-            sign: 1,
-            integer: 1,
-            decimal: 1,
-            value: 2,
-          }
-        ]
-      },
-    ]
-
-    testReceiveData.forEach(item => {
+    // TODO 因为没有收到真实的消息，所以这里是错误的
+    this.currentTestConfigReceiveData.forEach(item => {
       item.signals.forEach((signal, index) => {
         const key = getSignalMapKey(item.moduleId, item.collectType, item.busType, item.frameId)
         data.push({

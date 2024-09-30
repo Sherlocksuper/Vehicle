@@ -219,10 +219,9 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
                     }}
                 />
                 <Input
-                    placeholder={`请输入采集板卡序号`}
+                    placeholder={`请输入板卡地址`}
                     style={{marginBottom: 10}}
                     required={true}
-                    type={"number"}
                     onChange={(e) => {
                         setAddress(e.target.value);
                     }}

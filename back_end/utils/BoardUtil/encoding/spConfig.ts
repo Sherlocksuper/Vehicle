@@ -49,7 +49,7 @@ export const getSpConfig = (protocol: IPro): ISpConfigResult => {
  * 起点、长度、斜率、偏移
  */
 const getOneSignalConfig = (protocol: IProtocolSignal) => {
-  return Buffer.from([Number(protocol.startPoint), Number(protocol.length), Number(protocol.slope), Number(protocol.offset)])
+  return Buffer.from([Number(protocol.startPoint), Number(protocol.length) << 2, Number(protocol.slope), Number(protocol.offset)])
 }
 
 //用来提示模块进行下发		目标ID	采集项	功能码	……依据配置内容而定，最长80字节
@@ -271,9 +271,26 @@ const getAnalogSpConfig = (protocol: IPro) => {
 }
 
 const getDigitalSpConfig = (protocol: IPro) => {
-  // 直接返回空的
+  const targetId = protocol.collector.collectorAddress!
+  const collectType = getCollectType(protocol)
+  const collectCategory = getBusCategory(protocol)
+
+  const signalsMap = new Map<string, string[]>()
+
+  protocol.protocol.signalsParsingConfig.forEach(spConfig => {
+    const key = getSignalMapKey(targetId, collectType, collectCategory, 0)
+    spConfig.signals.forEach(signal => {
+      if (signalsMap.has(key)) {
+        signalsMap.get(key)!.push(signal.id)
+      } else {
+        signalsMap.set(key, [signal.id])
+      }
+    })
+  })
+
+
   return {
     resultMessages: [],
-    signalsMap: new Map()
+    signalsMap: signalsMap
   }
 }

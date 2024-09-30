@@ -1,7 +1,8 @@
 import net from "node:net";
-import {decodingBoardMessage, decodingBoardMessageWithMap} from "../../utils/BoardUtil/decoding";
+import {decodingBoardMessage, decodingBoardMessageWithMap, splitBufferByDelimiter} from "../../utils/BoardUtil/decoding";
 import {IFrontMessage, sendMessageToFront} from "./toFront";
 import TestConfigService from "../service/TestConfig";
+import {getSignalMapKey} from "../../utils/BoardUtil/encoding/spConfig";
 
 let client: net.Socket;
 let reconnectInterval = 5000; // 重连间隔 5 秒
@@ -17,6 +18,7 @@ const mapToJson = (map: Map<string, number>) => {
 
 // 定义一个递归函数来遍历host和port数组
 export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, port: number }>, index = 0) => {
+  isManuallyClosed = false
   return new Promise<void>((resolve, reject) => {
     if (index >= hostPortList.length) {
       reject(new Error('所有的连接尝试均失败'));
@@ -36,24 +38,38 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
     });
 
     client.on('data', (data) => {
-      // 1. 解析数据
-      const message = decodingBoardMessage(data);
-      const result = decodingBoardMessageWithMap(message);
-      TestConfigService.pushReceiveData(message);
+      try {
+        console.log("data", data)
+        // 1. 解析数据,
+        const datas = splitBufferByDelimiter(data, Buffer.from([0xcd, 0xef]));
+        const messages = datas.map((item) => {
+          console.log(item)
+          return decodingBoardMessage(item);
+        })
+        // TODO 调试专用
+        // console.log("this is message 0", messages[0])
+        // const message0 = messages[0];
+        // console.log(getSignalMapKey(message0.moduleId, message0.frameId, message0.busType, message0.collectType))
+        // console.log(TestConfigService.signalsMappingRelation)
+        const result = decodingBoardMessageWithMap(messages[0]);
+        TestConfigService.pushReceiveData(messages);
 
-      console.log("decodingBoardMessageWith Map result ", result);
-      const msg = mapToJson(result);
+        console.log("decodingBoardMessageWith Map result ", result);
+        const msg = mapToJson(result);
 
-      TestConfigService.currentTestConfigHistoryData.push({
-        time: new Date().getTime(),
-        data: JSON.parse(msg)
-      });
+        TestConfigService.currentTestConfigHistoryData.push({
+          time: new Date().getTime(),
+          data: JSON.parse(msg)
+        });
 
-      // 发送消息给前端
-      sendMessageToFront({
-        type: 'DATA',
-        message: mapToJson(result)
-      });
+        // 发送消息给前端
+        sendMessageToFront({
+          type: 'DATA',
+          message: mapToJson(result)
+        });
+      } catch (e) {
+        console.log("这里出错了")
+      }
     });
 
     client.on('end', () => {
@@ -66,7 +82,7 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
     });
 
     client.on('error', (err) => {
-      console.log(`连接错误: ${err.message}`);
+      console.log(`连接错误: ${err.message}`, `中断类型`, isManuallyClosed ? '手动' : '被动');
       sendMessageToFront({
         type: 'NOTIFICATION',
         message: '连接下位机失败: ' + err.message
@@ -94,7 +110,6 @@ export const reconnectWithMultipleBoards = async (hostPortList: Array<{ host: st
       message: '正在尝试与下位机重新连接...'
     });
     await connectWithMultipleBoards(hostPortList, index);
-    await TestConfigService.tryRecoverConfig();
   } else {
     console.log("不重连");
   }

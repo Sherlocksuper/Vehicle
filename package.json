@@ -2,8 +2,11 @@
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
- "scripts": {
-   "start-all": "concurrently \"npm start --prefix back_end\" \"npm run dev --prefix front_end\" \"node long/public/server.js\"",
-   "start-dev": "concurrently \"npm start --prefix back_end\" \"npm run dev --prefix front_end\""
- }
+  "scripts": {
+    "start-all": "concurrently \"npm start --prefix back_end\" \"npm run dev --prefix front_end\" \"node long/public/server.js\"",
+    "start-dev": "concurrently \"npm start --prefix back_end\" \"npm run dev --prefix front_end\""
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
 }

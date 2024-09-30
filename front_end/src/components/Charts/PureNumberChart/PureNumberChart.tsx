@@ -64,7 +64,7 @@ const PureNumberChart: React.FC<IChartInterface> = (props) => {
               {
                 requestSignals.map((signal) => {
                   return <div key={signal.id}>
-                    {signal.belongVehicle} :{signal.name}: {map.get(signal.id) || 0}
+                    {signal.belongVehicle} :{signal.name}: {signal.dimension}: {map.get(signal.id) || 0}
                   </div>
                 })
               }
