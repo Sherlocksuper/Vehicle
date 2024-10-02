@@ -130,6 +130,10 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
           xAxisIndex: [0],
           start: 1,
           end: 100
+        },
+        {
+          type: 'inside',
+          orient: 'vertical',
         }
       ],
       tooltip: {
