@@ -3,9 +3,13 @@ import React, {useEffect} from "react";
 import {FAIL_CODE} from "@/constants";
 import {deleteProtocolApi, getProtocols, IProtocol} from "@/apis/request/protocol.ts";
 import {ProtocolModel} from "@/views/demo/ProtocolTable/protocols.tsx";
+import Search from "antd/es/input/Search";
+import {ExpandAltOutlined} from "@ant-design/icons";
 
 
 const ProtocolTable = () => {
+    const [protocolStore, setProtocolStore] = React.useState<IProtocol[]>([]);
+
     const [protocols, setProtocols] = React.useState<IProtocol[]>([]);
     const [openProtocolModal, setOpenProtocolModal] = React.useState<boolean>(false);
     const [currentRecord, setCurrentRecord] = React.useState<IProtocol | undefined>(undefined);
@@ -58,6 +62,7 @@ const ProtocolTable = () => {
             if (res.code === FAIL_CODE) {
                 message.error("请求失败：" + res.msg);
             } else {
+                setProtocolStore(res.data)
                 setProtocols(res.data);
             }
         });
@@ -79,13 +84,21 @@ const ProtocolTable = () => {
 
     return (
         <Card style={{overflow: "scroll", overflowX: "hidden", height: "100vh"}}>
-            <Row justify="start" style={{marginBottom: "20px"}}>
+            <Space style={{marginBottom: "20px"}}>
                 <Button type={"primary"} onClick={() => {
                     setCurrentRecord(undefined);
                     setOpenProtocolModal(true);
                     setModelMode("ADD");
                 }}>添加协议</Button>
-            </Row>
+                <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value)=>{
+                    const targetProtocols = protocols.map(protocol => {
+                        if (protocol.protocolName.includes(value)){
+                            return protocol
+                        }
+                    }).filter(protocol => protocol !== undefined)
+                    setProtocols(targetProtocols)
+                }}/>
+            </Space>
             <Table
                 columns={columns}
                 dataSource={protocols}
