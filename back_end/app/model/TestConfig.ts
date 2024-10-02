@@ -1,8 +1,5 @@
-import {AutoIncrement, BelongsTo, Column, CreatedAt, DataType, ForeignKey, Model, PrimaryKey, Table, UpdatedAt} from "sequelize-typescript";
-import User from "./User.model";
-import {ITestObjectNModel} from "./2TestObjectN.model";
+import {AutoIncrement, Column, CreatedAt, DataType,  Model, PrimaryKey, Table, UpdatedAt} from "sequelize-typescript";
 import {ITemplate} from "./PreSet/TestTemplate.model";
-import {ITestProcessNModel} from "./1TestProcessN";
 import {IVehicleModel} from "./PreSet/Vehicle.model";
 import {IProtocolSignal} from "./PreSet/Protocol.model";
 

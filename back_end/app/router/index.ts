@@ -10,7 +10,6 @@ import VehicleController from "../controller/PreSet/VehicleController";
 import ProjectController from "../controller/PreSet/ProjectController";
 import TestTemplateController from "../controller/PreSet/TestTemplateController";
 import TestObjectNController from "../controller/TestObjectNController";
-import TestProcessNController from "../controller/TestProcessNController";
 import HistoryController from "../controller/HistoryController";
 import ProtocalController from "../controller/PreSet/ProtocalController";
 import {Context} from "koa";
@@ -103,25 +102,6 @@ router.post('/createTestObjectN', TestObjectNController.createTestObjectN)
 router.post('/updateTestObjectN/:id', TestObjectNController.updateTestObjectNById)
 router.get('/getTestObjectNById/:id', TestObjectNController.getTestObjectNById)
 router.post('/deleteTestObjectN/:id', TestObjectNController.deleteTestObjectNById)
-
-
-/**
- * 测试流程管理接口 TestProcessN
- * created by lby on 6.5
- */
-router.get('/getTestProcessNList', TestProcessNController.getAllTestProcessNs)
-router.post('/createTestProcessN', TestProcessNController.createTestProcessN)
-router.get('/getTestProcessNById/:id', TestProcessNController.getTestProcessN)
-router.post('/updateTestProcessN/:id', TestProcessNController.updateTestProcessN)
-router.post('/deleteTestProcessN/:id', TestProcessNController.deleteTestProcessN)
-
-/**
- * 下发测试流程、获取当前测试流程、停止当前测试流程
- */
-router.post('/downTestProcessN', TestProcessNController.downTestProcessN)
-router.get('/getCurrentTestProcessN', TestProcessNController.getCurrentTestProcessN)
-router.get('/stopCurrentTestProcessN', TestProcessNController.stopCurrentTestProcessN)
-
 
 /**
  * history
