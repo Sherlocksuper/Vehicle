@@ -11,6 +11,7 @@ import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {ICollector, IController} from "@/views/demo/Topology/PhyTopology.tsx";
 import {getAllControllerList} from "@/apis/request/board-signal/controller.ts";
 import {getAllCollectorList} from "@/apis/request/board-signal/collector.ts";
+import Search from "antd/es/input/Search";
 
 
 const columns: TableProps<IVehicle>["columns"] = [
@@ -33,6 +34,7 @@ const columns: TableProps<IVehicle>["columns"] = [
 
 const TestVehicle: React.FC = () => {
   const [vehicles, setVehicles] = React.useState<IVehicle[]>([])
+  const [vehiclesStore, setVehiclesStore] = React.useState<IVehicle[]>([])
   const [openUpdateModel, setOpenUpdateModel] = React.useState<boolean>(false)
   const [targetVehicle, setTargetVehicle] = React.useState<IVehicle>(undefined)
 
@@ -40,6 +42,7 @@ const TestVehicle: React.FC = () => {
     getVehicles().then((res) => {
       console.log("vehicle:" + res.data)
       setVehicles(res.data)
+      setVehiclesStore(res.data)
     })
   }
 
@@ -88,13 +91,23 @@ const TestVehicle: React.FC = () => {
       overflowX: "hidden",
       height: "100vh",
     }}>
-      <CreateTestVehicleButton
-        vehicles={vehicles}
-        onFinished={() => {
-          getVehicles().then((res) => {
-            setVehicles(res.data)
-          })
-        }} key={new Date().getTime()}/>
+      <Space>
+        <CreateTestVehicleButton
+          vehicles={vehicles}
+          onFinished={() => {
+            getVehicles().then((res) => {
+              setVehicles(res.data)
+            })
+          }} key={new Date().getTime()}/>
+          <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value)=>{
+            const targetVehicles = vehiclesStore.map(vehicle => {
+              if (vehicle.vehicleName.includes(value)) {
+                return vehicle
+              }
+          }).filter(vehicle => vehicle !== undefined)
+          setVehicles(targetVehicles)
+          }}/>
+      </Space>
       <Table style={{
         marginTop: 20
       }} columns={columns} dataSource={vehicles}/>

@@ -91,7 +91,7 @@ const ProtocolTable = () => {
                     setModelMode("ADD");
                 }}>添加协议</Button>
                 <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value)=>{
-                    const targetProtocols = protocols.map(protocol => {
+                    const targetProtocols = protocolStore.map(protocol => {
                         if (protocol.protocolName.includes(value)){
                             return protocol
                         }

@@ -5,10 +5,13 @@ import {ITestConfig} from "@/apis/standard/test.ts";
 import {deleteTestConfig, downTestConfig, getCurrentTestConfig, getTestConfigs, stopCurrentTestConfig} from "@/apis/request/testConfig.ts";
 import {TestConfigModel} from "@/views/demo/TestConfig/testConfigModel.tsx";
 import {confirmDelete} from "@/utils";
+import Search from "antd/es/input/Search";
 
 
 const TestConfig = () => {
   const [configs, setConfigs] = React.useState<ITestConfig[]>([]);
+  const [configsStore, setConfigsStore] = React.useState<ITestConfig[]>([]);
+
   const [openTestConfigModal, setOpenTestConfigModal] = React.useState<boolean>(false);
   const [currentRecord, setCurrentRecord] = React.useState<ITestConfig | undefined>(undefined);
   const [currentDownConfig, setCurrentDownConfig] = React.useState<ITestConfig | undefined>(undefined);
@@ -44,6 +47,7 @@ const TestConfig = () => {
       } else {
         console.log(res.data);
         setConfigs(res.data);
+        setConfigsStore(res.data);
       }
     });
   };
@@ -123,6 +127,14 @@ const TestConfig = () => {
           setCurrentRecord(undefined);
           setOpenTestConfigModal(true);
         }}>创建配置</Button>
+        <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value)=>{
+          const targetConfigs = configsStore.map(config => {
+            if (config.name.includes(value)) {
+              return config
+            }
+          }).filter(config => config !== undefined)
+          setConfigs(targetConfigs)
+        }}/>
 
         <Button type={"primary"} onClick={() => fetchCurrentConfig()}>刷新当前下发配置</Button>
 
