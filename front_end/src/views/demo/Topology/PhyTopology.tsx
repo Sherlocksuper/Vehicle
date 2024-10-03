@@ -8,14 +8,13 @@ import {
     Row,
     Col,
     Input,
-    Select,
+    Select, Form,
 } from "antd";
 import ControllerInfoTable from "./ControllerInfoTabl";
-import {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {request} from "@/utils/request";
 import {Method} from "@/apis/standard/all";
 import CollectorInfoTable from "./CollectorInfoTable";
-import SignalInfoTable from "./SignalInfoTable";
 import {SUCCESS_CODE} from "@/constants";
 import {createSignal} from "@/apis/request/board-signal/signal.ts";
 import {
@@ -23,6 +22,7 @@ import {
     getActiveCollectorList,
 } from "@/apis/request/board-signal/collector.ts";
 import {createController} from "@/apis/request/board-signal/controller.ts";
+import {getProtocols, IProtocol} from "@/apis/request/protocol.ts";
 
 export interface IController {
     id: number;
@@ -36,6 +36,7 @@ export interface ICollector {
     id: number;
     collectorName: string;
     collectorAddress: number;
+    protocols: IProtocol[];
     userId?: number;
     isDisabled: boolean;
 }
@@ -111,7 +112,7 @@ const PreTestManager: React.FC = () => {
             </Col>
             <AddConOrCollectButton reloadData={reloadData} type="controller"/>
             <AddConOrCollectButton reloadData={reloadData} type="collector"/>
-            <AddSignalButton reloadData={reloadData}/>
+            {/*<AddSignalButton reloadData={reloadData}/>*/}
         </Row>}>
             <Tabs className="tm_tabs" defaultActiveKey="1" items={items}/>
         </Card>
@@ -129,23 +130,24 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
     const [open, setOpen] = useState(false)
     const [name, setName] = useState('')
     const [address, setAddress] = useState('')
+    const [selectedProtocols, setSelectedProtocols] = useState<IProtocol[]>([])
 
     const boardType = type === 'controller' ? '核心板卡' : '采集板卡'
+    const [protocols,setProtocols] = useState<IProtocol[]>([])
 
-    const checkValid = () => {
-        // const addresses = address.split(".");
-        // if (addresses.length !== 4) {
-        //     message.error("板卡地址格式错误");
-        //     return false;
-        // }
-        // addresses.forEach((i: string) => {
-        //     if (isNaN(Number(i)) || Number(i) < 0 || Number(i) > 255) {
-        //         message.error("板卡地址格式错误");
-        //         return false;
-        //     }
-        // });
-        return true;
-    };
+    useEffect(()=>{
+        fetchData()
+    },[])
+
+    const fetchData = () => {
+        getProtocols().then((res) => {
+            if (res.code !== SUCCESS_CODE) {
+                message.error("获取协议失败："+ res.msg)
+                return
+            }
+            setProtocols(res.data)
+        })
+    }
 
     const close = () => {
         setOpen(false);
@@ -174,6 +176,7 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
         const collector = {
             collectorName: name,
             collectorAddress: Number(address),
+            protocols: selectedProtocols
         } as ICollector;
 
         createCollector(collector).then((res: any) => {
@@ -203,10 +206,8 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
                 title={`添加${boardType}`}
                 open={open}
                 onOk={() => {
-                    if (checkValid()) {
                         type === "controller" ? addController() : addCollector();
                         setOpen(false);
-                    }
                 }}
                 onCancel={close}
             >
@@ -226,6 +227,24 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
                         setAddress(e.target.value);
                     }}
                 />
+                {
+                    type === 'collector' ?
+                        <Select
+                          mode="multiple"
+                          placeholder="请选择协议"
+                          style={{marginBottom: 20,width:'100%'}}
+                          onSelect={(value) => {
+                              setSelectedProtocols([...selectedProtocols, JSON.parse(value as string)])
+                          }}
+                        >
+                            {
+                                protocols.map((item) => {
+                                    return <Select.Option key={item.protocolName}
+                                                          value={JSON.stringify(item)}>{item.protocolName}</Select.Option>
+                                })
+                            }
+                        </Select> : null
+                }
             </Modal>
         </>
     );

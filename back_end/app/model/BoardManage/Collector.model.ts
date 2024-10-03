@@ -11,12 +11,14 @@ import {
 } from 'sequelize-typescript'
 import Signal from './Signal.model';
 import User from '../User.model';
+import {IProtocolModel} from "../PreSet/Protocol.model";
 
 //采集板卡
 export interface ICollectorModel {
     id?: number
     collectorName: string
     collectorAddress:number
+    protocols: IProtocolModel[]
     userId: number | null
     isDisabled: boolean
 }
@@ -48,6 +50,9 @@ export default class Collector extends Model<ICollectorModel> {
 
     @Column(DataType.STRING)
     collectorAddress!:number
+
+    @Column(DataType.JSON)
+    protocols!: IProtocolModel[]
 
     @HasMany(() => Signal)
     signals!: Signal[]

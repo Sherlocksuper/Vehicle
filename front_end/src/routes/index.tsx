@@ -30,14 +30,14 @@ export const routeItems: RouteItem[] = [
     element: <Outlet/>,
     children: [
       {
-        key: '/test-config/physical-Topology',
-        label: '测试板卡信息管理',
-        element: <PhyTopology/>
-      },
-      {
         key: '/test-config/protocol-management',
         label: '测试协议管理',
         element: <ProtocolTable/>
+      },
+      {
+        key: '/test-config/physical-Topology',
+        label: '测试板卡信息管理',
+        element: <PhyTopology/>
       },
       {
         key: '/test-config/test-vehicle',
