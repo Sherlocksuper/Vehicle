@@ -47,39 +47,6 @@ class ProjectService {
                     projectName: name
                 }
             });
-            if (!project) {
-                await Project.create({
-                    projectName: name,
-                    projectConfig: [
-                        {
-                            "signal": {
-                                "id": 1,
-                                "remark": "测试信号备注",
-                                "innerIndex": 1,
-                                "signalName": "行驶速度",
-                                "signalType": "测试信号类型0",
-                                "signalAttribute": "测试信号属性0",
-                                "signalUnit": "测试信号单位0",
-                                "collectorId": 1
-                            },
-                            "collector": {
-                                "isDisabled": false,
-                                "id": 1,
-                                "collectorName": "zx-04A-1",
-                                "collectorAddress": 0x01,
-                                "userId": null
-                            },
-                            "controller": {
-                                "isDisabled": false,
-                                "id": 1,
-                                "controllerName": "hx-04A-1",
-                                "controllerAddress": "192.168.0.101",
-                                "userId": null
-                            },
-                        }
-                    ]
-                });
-            }
         }
     }
 }

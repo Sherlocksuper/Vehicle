@@ -289,15 +289,7 @@ export const CanSignalsParsingForm = () => (
               </Form.Item>
               <MinusCircleOutlined onClick={() => remove(name)}/>
             </Space>
-            <div style={{
-              display: 'flex', flexDirection: 'column',
-              maxHeight: 300, overflow: 'auto',
-              overflowX: 'hidden',
-              border: '1px solid #d9d9d9',
-              padding: 8,
-              borderRadius: 4
-            }}>
-              <Form.List name={[name, 'signals']}>
+            <Form.List name={[name, 'signals']}>
                 {(signalFields, {add: addSignal, remove: removeSignal}) => (
                   <SignalForm fields={signalFields} add={() => {
                     addSignal()
@@ -306,7 +298,6 @@ export const CanSignalsParsingForm = () => (
                   }}/>
                 )}
               </Form.List>
-            </div>
           </Space>
         ))}
         <Form.Item>
