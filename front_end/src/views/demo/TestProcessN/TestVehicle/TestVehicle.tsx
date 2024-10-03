@@ -167,7 +167,7 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
   const fetchData = async () => {
     getProtocols().then((res) => {
       if (res.code !== SUCCESS_CODE) {
-        message.error("获取协议失败：", res.msg)
+        message.error("获取协议失败："+ res.msg)
         return
       }
       setProtocols(res.data)
@@ -181,7 +181,7 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
     })
     getAllCollectorList().then((res) => {
       if (res.code !== SUCCESS_CODE) {
-        message.error("获取协议失败：", res.msg)
+        message.error("获取协议失败："+ res.msg)
         return
       }
       setCollectBoards(res.data)
@@ -445,7 +445,7 @@ export const UpdateTestVehicleModel: React.FC<{
   const fetchData = async () => {
     getProtocols().then((res) => {
       if (res.code !== SUCCESS_CODE) {
-        message.error("获取协议失败：", res.msg)
+        message.error("获取协议失败："+ res.msg)
         return
       }
       setProtocols(res.data)
@@ -459,7 +459,7 @@ export const UpdateTestVehicleModel: React.FC<{
     })
     getAllCollectorList().then((res) => {
       if (res.code !== SUCCESS_CODE) {
-        message.error("获取协议失败：", res.msg)
+        message.error("获取协议失败："+ res.msg)
         return
       }
       setCollectBoards(res.data)
