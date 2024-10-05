@@ -5,15 +5,14 @@ import {createBrowserRouter, Outlet} from "react-router-dom";
 import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import React, {ReactElement} from "react";
-import userUtils from "@/utils/userUtils.ts";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
-import UserManage from "@/views/demo/User/UserList.tsx";
 import VehicleTable from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
-import HistoryData from "@/views/demo/History/history.tsx";
+import HistoryData from "@/views/demo/CollectUnit/collectUnit.tsx";
 import ProtocolTable from "@/views/demo/ProtocolTable";
 import TestConfig from "@/views/demo/TestConfig";
 import TestTemplateForConfig from "@/views/demo/TestConfig/template.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
+import CollectUnitPage from "@/views/demo/CollectUnit/collectUnit.tsx";
 
 interface RouteItem {
   key: string;
@@ -38,6 +37,11 @@ export const routeItems: RouteItem[] = [
         key: '/test-config/physical-Topology',
         label: '测试板卡信息管理',
         element: <PhyTopology/>
+      },
+      {
+        key: '/test-config/units',
+        label: '采集单元管理',
+        element: <CollectUnitPage/>
       },
       {
         key: '/test-config/test-vehicle',

@@ -12,8 +12,7 @@ import TestTemplateController from "../controller/PreSet/TestTemplateController"
 import TestObjectNController from "../controller/TestObjectNController";
 import HistoryController from "../controller/HistoryController";
 import ProtocalController from "../controller/PreSet/ProtocalController";
-import {Context} from "koa";
-import {PassThrough} from "stream";
+import CollectUnitController from "../controller/CollectUnitController";
 
 const router = new KoaRouter({
   prefix: ''
@@ -143,5 +142,11 @@ router.get('/getCurrentTestConfig', TestConfigController.getCurrentTestConfig);
 router.get('/stopCurrentTestConfig', TestConfigController.stopCurrentTestConfig);
 //async downHistoryDataAsJson() {
 router.get('/downHistoryDataAsJson', TestConfigController.downHistoryDataAsJson);
+
+// CollectUnit
+router.post('/addCollectUnit', CollectUnitController.addCollectUnit);
+router.post('/deleteCollectUnit/:id', CollectUnitController.deleteCollectUnit);
+router.post('/updateCollectUnit', CollectUnitController.updateCollectUnit);
+router.get('/getCollectUnits', CollectUnitController.getCollectUnits);
 
 export default router
