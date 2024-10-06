@@ -3,6 +3,7 @@
  */
 import {IProtocol} from "@/apis/request/protocol.ts";
 import {ICollector, IController} from "@/views/demo/Topology/PhyTopology.tsx";
+import {ICollectUnit} from "@/apis/standard/collectUnit.ts";
 
 export interface IVehicle {
     id?: number
@@ -13,4 +14,5 @@ export interface IVehicle {
         core: IController,
         collector: ICollector,
     }[]
+    collectUnits: ICollectUnit[]
 }

@@ -2,6 +2,7 @@ import {AutoIncrement, Column, DataType, Model, PrimaryKey, Table} from "sequeli
 import {IProtocolModel} from "./Protocol.model";
 import {IControllerModel} from "../BoardManage/Controller.model";
 import {ICollectorModel} from "../BoardManage/Collector.model";
+import {ICollectUnitModel} from "../CollectUnit.model";
 
 /**
  * 车辆管理
@@ -16,6 +17,7 @@ export interface IVehicleModel {
         core: IControllerModel,
         collector: ICollectorModel,
     }[]
+    collectUnits: ICollectUnitModel[]
 }
 
 @Table({
@@ -43,4 +45,7 @@ export default class Vehicle extends Model<IVehicleModel> {
         core: IControllerModel,
         collector: ICollectorModel,
     }[];
+
+    @Column(DataType.JSON)
+    collectUnits!: ICollectUnitModel[];
 }
