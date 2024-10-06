@@ -8,10 +8,12 @@ import {getActiveControllerList} from "@/apis/request/board-signal/controller.ts
 import {getActiveCollectorList} from "@/apis/request/board-signal/collector.ts";
 import {ICollector, IController} from "@/views/demo/Topology/PhyTopology.tsx";
 import {NOT_ON_USED, ON_USED} from "@/constants/board.ts";
+import Search from "antd/es/input/Search";
 
 
 const CollectUnitPage = () => {
   const [collectUnitData, setCollectUnitData] = React.useState<ICollectUnit[]>([])
+  const [collectUnitDataStore, setCollectUnitDataStore] = React.useState<ICollectUnit[]>([])
   const [currentCollectUnit, setCurrentCollectUnit] = React.useState<ICollectUnit | undefined>(undefined)
   const [mode, setMode] = React.useState<"SHOW" | "ADD" | "EDIT">(undefined)
 
@@ -72,6 +74,7 @@ const CollectUnitPage = () => {
     getCollectUnits().then(res => {
       if (res.code === FAIL_CODE) return
       setCollectUnitData(res.data)
+      setCollectUnitDataStore(res.data)
     })
   }
 
@@ -97,6 +100,20 @@ const CollectUnitPage = () => {
         <Button type={"primary"} onClick={() => {
           fetchCollectUnitData()
         }}>刷新</Button>
+        <Search
+          placeholder="搜索"
+          onSearch={(value) => {
+            if (value === "") {
+              setCollectUnitData(collectUnitDataStore)
+              return
+            }
+            const result = collectUnitDataStore.filter((item) => {
+              return item.collectUnitName.includes(value)
+            })
+            setCollectUnitData(result)
+          }}
+          enterButton
+        />
       </Space>}
       style={{
         height: "100vh",
