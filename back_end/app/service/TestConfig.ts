@@ -185,24 +185,24 @@ class TestConfigService {
   async downTestConfig(testConfigId: number) {
     if (this.currentTestConfig) return false
     const testConfig = await this.getTestConfigById(testConfigId);
+    console.log("下发的消息", testConfig)
     if (!testConfig) return false
 
     const res = getConfigBoardMessage(testConfig!)
     const hostPortList = await this.getHostPortList(testConfig)
-    console.log("下发的消息", res)
 
-    try {
-      await connectWithMultipleBoards(hostPortList, 0)
-    } catch (e) {
-      return false
-    }
-
-    // 发送所有消息给板子
-    try {
-      await sendMultipleMessagesBoard(res.resultMessages, 1000)
-    } catch (e) {
-      return false
-    }
+    // try {
+    //   await connectWithMultipleBoards(hostPortList, 0)
+    // } catch (e) {
+    //   return false
+    // }
+    //
+    // // 发送所有消息给板子
+    // try {
+    //   await sendMultipleMessagesBoard(res.resultMessages, 1000)
+    // } catch (e) {
+    //   return false
+    // }
 
     // 解析下发的配置，获取需要下发的信息、信号的映射
     this.resultMessages = res.resultMessages
@@ -213,7 +213,7 @@ class TestConfigService {
     await this.setTestConfigSignalMapping(testConfig!)
     await this.getSpecialDigitalKeyList(testConfig!)
 
-    // startMockBoardMessage(this.signalsMappingRelation)
+    startMockBoardMessage(this.signalsMappingRelation)
     return true
   }
 
@@ -221,8 +221,8 @@ class TestConfigService {
    * 停止当前下发
    */
   async stopCurrentTestConfig() {
-    // stopMockBoardMessage()
-    await sendMultipleMessagesBoard(this.banMessage, 200)
+    stopMockBoardMessage()
+    // await sendMultipleMessagesBoard(this.banMessage, 200)
     await this.clearCurrent()
     return true
   }

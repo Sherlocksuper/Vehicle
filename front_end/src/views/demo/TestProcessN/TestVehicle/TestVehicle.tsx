@@ -273,9 +273,16 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
           <Form.Item
             label="车辆名称"
             name="vehicleName"
-            rules={[{validator: validateVehicleData}]}
+            rules={[{validator: validateVehicleData}, {required: true, message: '请输入车辆名称'}]}
           >
             <Input placeholder={"请输入车辆名称"}/>
+          </Form.Item>
+          <Form.Item
+            label="装备类型"
+            name="equipmentType"
+            rules={[{required: true, message: '请输入装备类型'}]}
+          >
+            <Input placeholder={"请输入装备类型"}/>
           </Form.Item>
           <Form.Item
             label={"选择采集单元"}
@@ -327,6 +334,7 @@ export const TestVehicleDetailButton: React.FC<{ vehicle: IVehicle }> = ({vehicl
           >
             <Descriptions.Item label="车辆名称">{vehicle.vehicleName}</Descriptions.Item>
             <Descriptions.Item label="是否启用">{vehicle.isDisabled ? "否" : "是"}</Descriptions.Item>
+            <Descriptions.Item label="装备类型">{vehicle.equipmentType}</Descriptions.Item>
             <Descriptions.Item label="采集单元">
               {
                 vehicle.collectUnits.map((item) => (

@@ -40,7 +40,7 @@ const DB_OPT = {
     },
     async initDB() {
         try {
-            // await sequelize.sync({force: true})
+            await sequelize.sync({force: true})
             // // 初始化核心板卡
             // await ControllerService.initControllers()
             // // 初始化采集板卡
@@ -48,7 +48,7 @@ const DB_OPT = {
             // // 初始化采集信号
             // await SignalService.initSignals()
             // // 初始化超级用户表
-            // await UserService.initRootUser()
+            await UserService.initRootUser()
             // // 初始化测试项目
             // // await ProjectService.initProject(10)
             // // 初始化Protocol协议

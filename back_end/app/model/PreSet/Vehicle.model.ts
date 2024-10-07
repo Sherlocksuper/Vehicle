@@ -12,6 +12,7 @@ export interface IVehicleModel {
     id?: number
     vehicleName: string
     isDisabled: boolean
+    equipmentType: string
     protocols: {
         protocol: IProtocolModel,
         core: IControllerModel,
@@ -38,6 +39,9 @@ export default class Vehicle extends Model<IVehicleModel> {
         defaultValue: false
     })
     isDisabled!: boolean;
+
+    @Column(DataType.STRING)
+    equipmentType!: string;
 
     @Column(DataType.JSON)
     protocols!: {

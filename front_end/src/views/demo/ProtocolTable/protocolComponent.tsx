@@ -305,6 +305,7 @@ export const CanSignalsParsingForm = () => (
           <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
             <Space key={key} style={{display: 'flex'}} align="baseline">
               <Form.Item label={"帧编号"} {...restField} name={[name, 'frameNumber']}
+                         initialValue={(name + 1).toString(16)}
                          rules={[{required: true, message: '请输入帧编号'}]}>
                 <HexInput/>
               </Form.Item>
@@ -343,6 +344,7 @@ export const FlexRaySignalsParsingForm = () => (
           <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
             <Space key={key} style={{display: 'flex'}} align="baseline">
               <Form.Item  {...restField} name={[name, 'frameNumber']} label={"帧编号"}
+                          initialValue={(name + 1).toString(16)}
                           rules={[{required: true, message: '请输入帧编号'}]}>
                 <HexInput/>
               </Form.Item>
@@ -389,6 +391,7 @@ export const MICSignalsParsingForm = () => {
               <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
                 <Space key={key} style={{display: 'flex'}} align="baseline">
                   <Form.Item  {...restField} name={[name, 'frameNumber']} label={"帧编号"}
+                              initialValue={(name + 1).toString(16)}
                               rules={[{required: true, message: '请输入帧编号'}]}>
                     <HexInput/>
                   </Form.Item>
@@ -442,6 +445,7 @@ export const B1552BSignalParsingForm = () => {
             <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
               <Space key={key} style={{display: 'flex'}} align="baseline">
                 <Form.Item  {...restField} name={[name, 'frameNumber']} label={"帧编号"}
+                            initialValue={(name + 1).toString(16)}
                             rules={[{required: true, message: '请输入帧编号'}]}>
                   <HexInput/>
                 </Form.Item>

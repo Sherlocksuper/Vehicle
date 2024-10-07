@@ -9,6 +9,7 @@ export interface IVehicle {
     id?: number
     vehicleName: string
     isDisabled: boolean
+    equipmentType: string
     protocols: {
         protocol: IProtocol
         core: IController,
