@@ -66,7 +66,6 @@ export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
   return (
     <>
       <Modal
-        title="动态添加信号"
         open={open}
         onOk={handleOk}
         onCancel={handleCancel}

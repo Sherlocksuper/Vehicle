@@ -49,6 +49,7 @@ export const FlexRayBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "microticksPerCycle"]}
           rules={[{required: true, message: "请输入周期微时钟(microticksPerCycle)"}]}
+          label={"周期微时钟(microticksPerCycle)"}
         >
           <Input type="number" placeholder="周期微时钟(microticksPerCycle)"/>
         </Form.Item>
@@ -57,6 +58,7 @@ export const FlexRayBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "macroticksPerCycle"]}
           rules={[{required: true, message: "请输入周期宏时钟(macroticksPerCycle)"}]}
+          label={"周期宏时钟(macroticksPerCycle)"}
         >
           <Input type="number" placeholder="周期宏时钟(macroticksPerCycle)"/>
         </Form.Item>
@@ -65,6 +67,7 @@ export const FlexRayBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "transmissionStartTime"]}
           rules={[{required: true, message: "请输入传输开始时间(transmissionStartTime)"}]}
+          label={"传输开始时间(transmissionStartTime)"}
         >
           <Input type="number" placeholder="传输开始时间(transmissionStartTime)"/>
         </Form.Item>
@@ -73,6 +76,7 @@ export const FlexRayBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "staticFramepayload"]}
           rules={[{required: true, message: "请输入静态帧负载(staticFramepayload)"}]}
+          label={"静态帧负载(staticFramepayload)"}
         >
           <Input type="number" placeholder="静态帧负载(staticFramepayload)"/>
         </Form.Item>
@@ -81,6 +85,7 @@ export const FlexRayBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "staticSlotsCount"]}
           rules={[{required: true, message: "请输入静态槽(staticSlotsCount)"}]}
+          label={"静态槽(staticSlotsCount)"}
         >
           <Input type="number" placeholder="静态槽(staticSlotsCount)"/>
         </Form.Item>
@@ -89,6 +94,7 @@ export const FlexRayBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "dynamicSlotCount"]}
           rules={[{required: true, message: "请输入动态槽(dynamicSlotCount)"}]}
+          label={"动态槽(dynamicSlotCount)"}
         >
           <Input type="number" placeholder="动态槽(dynamicSlotCount)"/>
         </Form.Item>
@@ -97,6 +103,7 @@ export const FlexRayBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "dynamicSlotLength"]}
           rules={[{required: true, message: "请输入动态槽长度(dynamicSlotLength)"}]}
+          label={"动态槽长度(dynamicSlotLength)"}
         >
           <Input type="number" placeholder="动态槽长度(dynamicSlotLength)"/>
         </Form.Item>
@@ -105,6 +112,7 @@ export const FlexRayBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "setAsSyncNode"]}
           rules={[{required: true, message: "请输入设置为同步节点(setAsSyncNode)"}]}
+          label={"设置为同步节点(setAsSyncNode)"}
         >
           <Input type="number" placeholder="设置为同步节点(setAsSyncNode)"/>
         </Form.Item>
@@ -122,6 +130,7 @@ export const MICBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "nctc"]}
           rules={[{required: true, message: "请输入NCTC"}]}
+          label={"NCTC"}
         >
           <Input placeholder="NCTC"/>
         </Form.Item>
@@ -130,6 +139,7 @@ export const MICBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "btc"]}
           rules={[{required: true, message: "请输入BTC"}]}
+          label={"BTC"}
         >
           <Input placeholder="BTC"/>
         </Form.Item>
@@ -138,6 +148,7 @@ export const MICBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "nrtc"]}
           rules={[{required: true, message: "请输入NRTC"}]}
+          label={"NRTC"}
         >
           <Input placeholder="NRTC"/>
         </Form.Item>
@@ -146,6 +157,7 @@ export const MICBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "modadd"]}
           rules={[{required: true, message: "请输入MODADD"}]}
+          label={"MODADD"}
         >
           <Input placeholder="MODADD"/>
         </Form.Item>
@@ -154,6 +166,7 @@ export const MICBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
+          label={"数据更新速率"}
         >
           <Input placeholder="数据更新速率"/>
         </Form.Item>
@@ -171,6 +184,7 @@ export const B1552BaseConfig = () => {
         <Form.Item
           name={["baseConfig", "listenAddress"]}
           rules={[{required: true, message: "请输入监听地址"}]}
+          label={"监听地址"}
         >
           <Input placeholder="监听地址"/>
         </Form.Item>
@@ -186,6 +200,7 @@ export const Serial422BaseConfig = () => {
         <Form.Item
           name={["baseConfig", "baudRate"]}
           rules={[{required: true, message: "请输入波特率"}]}
+          label={"波特率"}
         >
           <Input type="number" placeholder="波特率"/>
         </Form.Item>
@@ -194,6 +209,7 @@ export const Serial422BaseConfig = () => {
         <Form.Item
           name={["baseConfig", "stopBits"]}
           rules={[{required: true, message: "请输入停止位"}]}
+          label={"停止位"}
         >
           <Input type="number" placeholder="停止位"/>
         </Form.Item>
@@ -202,6 +218,7 @@ export const Serial422BaseConfig = () => {
         <Form.Item
           name={["baseConfig", "check"]}
           rules={[{required: true, message: "请输入是否校验"}]}
+          label={"是否校验"}
         >
           <Input type="number" placeholder="是否校验"/>
         </Form.Item>
@@ -210,6 +227,7 @@ export const Serial422BaseConfig = () => {
         <Form.Item
           name={["baseConfig", "checkType"]}
           rules={[{required: true, message: "请输入校验类型"}]}
+          label={"校验类型"}
         >
           <Input type="number" placeholder="校验类型"/>
         </Form.Item>
@@ -290,14 +308,14 @@ export const CanSignalsParsingForm = () => (
               <MinusCircleOutlined onClick={() => remove(name)}/>
             </Space>
             <Form.List name={[name, 'signals']}>
-                {(signalFields, {add: addSignal, remove: removeSignal}) => (
-                  <SignalForm fields={signalFields} add={() => {
-                    addSignal()
-                  }} remove={(index) => {
-                    removeSignal(index)
-                  }}/>
-                )}
-              </Form.List>
+              {(signalFields, {add: addSignal, remove: removeSignal}) => (
+                <SignalForm fields={signalFields} add={() => {
+                  addSignal()
+                }} remove={(index) => {
+                  removeSignal(index)
+                }}/>
+              )}
+            </Form.List>
           </Space>
         ))}
         <Form.Item>

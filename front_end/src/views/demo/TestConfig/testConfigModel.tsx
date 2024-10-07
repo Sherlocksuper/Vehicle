@@ -96,7 +96,6 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
   return (
     <>
       <Modal
-        title="动态添加信号"
         open={open}
         onOk={handleOk}
         onCancel={()=>{
