@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Button, Card, Descriptions, Form, Input, message, Modal, Select, Space, Table, Tag} from 'antd';
+import {Button, Card, Descriptions, Divider, Form, Input, message, Modal, Select, Space, Table, Tag} from 'antd';
 import type {TableProps} from 'antd';
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {createVehicle, deleteVehicle, getVehicles, updateVehicle} from "@/apis/request/vehicle.ts";
@@ -9,12 +9,16 @@ import {RuleObject} from 'antd/es/form';
 import Search from "antd/es/input/Search";
 import {getCollectUnits} from "@/apis/request/collectUnit.ts";
 import {ICollectUnit} from "@/apis/standard/collectUnit.ts";
+import {DeleteOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {ITestConfig} from "@/apis/standard/test.ts";
+import {createTestConfig} from "@/apis/request/testConfig.ts";
+import {ICollector} from "@/views/demo/Topology/PhyTopology.tsx";
+import {v4 as uuid} from "uuid"
 
 
 const TestVehicle: React.FC = () => {
   const [vehicles, setVehicles] = React.useState<IVehicle[]>([])
   const [vehiclesStore, setVehiclesStore] = React.useState<IVehicle[]>([])
-  const [openUpdateModel, setOpenUpdateModel] = React.useState<boolean>(false)
   const [targetVehicle, setTargetVehicle] = React.useState<IVehicle>(undefined)
 
   const fetchVehicles = async () => {
@@ -78,6 +82,10 @@ const TestVehicle: React.FC = () => {
           }
           }>{"删除"}</Button>
 
+          <Button type="primary" onClick={() => {
+            setTargetVehicle(record)
+          }}>{"配置"}</Button>
+
         </Space>
       )
     },
@@ -113,6 +121,12 @@ const TestVehicle: React.FC = () => {
           }).filter(vehicle => vehicle !== undefined)
           setVehicles(targetVehicles)
         }}/>
+        <TestConfigModel onFinished={
+          () => {
+            fetchVehicles()
+            setTargetVehicle(undefined)
+          }
+        } belongVehicle={targetVehicle} open={targetVehicle !== undefined}></TestConfigModel>
       </Space>
       <Table style={{
         marginTop: 20
@@ -202,6 +216,39 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
           form.validateFields().then(() => {
             const result = form.getFieldsValue()
             result.collectUnits = result.collectUnits.map((item) => JSON.parse(item.key))
+
+            // 给每个车的每个协议设置uuid
+            result.collectUnits.forEach(collectUnit => {
+              collectUnit.collectors.forEach(collector => {
+                collector.protocols.forEach(protocol => {
+                  protocol.signalsParsingConfig.forEach(spConfig => {
+                    spConfig.signals.forEach(signal => {
+                      signal.id = uuid()
+                    })
+                  })
+                })
+              })
+            })
+
+            result.collectUnits.forEach(collectUnit => {
+              collectUnit.collectors.forEach(collector => {
+                collector.protocols.forEach(protocol => {
+                  if (!result.protocols) result.protocols = []
+                  // 把protocol变为空
+                  const col: ICollector = {
+                    ...collector,
+                    protocols: []
+                  }
+
+                  result.protocols.push({
+                    core: collectUnit.core,
+                    collector: col,
+                    protocol: protocol,
+                  })
+                })
+              })
+            })
+
             newVehicle(result)
           })
         }}
@@ -289,6 +336,181 @@ export const TestVehicleDetailButton: React.FC<{ vehicle: IVehicle }> = ({vehicl
             </Descriptions.Item>
           </Descriptions>
         </Card>
+      </Modal>
+    </>
+  );
+}
+
+// 新建车辆测试配置
+export const TestConfigModel: React.FC<{
+  onFinished: () => void,
+  belongVehicle: IVehicle,
+  open: boolean,
+  initValue?: IVehicle
+}> = ({
+        onFinished,
+        belongVehicle,
+        open,
+        initValue
+      }) => {
+
+  const title = (initValue === undefined ? "新建" : "编辑")
+  const [form] = Form.useForm()
+
+  useEffect(() => {
+    if (initValue !== undefined) {
+      form.setFieldsValue(initValue)
+    }
+  }, [form, initValue])
+
+  useEffect(() => {
+    if (open === false) {
+      form.resetFields()
+    }
+  }, [form, open])
+
+  const createTestConfigApi = () => {
+    const value = form.getFieldsValue()
+    console.log(value)
+    value.projects = value.projects.map((project) => {
+      project.indicators = project.indicators.map((indicator) => {
+        indicator.signal = JSON.parse(indicator.signal.value)
+        return indicator
+      })
+      return project
+    })
+
+    const result: ITestConfig = {
+      id: undefined,
+      name: value.name,
+      configs: [{
+        vehicle: belongVehicle,
+        projects: value.projects
+      }],
+      template: undefined
+    }
+    console.log(result)
+
+    createTestConfig(result).then((res) => {
+      if (res.code === SUCCESS_CODE) {
+        onFinished()
+      } else {
+        message.error("创建失败")
+      }
+    })
+
+  }
+
+  const getSelectOptions = (vehicle: IVehicle) => {
+    const result = []
+    vehicle.collectUnits.forEach((collectUnit) => {
+      collectUnit.collectors.forEach((collector) => {
+        collector.protocols.forEach((protocol) => {
+          protocol.signalsParsingConfig.forEach((spConfig) => {
+            spConfig.signals.forEach((signal) => {
+              result.push(<Select.Option key={collectUnit.collectUnitName + "/" + collector.collectorName + "/" + protocol.protocolName + "/" + signal.name}
+                                         onClick={() => console.log(signal)}
+                                         value={JSON.stringify(signal)}>{collectUnit.collectUnitName + "/" + collector.collectorName + "/" + protocol.protocolName + "/" + signal.name}</Select.Option>)
+
+            })
+          })
+        })
+      })
+    })
+    return result
+  }
+
+  return (
+    <>
+      <Modal
+        title={title}
+        open={open}
+        onOk={() => {
+          createTestConfigApi()
+          // onFinished()
+        }}
+        onCancel={() => {
+          onFinished()
+        }}
+        okText="确定"
+        cancelText="取消"
+        width={"80%"}
+      >
+        <Form form={form}>
+          <Form.Item name={"name"} rules={[{required: true, message: '请输入测试配置名称'}]}
+                     label={"测试配置名称"}>
+            <Input placeholder="测试配置名称"/>
+          </Form.Item>
+          <Form.List name={['projects']}>
+            {(fields, {add, remove}) => (
+              <>
+                {fields.map(({key, name, fieldKey, ...restField}) => {
+                  const projectIndex = name
+                  return (
+                    <Space key={key} style={{display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'start',}}>
+                      <Form.Item {...restField} name={[projectIndex, 'name']}
+                                 rules={[{required: true, message: '请输入测试项目名称'}]}
+                                 label={"测试项目名称"}>
+                        <Input placeholder="测试项目名称"/>
+                      </Form.Item>
+                      <Form.List name={[projectIndex, 'indicators']}>
+                        {(fields, {add, remove}) => (
+                          <>
+                            {fields.map(({key, name, fieldKey, ...restField}) => {
+                              const indicatorIndex = name
+                              return (
+                                <Space key={key}
+                                       style={{display: 'flex', flexDirection: 'row', alignItems: 'start', justifyContent: 'start'}}>
+                                  <Form.Item {...restField} name={[indicatorIndex, 'name']}
+                                             rules={[{required: true, message: '请输入指标名称'}]}
+                                             label={"指标名称"}>
+                                    <Input placeholder="指标名称"/>
+                                  </Form.Item>
+                                  <Form.Item {...restField} name={[indicatorIndex, 'signal']} fieldKey={[fieldKey, 'signal']}
+                                             rules={[{required: true, message: '请选择内侧参数'}]}
+                                             label={"内测参数"}
+                                  >
+                                    <Select
+                                      labelInValue
+                                      placeholder="选择内测参数"
+                                      style={{
+                                        width: 300
+                                      }}
+                                    >
+                                      {getSelectOptions(belongVehicle)}
+                                    </Select>
+                                  </Form.Item>
+                                  <MinusCircleOutlined onClick={() => remove(name)} disabled={initValue !== undefined}/>
+                                </Space>
+                              )
+                            })}
+                            <Form.Item>
+                              <Button type="dashed" onClick={() => {
+                                add()
+                              }}
+                                      disabled={initValue !== undefined}>
+                                <PlusOutlined/>添加指标
+                              </Button>
+                            </Form.Item>
+                          </>
+                        )}
+                      </Form.List>
+                      <DeleteOutlined onClick={() => remove(name)} disabled={initValue !== undefined}/>
+                      <Divider/>
+                    </Space>
+                  )
+                })}
+                <Form.Item>
+                  <Button type="dashed" onClick={() => {
+                    add()
+                  }}>
+                    <PlusOutlined/>添加测试项目
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
+        </Form>
       </Modal>
     </>
   );

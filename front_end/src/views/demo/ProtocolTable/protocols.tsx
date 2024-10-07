@@ -20,7 +20,6 @@ import {
   Serial422BaseConfig,
   Serial422SignalsParsingForm
 } from "@/views/demo/ProtocolTable/protocolComponent.tsx";
-import {v4 as uuid} from "uuid"
 
 export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
   // 外面的状态
@@ -79,12 +78,6 @@ export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
               disabled={mode === "SHOW"}
               onFinish={() => {
                 const value = form.getFieldsValue() as IProtocol
-                value.signalsParsingConfig.forEach((item) => {
-                  item.signals.forEach((signal) => {
-                    signal.id = uuid()
-                  })
-                })
-
                 if (mode === "ADD") {
                   createProtocol(value as IProtocol).then((res) => {
                     if (res.code === SUCCESS_CODE) {
