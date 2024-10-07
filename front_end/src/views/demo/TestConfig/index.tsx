@@ -121,29 +121,32 @@ const TestConfig = () => {
   }, []);
 
   return (
-    <Card style={{overflow: "scroll", overflowX: "hidden", height: "100vh"}}>
-      <Space style={{marginBottom: "20px", alignItems: "center",}}>
-        <Button type={"primary"} onClick={() => {
-          setCurrentRecord(undefined);
-          setOpenTestConfigModal(true);
-        }}>创建配置</Button>
-        <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value)=>{
-          const targetConfigs = configsStore.map(config => {
-            if (config.name.includes(value)) {
-              return config
-            }
-          }).filter(config => config !== undefined)
-          setConfigs(targetConfigs)
-        }}/>
+    <Card title={"测试配置"}
+          style={{overflow: "scroll", overflowX: "hidden", height: "100vh", padding: "20px", display: "flex", flexDirection: "column"}}
+          extra={
+            <Space style={{marginBottom: "20px", alignItems: "center",}}>
 
-        <Button type={"primary"} onClick={() => fetchCurrentConfig()}>刷新当前下发配置</Button>
+              <Button type={"primary"} onClick={() => fetchCurrentConfig()}>刷新当前下发配置</Button>
 
-        <Button type={"primary"} disabled={!currentDownConfig} onClick={() => handleShowCurrentData()}>前往查看当前数据</Button>
+              <Button type={"primary"} disabled={!currentDownConfig} onClick={() => handleShowCurrentData()}>{
+                currentDownConfig ? ("当前测试配置" + currentDownConfig.name) : "暂无当前数据"
+              }</Button>
 
-        <Button type={"primary"} onClick={() => handleStopCurrentCollect()}>停止当前采集</Button>
+              <Button type={"primary"} onClick={() => handleStopCurrentCollect()}>停止当前采集</Button>
 
-        {currentDownConfig?.name ?? "暂无下发配置"}
-      </Space>
+              {currentDownConfig?.name ?? "暂无下发配置"}
+
+              <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value) => {
+                const targetConfigs = configsStore.map(config => {
+                  if (config.name.includes(value)) {
+                    return config
+                  }
+                }).filter(config => config !== undefined)
+                setConfigs(targetConfigs)
+              }}/>
+            </Space>
+          }
+    >
       <Table
         columns={columns}
         dataSource={configs}
