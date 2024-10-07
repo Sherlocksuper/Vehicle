@@ -7,12 +7,12 @@ import {HTML5Backend} from "react-dnd-html5-backend";
 import React, {ReactElement} from "react";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import VehicleTable from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
-import HistoryData from "@/views/demo/CollectUnit/collectUnit.tsx";
 import ProtocolTable from "@/views/demo/ProtocolTable";
 import TestConfig from "@/views/demo/TestConfig";
 import TestTemplateForConfig from "@/views/demo/TestConfig/template.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import CollectUnitPage from "@/views/demo/CollectUnit/collectUnit.tsx";
+import HistoryData from "@/views/demo/History/history.tsx";
 
 interface RouteItem {
   key: string;
