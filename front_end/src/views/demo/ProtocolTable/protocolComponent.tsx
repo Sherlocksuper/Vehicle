@@ -47,7 +47,9 @@ export const CanBaseConfig = () => {
       rules={[{required: true, message: "请输入波特率"}]} // 必填
       label={"波特率"}
     >
-      <HexInput/>
+      <div style={{width: "100px"}}>
+        <HexInput/>
+      </div>
     </Form.Item>
   )
 }
