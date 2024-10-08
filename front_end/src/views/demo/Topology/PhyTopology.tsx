@@ -153,6 +153,7 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
         setOpen(false);
         setName("");
         setAddress("");
+        setSelectedProtocols([])
     };
 
     const addController = () => {
@@ -206,11 +207,14 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
                 title={`添加${boardType}`}
                 open={open}
                 onOk={() => {
-                        type === "controller" ? addController() : addCollector();
-                        setOpen(false);
+                    if (name === "" || address === "") {
+                        message.error("请填写完整信息");
+                        return;
+                    }
+                    type === "controller" ? addController() : addCollector();
+                    close()
                 }}
-                onCancel={close}
-            >
+                onCancel={()=>{close()}} >
                 <Input
                     placeholder={`请输入${boardType}名称`}
                     style={{marginBottom: 10}}
@@ -218,6 +222,7 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
                     onChange={(e) => {
                         setName(e.target.value);
                     }}
+                    value={name}
                 />
                 <Input
                     placeholder={`请输入板卡地址`}
@@ -226,6 +231,7 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
                     onChange={(e) => {
                         setAddress(e.target.value);
                     }}
+                    value={address}
                 />
                 {
                     type === 'collector' ?
@@ -236,6 +242,7 @@ const AddConOrCollectButton = ({reloadData, type}: AddManagerProps) => {
                           onSelect={(value) => {
                               setSelectedProtocols([...selectedProtocols, JSON.parse(value as string)])
                           }}
+                          value={selectedProtocols.map((item) => JSON.stringify(item))}
                         >
                             {
                                 protocols.map((item) => {
