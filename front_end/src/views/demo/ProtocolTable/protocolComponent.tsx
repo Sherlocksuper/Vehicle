@@ -16,10 +16,13 @@ const HexInput = ({
 
   const handleHexChange = (e) => {
     const hex = e.target.value;
-    setHexValue(hex);
-    const decimal = parseInt(hex, 16);
-    if (!isNaN(decimal)) {
-      onChange(decimal);
+    const hexRegex = /^[0-9a-fA-F]*$/;
+    if (hexRegex.test(hex)) {
+      setHexValue(hex);
+      const decimal = parseInt(hex, 16);
+      if (!isNaN(decimal)) {
+        onChange(decimal);
+      }
     }
   };
 
@@ -641,7 +644,9 @@ export const SignalForm = ({fields, add, remove, onlyName = false}) => {
                 <Input placeholder="信号名称"/>
               </Form.Item>
               <Form.Item {...restField} name={[name, 'dimension']} label={"信号量纲"}
-                         rules={[{required: true, message: `请输入信号${key + 1}量纲`}]}>
+                         rules={[{required: true, message: `请输入信号${key + 1}量纲`}]}
+                         initialValue={"/"}
+              >
                 <Input placeholder="信号量纲"/>
               </Form.Item>
               <MinusCircleOutlined onClick={() => remove(name)}/>
@@ -667,22 +672,30 @@ export const SignalForm = ({fields, add, remove, onlyName = false}) => {
               <Input placeholder="信号名称"/>
             </Form.Item>
             <Form.Item {...restField} name={[name, 'dimension']} label={"信号量纲"}
-                       rules={[{required: true, message: `请输入信号${key + 1}量纲`}]}>
+                       rules={[{required: true, message: `请输入信号${key + 1}量纲`}]}
+                       initialValue={"/"}
+            >
               <Input placeholder="信号量纲"/>
             </Form.Item>
             <Form.Item {...restField} name={[name, 'startPoint']} label={"起点"}
-                       rules={[{required: true, message: '请输入起点'}]}>
+                       rules={[{required: true, message: '请输入起点'}]}
+                       initialValue={"0"}
+            >
               <HexInput/>
             </Form.Item>
             <Form.Item {...restField} name={[name, 'length']}
                        rules={[{required: true, message: '请输入长度'}]}
-                       label={"长度"}>
+                       label={"长度"}
+                       initialValue={"8"}
+            >
               <HexInput/>
             </Form.Item>
-            <Form.Item {...restField} name={[name, 'slope']} rules={[{required: true, message: '请输入斜率'}]} label={"斜率"}>
+            <Form.Item {...restField} name={[name, 'slope']} rules={[{required: true, message: '请输入斜率'}]} label={"斜率"}
+                       initialValue={"1"}>
               <HexInput/>
             </Form.Item>
-            <Form.Item {...restField} name={[name, 'offset']} rules={[{required: true, message: '请输入偏移'}]} label={"偏移"}>
+            <Form.Item {...restField} name={[name, 'offset']} rules={[{required: true, message: '请输入偏移'}]} label={"偏移"}
+                       initialValue={"0"} >
               <HexInput/>
             </Form.Item>
             <MinusCircleOutlined onClick={() => remove(name)}/>
