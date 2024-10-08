@@ -178,7 +178,7 @@ export const MICBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
-          label={"数据更新速率"}
+          label={"数据更新速率（Hz）"}
         >
           <HexInput/>
         </Form.Item>
@@ -256,7 +256,7 @@ export const AnalogBaseConfig = () => {
     <Row gutter={[8, 0]}>
       <Col className="gutter-row" span={6}>
         <Form.Item
-          label={"数据更新速率"}
+          label={"数据更新速率（Hz）"}
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
         >
@@ -281,7 +281,7 @@ export const DigitalBaseConfig = () => {
     <Row gutter={[8, 0]}>
       <Col className="gutter-row" span={6}>
         <Form.Item
-          label={"数据更新速率"}
+          label={"数据更新速率（Hz）"}
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
         >
