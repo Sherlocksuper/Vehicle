@@ -1,18 +1,19 @@
-import {Button, Descriptions, Modal, Space, Table, Tag} from "antd";
+import {Button, Descriptions, Input, Modal, Select, Space, Table, Tag} from "antd";
 import {ICollector} from "../PhyTopology.tsx";
 import {deleteCollector, updateCollector} from "@/apis/request/board-signal/collector.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {NOT_ON_USED, ON_USED, USED_INFO} from "@/constants/board.ts";
 import {confirmDelete} from "@/utils";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {ProtocolModel} from "@/views/demo/ProtocolTable/protocols.tsx";
-import {IProtocol} from "@/apis/request/protocol.ts";
+import {getProtocols, IProtocol} from "@/apis/request/protocol.ts";
 
 const CollectorInfoTable: React.FC<{
     dataSource: ICollector[],
     reload: () => void
 }> = ({dataSource, reload}) => {
     const [collector, setCollector] = useState<ICollector | undefined>(undefined)
+    const [mode, setMode] = useState<"SHOW" | "UPDATE">(undefined)
     const [showProtocol, setShowProtocol] = useState<IProtocol | undefined>(undefined)
 
     const columns = [
@@ -51,6 +52,10 @@ const CollectorInfoTable: React.FC<{
                     }}>
                         {record.isDisabled ? '启用' : '禁用'}
                     </Button>
+                    <Button type="primary" onClick={() => {
+                      setCollector(record)
+                      setMode("UPDATE")
+                    }}> 修改 </Button>
                     <Button type="primary" danger onClick={() => {
                         if (!confirmDelete())return;
                         const collector = {...record} as ICollector
@@ -66,6 +71,7 @@ const CollectorInfoTable: React.FC<{
                     </Button>
                      <Button type="primary" onClick={() => {
                           setCollector(record)
+                          setMode("SHOW")
                      }}>
                          详情
                      </Button>
@@ -80,10 +86,11 @@ const CollectorInfoTable: React.FC<{
                dataSource={dataSource}
                columns={columns}/>
 
-        <Modal width={800} title="采集板卡信息" open={collector !== undefined} onOk={() => {
+        <Modal width={800} title="采集板卡信息" open={collector !== undefined && mode === "SHOW"} onOk={() => {
             setCollector(undefined)
         }} onCancel={() => {
             setCollector(undefined)
+            setMode(undefined)
         }}>
             <Descriptions bordered>
                 <Descriptions.Item label="采集板卡代号">{collector?.collectorName}</Descriptions.Item>
@@ -103,6 +110,12 @@ const CollectorInfoTable: React.FC<{
                 </Descriptions.Item>
             </Descriptions>
         </Modal>
+        <CollectorUpdateModal collector={collector!} open={collector !== undefined && mode === "UPDATE"} setOpen={(value)=>{
+            if (!value) {
+                setCollector(undefined)
+                setMode(undefined)
+            }
+        }} reload={reload}/>
         <ProtocolModel
           open={showProtocol !== undefined}
           mode={"SHOW"}
@@ -118,3 +131,84 @@ const CollectorInfoTable: React.FC<{
 }
 
 export default CollectorInfoTable
+
+const CollectorUpdateModal: React.FC<{
+    collector: ICollector,
+    open: boolean,
+    setOpen: (value: boolean) => void,
+    reload: () => void
+}> = ({collector, open, setOpen, reload}) => {
+    const [newName, setNewName] = useState(undefined)
+    const [newAddress, setNewAddress] = useState(undefined)
+    const [newProtocols, setNewProtocols] = useState<IProtocol[]>([])
+
+    const [protocols, setProtocols] = useState<IProtocol[]>([])
+
+    useEffect(() => {
+        setNewName(collector?.collectorName)
+        setNewAddress(collector?.collectorAddress)
+        setNewProtocols(collector?.protocols ?? [])
+    }, [collector])
+
+    useEffect(()=>{
+      getProtocols().then((res) => {
+          if (res.code === SUCCESS_CODE) {
+              setProtocols(res.data)
+          } else {
+              console.error(res.msg)
+          }
+      })
+    }, [])
+
+    return <Modal title="修改采集板卡" open={open} onOk={() => {
+        updateCollector({
+            ...collector,
+            collectorName: newName,
+            collectorAddress: newAddress,
+            protocols: newProtocols
+        }).then((res) => {
+            if (res.code === SUCCESS_CODE) {
+                setOpen(false)
+                reload()
+            } else {
+                console.error(res.msg)
+            }
+        })
+    }} onCancel={() => {
+        setOpen(false)
+    }}>
+        <div>
+            <div>
+                <span>采集板卡代号:</span>
+                <Input value={newName} onChange={(e) => {
+                    collector.collectorName = e.target.value
+                }}/>
+            </div>
+            <div>
+                <span>采集板卡地址:</span>
+                <Input value={newAddress} onChange={(e) => {
+                    setNewAddress(e.target.value)
+                }}/>
+            </div>
+            <div>
+                <span>采集板卡协议:</span>
+                <Select mode="multiple" style={{width: '100%'}} placeholder="请选择协议" labelInValue
+                        value={newProtocols.map((protocol) => ({
+                            label: protocol.protocolName,
+                            value: protocol.protocolName
+                        }))}
+                        onChange={(value) => {
+                            setNewProtocols(value.map((item) => {
+                                return protocols.find((protocol) => protocol.protocolName === item.value)!
+                            }))
+                        }}>
+                    {protocols.map((protocol) => (
+                        <Select.Option key={protocol.protocolName} value={protocol.protocolName}>
+                            {protocol.protocolName}
+                        </Select.Option>
+                    ))}
+                </Select>
+            </div>
+        </div>
+    </Modal>
+}
