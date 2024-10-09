@@ -1,4 +1,4 @@
-import {Button, Col, Form, Input, Row, Space, Tooltip} from "antd";
+import {Button, Col, Form, Input, InputNumber, Row, Space, Tooltip} from "antd";
 import React, {useEffect, useState} from "react";
 import {MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 
@@ -63,7 +63,7 @@ export const FlexRayBaseConfig = () => {
           rules={[{required: true, message: "请输入周期微时钟(microticksPerCycle)"}]}
           label={"周期微时钟(microticksPerCycle)"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -72,7 +72,7 @@ export const FlexRayBaseConfig = () => {
           rules={[{required: true, message: "请输入周期宏时钟(macroticksPerCycle)"}]}
           label={"周期宏时钟(macroticksPerCycle)"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -81,7 +81,7 @@ export const FlexRayBaseConfig = () => {
           rules={[{required: true, message: "请输入传输开始时间(transmissionStartTime)"}]}
           label={"传输开始时间(transmissionStartTime)"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -90,7 +90,7 @@ export const FlexRayBaseConfig = () => {
           rules={[{required: true, message: "请输入静态帧负载(staticFramepayload)"}]}
           label={"静态帧负载(staticFramepayload)"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -99,7 +99,7 @@ export const FlexRayBaseConfig = () => {
           rules={[{required: true, message: "请输入静态槽(staticSlotsCount)"}]}
           label={"静态槽(staticSlotsCount)"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -108,7 +108,7 @@ export const FlexRayBaseConfig = () => {
           rules={[{required: true, message: "请输入动态槽(dynamicSlotCount)"}]}
           label={"动态槽(dynamicSlotCount)"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -117,7 +117,7 @@ export const FlexRayBaseConfig = () => {
           rules={[{required: true, message: "请输入动态槽长度(dynamicSlotLength)"}]}
           label={"动态槽长度(dynamicSlotLength)"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -126,7 +126,7 @@ export const FlexRayBaseConfig = () => {
           rules={[{required: true, message: "请输入设置为同步节点(setAsSyncNode)"}]}
           label={"设置为同步节点(setAsSyncNode)"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
     </Row>
@@ -144,7 +144,7 @@ export const MICBaseConfig = () => {
           rules={[{required: true, message: "请输入NCTC"}]}
           label={"NCTC"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -153,7 +153,7 @@ export const MICBaseConfig = () => {
           rules={[{required: true, message: "请输入BTC"}]}
           label={"BTC"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -162,7 +162,7 @@ export const MICBaseConfig = () => {
           rules={[{required: true, message: "请输入NRTC"}]}
           label={"NRTC"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -171,7 +171,7 @@ export const MICBaseConfig = () => {
           rules={[{required: true, message: "请输入MODADD"}]}
           label={"MODADD"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -180,7 +180,7 @@ export const MICBaseConfig = () => {
           rules={[{required: true, message: "请输入数据更新速率"}]}
           label={"数据更新速率（Hz）"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
     </Row>
@@ -198,7 +198,7 @@ export const B1552BaseConfig = () => {
           rules={[{required: true, message: "请输入监听地址"}]}
           label={"监听地址"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
     </Row>
@@ -214,7 +214,7 @@ export const Serial422BaseConfig = () => {
           rules={[{required: true, message: "请输入波特率"}]}
           label={"波特率"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -223,7 +223,7 @@ export const Serial422BaseConfig = () => {
           rules={[{required: true, message: "请输入停止位"}]}
           label={"停止位"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -232,7 +232,7 @@ export const Serial422BaseConfig = () => {
           rules={[{required: true, message: "请输入是否校验"}]}
           label={"是否校验"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       <Col className="gutter-row" span={6}>
@@ -241,7 +241,7 @@ export const Serial422BaseConfig = () => {
           rules={[{required: true, message: "请输入校验类型"}]}
           label={"校验类型"}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
     </Row>
@@ -260,7 +260,7 @@ export const AnalogBaseConfig = () => {
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       {/*<Col className="gutter-row" span={6}>*/}
@@ -285,7 +285,7 @@ export const DigitalBaseConfig = () => {
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
         >
-          <HexInput/>
+          <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
       {/*<Col className="gutter-row" span={6}>*/}
@@ -312,7 +312,7 @@ export const CanSignalsParsingForm = () => (
               <Form.Item label={"帧编号"} {...restField} name={[name, 'frameNumber']}
                          initialValue={(name + 1).toString(16)}
                          rules={[{required: true, message: '请输入帧编号'}]}>
-                <HexInput/>
+                <InputNumber min={0} precision={0}/>
               </Form.Item>
               <Form.Item label={"帧ID"} {...restField} name={[name, 'frameId']}
                          rules={[{required: true, message: '请输入帧ID'}]}>
@@ -351,7 +351,7 @@ export const FlexRaySignalsParsingForm = () => (
               <Form.Item  {...restField} name={[name, 'frameNumber']} label={"帧编号"}
                           initialValue={(name + 1).toString(16)}
                           rules={[{required: true, message: '请输入帧编号'}]}>
-                <HexInput/>
+                <InputNumber min={0} precision={0}/>
               </Form.Item>
               <Form.Item  {...restField} name={[name, 'frameId']} label={"帧ID"}
                           rules={[{required: true, message: '请输入帧ID'}]}>
@@ -359,7 +359,7 @@ export const FlexRaySignalsParsingForm = () => (
               </Form.Item>
               <Form.Item  {...restField} name={[name, 'cycleNumber']} label={"循环号"}
                           rules={[{required: true, message: '请输入循环号'}]}>
-                <HexInput/>
+                <InputNumber min={0} precision={0}/>
               </Form.Item>
               <MinusCircleOutlined onClick={() => remove(name)}/>
             </Space>
@@ -398,15 +398,15 @@ export const MICSignalsParsingForm = () => {
                   <Form.Item  {...restField} name={[name, 'frameNumber']} label={"帧编号"}
                               initialValue={(name + 1).toString(16)}
                               rules={[{required: true, message: '请输入帧编号'}]}>
-                    <HexInput/>
+                    <InputNumber min={0} precision={0}/>
                   </Form.Item>
                   <Form.Item  {...restField} name={[name, 'modadd']} label={"MODADD"}
                               rules={[{required: true, message: '请输入MODADD'}]}>
-                    <HexInput/>
+                    <InputNumber min={0} precision={0}/>
                   </Form.Item>
                   <Form.Item  {...restField} name={[name, 'devid']} label={"DEVID"}
                               rules={[{required: true, message: '请输入DEVID'}]}>
-                    <HexInput/>
+                    <InputNumber min={0} precision={0}/>
                   </Form.Item>
                   <MinusCircleOutlined onClick={() => remove(name)}/>
 
@@ -452,15 +452,15 @@ export const B1552BSignalParsingForm = () => {
                 <Form.Item  {...restField} name={[name, 'frameNumber']} label={"帧编号"}
                             initialValue={(name + 1).toString(16)}
                             rules={[{required: true, message: '请输入帧编号'}]}>
-                  <HexInput/>
+                  <InputNumber min={0} precision={0}/>
                 </Form.Item>
                 <Form.Item  {...restField} name={[name, 'rtAddress']} label={"RT地址"}
                             rules={[{required: true, message: '请输入RT地址'}]}>
-                  <HexInput/>
+                  <InputNumber min={0} precision={0}/>
                 </Form.Item>
                 <Form.Item  {...restField} name={[name, 'childAddress']} label={"子地址"}
                             rules={[{required: true, message: '请输入子地址'}]}>
-                  <HexInput/>
+                  <InputNumber min={0} precision={0}/>
                 </Form.Item>
                 <MinusCircleOutlined onClick={() => remove(name)}/>
                 <Form.Item>
@@ -683,22 +683,22 @@ export const SignalForm = ({fields, add, remove, onlyName = false}) => {
                        rules={[{required: true, message: '请输入起点'}]}
                        initialValue={"0"}
             >
-              <HexInput/>
+              <InputNumber min={0} precision={0}/>
             </Form.Item>
             <Form.Item {...restField} name={[name, 'length']}
                        rules={[{required: true, message: '请输入长度'}]}
                        label={"长度"}
                        initialValue={"8"}
             >
-              <HexInput/>
+              <InputNumber min={0} precision={0}/>
             </Form.Item>
             <Form.Item {...restField} name={[name, 'slope']} rules={[{required: true, message: '请输入斜率'}]} label={"斜率"}
                        initialValue={"1"}>
-              <HexInput/>
+              <InputNumber min={0} precision={0}/>
             </Form.Item>
             <Form.Item {...restField} name={[name, 'offset']} rules={[{required: true, message: '请输入偏移'}]} label={"偏移"}
                        initialValue={"0"} >
-              <HexInput/>
+              <InputNumber min={0} precision={0}/>
             </Form.Item>
             <MinusCircleOutlined onClick={() => remove(name)}/>
           </Space>
