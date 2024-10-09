@@ -81,11 +81,6 @@ const TestVehicle: React.FC = () => {
             })
           }
           }>{"删除"}</Button>
-
-          <Button type="primary" onClick={() => {
-            setTargetVehicle(record)
-          }}>{"配置"}</Button>
-
         </Space>
       )
     },
@@ -361,7 +356,6 @@ export const TestConfigModel: React.FC<{
   initValue?: IVehicle
 }> = ({
         onFinished,
-        belongVehicle,
         open,
         initValue
       }) => {
@@ -370,6 +364,8 @@ export const TestConfigModel: React.FC<{
   const [form] = Form.useForm()
   const [collectUnits, setCollectUnits] = React.useState<ICollectUnit[]>([])
   const [selectUnits, setSelectUnits] = React.useState<ICollectUnit[]>([])
+  const [vehicleStore,setVehicleStore] = React.useState<IVehicle[]>(undefined)
+  const [belongVehicle, setBelongVehicle] = React.useState<IVehicle>(undefined)
 
   useEffect(() => {
     if (initValue !== undefined) {
@@ -382,6 +378,12 @@ export const TestConfigModel: React.FC<{
       form.resetFields()
     }
   }, [form, open])
+
+  useEffect(() => {
+    getVehicles().then((res) => {
+      setVehicleStore(res.data)
+    })
+  }, [])
 
   useEffect(() => {
     getCollectUnits().then((res) => {
@@ -478,9 +480,23 @@ export const TestConfigModel: React.FC<{
         width={"80%"}
       >
         <Form form={form}>
-          <Form.Item name={"name"} rules={[{required: true, message: '请输入测试配置名称'}]}
-                     label={"测试配置名称"}>
-            <Input placeholder="测试配置名称"/>
+          <Form.Item name={"name"} rules={[{required: true, message: '请输入测试任务名称'}]}
+                     label={"测试任务名称"}>
+            <Input placeholder="测试任务名称"/>
+          </Form.Item>
+          <Form.Item label={"选择测试车辆"}
+                     name={"vehicle"}
+          >
+            <Select
+              onChange={(value) => {
+                setBelongVehicle(JSON.parse(value))
+              }}>
+              {
+                vehicleStore?.map((item) => (
+                  <Select.Option key={JSON.stringify(item)} value={JSON.stringify(item)}>{item.vehicleName}</Select.Option>
+                )) ?? []
+              }
+            </Select>
           </Form.Item>
           <Form.Item label={"选择采集单元"}
                      name={"collectUnits"}>
