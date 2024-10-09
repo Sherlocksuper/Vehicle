@@ -13,6 +13,11 @@ import TestTemplateForConfig from "@/views/demo/TestConfig/template.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import CollectUnitPage from "@/views/demo/CollectUnit/collectUnit.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
+import {Button, message} from "antd";
+import {log} from "@antv/g2plot/lib/utils";
+import {getCurrentTestConfig} from "@/apis/request/testConfig.ts";
+import {FAIL_CODE} from "@/constants";
+import {ITestConfig} from "@/apis/standard/test.ts";
 
 interface RouteItem {
   key: string;
@@ -23,47 +28,63 @@ interface RouteItem {
 
 export const routeItems: RouteItem[] = [
   {
-    //测试预配置
     key: '/test-config',
-    label: '测试预配置',
+    label: '测试任务及配置',
+    element: <TestConfig/>
+  },
+  {
+    //测试预配置
+    key: '/test-receive',
+    label: '数据接收与管理',
     element: <Outlet/>,
     children: [
       {
-        key: '/test-config/protocol-management',
+        key: '/test-receive/view',
+        label: <p
+          onClick={() => {
+            getCurrentTestConfig().then(res => {
+              if (res.code === FAIL_CODE) {
+                message.error(res.msg);
+              } else {
+                console.log(res.data);
+                const config: ITestConfig = (res.data);
+                const win = window.open(`/test-template-for-config?testConfigId=${config?.id}`);
+                if (!win) return
+              }
+            });
+          }}
+        >接收数据动态监视</p>
+      },
+      {
+        key: '/test-receive/offline-management',
+        label: '数据可视化分析',
+        element: <OfflineDate/>
+      },
+      {
+        key: '/test-receive/history',
+        label: '数据管理与维护',
+        element: <HistoryData/>
+      },
+    ]
+  },
+
+  {
+    //测试预配置
+    key: '/test-info',
+    label: '基础信息管理',
+    element: <Outlet/>,
+    children: [
+      {
+        key: '/test-info/protocol-management',
         label: '测试协议管理',
         element: <ProtocolTable/>
       },
       {
-        key: '/test-config/physical-Topology',
+        key: '/test-info/physical-Topology',
         label: '测试板卡信息管理',
         element: <PhyTopology/>
       },
-      {
-        key: '/test-config/units',
-        label: '采集单元管理',
-        element: <CollectUnitPage/>
-      },
-      {
-        key: '/test-config/test-vehicle',
-        label: '车辆管理',
-        element: <VehicleTable/>
-      },
-      {
-        key: '/test-config/test-config',
-        label: '测试配置',
-        element: <TestConfig/>
-      },
     ]
-  },
-  {
-    key: '/offline-management',
-    label: '离线数据管理',
-    element: <OfflineDate/>
-  },
-  {
-    key: '/history',
-    label: '历史数据管理',
-    element: <HistoryData/>
   },
   // userUtils.isRootUser() ? {
   //   key: '/User-management',
