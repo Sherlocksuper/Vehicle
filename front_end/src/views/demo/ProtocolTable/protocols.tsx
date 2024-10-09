@@ -63,6 +63,22 @@ export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
     close()
   };
 
+  const checkNameValid = (value: IProtocol) => {
+    const signalNames = value.signalsParsingConfig.map((spConfig) => {
+      return spConfig.signals.map((signal) => {
+        return signal.name
+      })
+    }).flat(3)
+    const names = new Set<string>()
+    for (const name of signalNames) {
+      if (names.has(name)) {
+        return false
+      }
+      names.add(name)
+    }
+    return true
+  }
+
   return (
     <>
       <Modal
@@ -77,6 +93,10 @@ export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
               disabled={mode === "SHOW"}
               onFinish={() => {
                 const value = form.getFieldsValue() as IProtocol
+                if (!checkNameValid(value)) {
+                  message.error("存在重复的信号名称，请检查")
+                  return
+                }
                 if (mode === "ADD") {
                   createProtocol(value as IProtocol).then((res) => {
                     if (res.code === SUCCESS_CODE) {
