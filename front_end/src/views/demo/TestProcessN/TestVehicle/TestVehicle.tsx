@@ -201,6 +201,8 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
           if (initValue !== undefined) {
             form.validateFields().then(() => {
               const result = form.getFieldsValue()
+              // collectUnits要放到新建配置的时候，所以此处先设置为空
+              result.collectUnits = []
               result.collectUnits = result.collectUnits.map((item) => JSON.parse(item.key))
               updateVehicle(Number(initValue.id), result).then((res) => {
                 if (res.code === SUCCESS_CODE) {
@@ -215,6 +217,8 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
           }
           form.validateFields().then(() => {
             const result = form.getFieldsValue()
+            // collectUnits要放到新建配置的时候，所以此处先设置为空
+            result.collectUnits = []
             result.collectUnits = result.collectUnits.map((item) => JSON.parse(item.key))
 
             // 给每个车的每个协议设置uuid
@@ -267,7 +271,7 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
                     key: JSON.stringify(item),
                     label: item.collectUnitName
                   }
-                })
+                }) ?? []
               }}
         >
           <Form.Item
@@ -284,21 +288,21 @@ export const CreateTestVehicleButton: React.FC<{ onFinished: () => void, vehicle
           >
             <Input placeholder={"请输入装备类型"}/>
           </Form.Item>
-          <Form.Item
-            label={"选择采集单元"}
-            name={"collectUnits"}
-          >
-            <Select
-              labelInValue
-              mode={"multiple"}
-            >
-              {
-                collectUnits.map((item) => (
-                  <Select.Option key={JSON.stringify(item)} value={JSON.stringify(item)}>{item.collectUnitName}</Select.Option>
-                ))
-              }
-            </Select>
-          </Form.Item>
+          {/*<Form.Item*/}
+          {/*  label={"选择采集单元"}*/}
+          {/*  name={"collectUnits"}*/}
+          {/*>*/}
+          {/*  <Select*/}
+          {/*    labelInValue*/}
+          {/*    mode={"multiple"}*/}
+          {/*  >*/}
+          {/*    {*/}
+          {/*      collectUnits.map((item) => (*/}
+          {/*        <Select.Option key={JSON.stringify(item)} value={JSON.stringify(item)}>{item.collectUnitName}</Select.Option>*/}
+          {/*      ))*/}
+          {/*    }*/}
+          {/*  </Select>*/}
+          {/*</Form.Item>*/}
         </Form>
       </Modal>
     </>
@@ -335,13 +339,13 @@ export const TestVehicleDetailButton: React.FC<{ vehicle: IVehicle }> = ({vehicl
             <Descriptions.Item label="车辆名称">{vehicle.vehicleName}</Descriptions.Item>
             <Descriptions.Item label="是否启用">{vehicle.isDisabled ? "否" : "是"}</Descriptions.Item>
             <Descriptions.Item label="装备类型">{vehicle.equipmentType}</Descriptions.Item>
-            <Descriptions.Item label="采集单元">
-              {
-                vehicle.collectUnits.map((item) => (
-                  <Tag key={item.id}>{item.collectUnitName}</Tag>
-                ))
-              }
-            </Descriptions.Item>
+            {/*<Descriptions.Item label="采集单元">*/}
+            {/*  {*/}
+            {/*    vehicle.collectUnits.map((item) => (*/}
+            {/*      <Tag key={item.id}>{item.collectUnitName}</Tag>*/}
+            {/*    ))*/}
+            {/*  }*/}
+            {/*</Descriptions.Item>*/}
           </Descriptions>
         </Card>
       </Modal>
@@ -364,6 +368,8 @@ export const TestConfigModel: React.FC<{
 
   const title = (initValue === undefined ? "新建" : "编辑")
   const [form] = Form.useForm()
+  const [collectUnits, setCollectUnits] = React.useState<ICollectUnit[]>([])
+  const [selectUnits, setSelectUnits] = React.useState<ICollectUnit[]>([])
 
   useEffect(() => {
     if (initValue !== undefined) {
@@ -377,9 +383,18 @@ export const TestConfigModel: React.FC<{
     }
   }, [form, open])
 
-  const createTestConfigApi = () => {
+  useEffect(() => {
+    getCollectUnits().then((res) => {
+      if (res.code !== SUCCESS_CODE) {
+        message.error("获取采集单元失败：" + res.msg)
+        return
+      }
+      setCollectUnits(res.data)
+    })
+  }, [])
+
+  const createTestConfigApi = async () => {
     const value = form.getFieldsValue()
-    console.log(value)
     value.projects = value.projects.map((project) => {
       project.indicators = project.indicators.map((indicator) => {
         indicator.signal = JSON.parse(indicator.signal.value)
@@ -392,7 +407,21 @@ export const TestConfigModel: React.FC<{
       id: undefined,
       name: value.name,
       configs: [{
-        vehicle: belongVehicle,
+        vehicle: {
+          ...belongVehicle,
+          collectUnits: selectUnits,
+          protocols: selectUnits.map(unit => {
+            return unit.collectors.map(collector => {
+              return collector.protocols.map(protocol => {
+                return {
+                  protocol: protocol,
+                  core: unit.core,
+                  collector: collector
+                }
+              })
+            })
+          }).flat(3)
+        },
         projects: value.projects
       }],
       template: undefined
@@ -402,6 +431,7 @@ export const TestConfigModel: React.FC<{
     createTestConfig(result).then((res) => {
       if (res.code === SUCCESS_CODE) {
         onFinished()
+        setSelectUnits([])
       } else {
         message.error("创建失败")
       }
@@ -409,9 +439,9 @@ export const TestConfigModel: React.FC<{
 
   }
 
-  const getSelectOptions = (vehicle: IVehicle) => {
+  const getSelectOptions = (collectUnits: ICollectUnit[]) => {
     const result = []
-    vehicle.collectUnits.forEach((collectUnit) => {
+    collectUnits.forEach((collectUnit) => {
       collectUnit.collectors.forEach((collector) => {
         collector.protocols.forEach((protocol) => {
           protocol.signalsParsingConfig.forEach((spConfig) => {
@@ -434,11 +464,14 @@ export const TestConfigModel: React.FC<{
         title={title}
         open={open}
         onOk={() => {
-          createTestConfigApi()
+          form.validateFields().then(() => {
+            createTestConfigApi()
+          })
           // onFinished()
         }}
         onCancel={() => {
           onFinished()
+          setSelectUnits([])
         }}
         okText="确定"
         cancelText="取消"
@@ -448,6 +481,33 @@ export const TestConfigModel: React.FC<{
           <Form.Item name={"name"} rules={[{required: true, message: '请输入测试配置名称'}]}
                      label={"测试配置名称"}>
             <Input placeholder="测试配置名称"/>
+          </Form.Item>
+          <Form.Item label={"选择采集单元"}
+                     name={"collectUnits"}>
+            <Select
+              labelInValue
+              mode={"multiple"}
+              onChange={(value) => {
+                setSelectUnits(value.map(item => {
+                  const unit: ICollectUnit = JSON.parse(item.key)
+                  unit.collectors.forEach(collector => {
+                    collector.protocols.forEach(protocol => {
+                      protocol.signalsParsingConfig.forEach(spConfig => {
+                        spConfig.signals.forEach(signal => {
+                          signal.id = uuid()
+                        })
+                      })
+                    })
+                  })
+                  return unit
+                }))
+              }}>
+              {
+                collectUnits.map((item) => (
+                  <Select.Option key={JSON.stringify(item)} value={JSON.stringify(item)}>{item.collectUnitName}</Select.Option>
+                ))
+              }
+            </Select>
           </Form.Item>
           <Form.List name={['projects']}>
             {(fields, {add, remove}) => (
@@ -485,7 +545,7 @@ export const TestConfigModel: React.FC<{
                                         width: 300
                                       }}
                                     >
-                                      {getSelectOptions(belongVehicle)}
+                                      {getSelectOptions(selectUnits)}
                                     </Select>
                                   </Form.Item>
                                   <MinusCircleOutlined onClick={() => remove(name)} disabled={initValue !== undefined}/>
