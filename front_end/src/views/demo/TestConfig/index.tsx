@@ -1,11 +1,12 @@
-import {Button, Card, message, Row, Space, Table, TableProps} from "antd";
+import {Button, Card, message, Modal, Row, Space, Table, TableProps} from "antd";
 import React, {useEffect} from "react";
 import {FAIL_CODE} from "@/constants";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import {deleteTestConfig, downTestConfig, getCurrentTestConfig, getTestConfigs, stopCurrentTestConfig} from "@/apis/request/testConfig.ts";
-import {TestConfigModel} from "@/views/demo/TestConfig/testConfigModel.tsx";
 import {confirmDelete} from "@/utils";
 import Search from "antd/es/input/Search";
+import {TestConfigModel} from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
+import {TestConfigTree} from "@/views/demo/TestConfig/testConfigModel.tsx";
 
 
 const TestConfig = () => {
@@ -98,9 +99,21 @@ const TestConfig = () => {
       key: 'id',
     },
     {
-      title: '测试配置名称',
+      title: '测试任务名称',
       dataIndex: 'name',
       key: 'name',
+    },
+
+    {
+      title: '测试任务配置',
+      key: 'set',
+      render: (text, record) => (
+        <Space>
+          <Button type="link" onClick={() => downConfig(record)}>测试单元管理</Button>
+          <Button type="link" onClick={() => downConfig(record)}>数据采集项</Button>
+          <Button type="link" onClick={() => downConfig(record)}>采集数据封装</Button>
+        </Space>
+      ),
     },
     {
       title: '操作',
@@ -121,15 +134,16 @@ const TestConfig = () => {
   }, []);
 
   return (
-    <Card title={"测试配置"}
+    <Card title={"测试任务"}
           style={{overflow: "scroll", overflowX: "hidden", height: "100vh", padding: "20px", display: "flex", flexDirection: "column"}}
           extra={
             <Space style={{marginBottom: "20px", alignItems: "center",}}>
-
-              <Button type={"primary"} onClick={() => fetchCurrentConfig()}>刷新当前下发配置</Button>
+              <Button type="primary" onClick={() => {
+                setOpenTestConfigModal(true);
+              }}>{"添加测试任务"}</Button>
 
               <Button type={"primary"} disabled={!currentDownConfig} onClick={() => handleShowCurrentData()}>{
-                currentDownConfig ? ("当前测试配置" + currentDownConfig.name) : "暂无当前数据"
+                currentDownConfig ? (currentDownConfig.name) : "暂无在下发任务"
               }</Button>
 
               <Button type={"primary"} onClick={() => handleStopCurrentCollect()}>停止当前采集</Button>
@@ -155,13 +169,14 @@ const TestConfig = () => {
         locale={{emptyText: '暂无协议数据'}}
       />
       <TestConfigModel
+        belongVehicle={undefined}
+        onFinished={
+          () => {
+            fetchConfigs();
+            setOpenTestConfigModal(false);
+          }
+        }
         open={openTestConfigModal}
-        close={() => {
-          setCurrentRecord(undefined)
-          setOpenTestConfigModal(false);
-        }}
-        onOk={() => fetchConfigs()}
-        initValue={currentRecord}
       />
     </Card>
   );

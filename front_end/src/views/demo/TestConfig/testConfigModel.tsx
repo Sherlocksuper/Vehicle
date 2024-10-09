@@ -80,7 +80,7 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
           onOk && onOk()
           close()
         } else {
-          console.error("创建测试配置失败，请重试：", res.msg)
+          console.error("创建测试任务失败，请重试：" + res.msg)
         }
       })
     })
@@ -244,7 +244,7 @@ export const TestConfigModel = ({open, close, onOk, initValue}: {
   );
 };
 
-const TestConfigTree = ({testConfig}: { testConfig: ITestConfig }) => {
+export const TestConfigTree = ({testConfig}: { testConfig: ITestConfig }) => {
 
   const calculateTreeNode = (testConfig: ITestConfig) => {
     const treeData: TreeDataNode[] = []
