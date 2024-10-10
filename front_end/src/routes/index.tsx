@@ -6,15 +6,12 @@ import {DndProvider} from "react-dnd";
 import {HTML5Backend} from "react-dnd-html5-backend";
 import React, {ReactElement} from "react";
 import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
-import VehicleTable from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
 import ProtocolTable from "@/views/demo/ProtocolTable";
 import TestConfig from "@/views/demo/TestConfig";
 import TestTemplateForConfig from "@/views/demo/TestConfig/template.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
-import CollectUnitPage from "@/views/demo/CollectUnit/collectUnit.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
-import {Button, message} from "antd";
-import {log} from "@antv/g2plot/lib/utils";
+import {message} from "antd";
 import {getCurrentTestConfig} from "@/apis/request/testConfig.ts";
 import {FAIL_CODE} from "@/constants";
 import {ITestConfig} from "@/apis/standard/test.ts";
@@ -48,6 +45,10 @@ export const routeItems: RouteItem[] = [
               } else {
                 console.log(res.data);
                 const config: ITestConfig = (res.data);
+                if(config.id === undefined) {
+                  message.error("当前无测试配置");
+                  return
+                }
                 const win = window.open(`/test-template-for-config?testConfigId=${config?.id}`);
                 if (!win) return
               }

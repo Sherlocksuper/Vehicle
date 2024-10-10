@@ -15,6 +15,11 @@ export interface ITestConfig {
             }[]
         }[]
     }[]
+    dataWrap: {
+        equipmentType: string,
+        equipmentId: string,
+        version: string,
+    }
     template: ITemplate
 }
 

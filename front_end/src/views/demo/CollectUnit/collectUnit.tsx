@@ -164,7 +164,7 @@ const CollectUnitDetail = ({collectUnit, onClose}: { collectUnit?: ICollectUnit,
   </Modal>
 }
 
-const CollectUnitEdit = ({collectUnit, open, onClose}: { collectUnit?: ICollectUnit, open: boolean, onClose: () => void }) => {
+export const CollectUnitEdit = ({collectUnit, open, onClose}: { collectUnit?: ICollectUnit, open: boolean, onClose: (result: ICollectUnit) => void }) => {
   const [controllers, setControllers] = React.useState([])
   const [collectors, setCollectors] = React.useState([])
   const [collectUnitName, setCollectUnitName] = React.useState<string>("")
@@ -199,38 +199,6 @@ const CollectUnitEdit = ({collectUnit, open, onClose}: { collectUnit?: ICollectU
     })
   }
 
-  const createCollectUnitApi = async () => {
-    const collectUnit: ICollectUnit = {
-      collectUnitName: collectUnitName,
-      core: controllerSelect,
-      collectors: collectorsSelect,
-    }
-
-    const res = await createCollectUnit(collectUnit)
-    if (res.code === FAIL_CODE) {
-      message.error("创建失败")
-    } else {
-      message.success("创建成功")
-      onClose()
-    }
-  }
-
-  const updateCollectUnitApi = async () => {
-    const newCollectUnit: ICollectUnit = {
-      id: collectUnit?.id,
-      collectUnitName: collectUnitName,
-      core: controllerSelect,
-      collectors: collectorsSelect,
-    }
-
-    const res = await updateCollectUnit(collectUnit.id, newCollectUnit)
-    if (res.code === FAIL_CODE) {
-      message.error("更新失败")
-    } else {
-      message.success("更新成功")
-      onClose()
-    }
-  }
 
   const checkValid = () => {
     if (collectUnitName === "") {
@@ -257,15 +225,17 @@ const CollectUnitEdit = ({collectUnit, open, onClose}: { collectUnit?: ICollectU
   }
 
   return <Modal open={open}
-                onCancel={onClose}
+                onCancel={() => {
+                  onClose(undefined)
+                }}
                 onOk={() => {
                   if (!checkValid()) return
-                  if (collectUnit === undefined) {
-                    createCollectUnitApi()
-                  } else {
-                    updateCollectUnitApi()
-                  }
-                  onClose()
+                  onClose({
+                    id: collectUnit?.id,
+                    collectUnitName: collectUnitName,
+                    core: controllerSelect,
+                    collectors: collectorsSelect
+                  })
                 }}>
     <Card title={collectUnit === undefined ? "新建采集单元" : "编辑采集单元"}>
       <Space
@@ -307,9 +277,9 @@ const CollectUnitEdit = ({collectUnit, open, onClose}: { collectUnit?: ICollectU
           onChange={(value) => {
             // 过滤掉key重复的
             const result = value.filter((item, index, self) =>
-              index === self.findIndex((t) => (
-                t.label === item.label
-              ))
+                index === self.findIndex((t) => (
+                  t.label === item.label
+                ))
             ).map((item) => JSON.parse(item.key))
             setCollectorsSelect(result)
           }}>

@@ -1,26 +1,36 @@
-import {Button, Card, message, Modal, Row, Space, Table, TableProps} from "antd";
+import {Button, Card, Divider, Form, Input, message, Modal, Row, Select, Space, Table, TableProps} from "antd";
 import React, {useEffect} from "react";
-import {FAIL_CODE} from "@/constants";
+import {FAIL_CODE, SUCCESS_CODE} from "@/constants";
 import {ITestConfig} from "@/apis/standard/test.ts";
-import {deleteTestConfig, downTestConfig, getCurrentTestConfig, getTestConfigs, stopCurrentTestConfig} from "@/apis/request/testConfig.ts";
+import {createTestConfig, deleteTestConfig, downTestConfig, getCurrentTestConfig, getTestConfigs, stopCurrentTestConfig, updateTestConfigById} from "@/apis/request/testConfig.ts";
 import {confirmDelete} from "@/utils";
 import Search from "antd/es/input/Search";
-import {TestConfigModel} from "@/views/demo/TestProcessN/TestVehicle/TestVehicle.tsx";
-import {TestConfigTree} from "@/views/demo/TestConfig/testConfigModel.tsx";
+import {IVehicle} from "@/apis/standard/vehicle.ts";
+import {ICollectUnit} from "@/apis/standard/collectUnit.ts";
+import {getCollectUnits} from "@/apis/request/collectUnit.ts";
+import {v4 as uuid} from "uuid";
+import {DeleteOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {CollectUnitEdit} from "@/views/demo/CollectUnit/collectUnit.tsx";
+import {IProject} from "@/apis/standard/project.ts";
+
+enum TaskStep {
+  CREATE = "CREATE",
+  UNIT = "UNIT",
+  COLLECT = "COLLECT",
+  WRAP = "WRAP"
+}
 
 
 const TestConfig = () => {
   const [configs, setConfigs] = React.useState<ITestConfig[]>([]);
   const [configsStore, setConfigsStore] = React.useState<ITestConfig[]>([]);
 
-  const [openTestConfigModal, setOpenTestConfigModal] = React.useState<boolean>(false);
-  const [currentRecord, setCurrentRecord] = React.useState<ITestConfig | undefined>(undefined);
   const [currentDownConfig, setCurrentDownConfig] = React.useState<ITestConfig | undefined>(undefined);
 
-  const handleShowDetail = (record: ITestConfig) => {
-    setCurrentRecord(record);
-    setOpenTestConfigModal(true);
-  };
+  const [currentTaskStep, setCurrentTaskStep] = React.useState<{
+    step: TaskStep,
+    config: ITestConfig
+  }>(undefined);
 
   const downConfig = (record: ITestConfig) => {
     if (currentDownConfig) {
@@ -46,7 +56,6 @@ const TestConfig = () => {
       if (res.code === FAIL_CODE) {
         message.error(res.msg);
       } else {
-        console.log(res.data);
         setConfigs(res.data);
         setConfigsStore(res.data);
       }
@@ -103,15 +112,23 @@ const TestConfig = () => {
       dataIndex: 'name',
       key: 'name',
     },
-
+    {
+      title: '测试车辆',
+      key: 'vehicle',
+      render: (text, record) => (
+        <Space>
+          <span>{record.configs[0].vehicle.vehicleName}</span>
+        </Space>
+      ),
+    },
     {
       title: '测试任务配置',
       key: 'set',
       render: (text, record) => (
         <Space>
-          <Button type="link" onClick={() => downConfig(record)}>测试单元管理</Button>
-          <Button type="link" onClick={() => downConfig(record)}>数据采集项</Button>
-          <Button type="link" onClick={() => downConfig(record)}>采集数据封装</Button>
+          <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.UNIT, config: record})}>测试单元管理</Button>
+          <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.COLLECT, config: record})}>数据采集项</Button>
+          <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.WRAP, config: record})}>采集数据封装</Button>
         </Space>
       ),
     },
@@ -120,7 +137,6 @@ const TestConfig = () => {
       key: 'action',
       render: (text, record) => (
         <Space>
-          <Button type="link" onClick={() => handleShowDetail(record)}>查看</Button>
           <Button type="link" onClick={() => deleteConfig(record.id)}>删除</Button>
           <Button type="link" onClick={() => downConfig(record)}>下发</Button>
         </Space>
@@ -139,7 +155,7 @@ const TestConfig = () => {
           extra={
             <Space style={{marginBottom: "20px", alignItems: "center",}}>
               <Button type="primary" onClick={() => {
-                setOpenTestConfigModal(true);
+                setCurrentTaskStep({step: TaskStep.CREATE, config: undefined})
               }}>{"添加测试任务"}</Button>
 
               <Button type={"primary"} disabled={!currentDownConfig} onClick={() => handleShowCurrentData()}>{
@@ -147,8 +163,6 @@ const TestConfig = () => {
               }</Button>
 
               <Button type={"primary"} onClick={() => handleStopCurrentCollect()}>停止当前采集</Button>
-
-              {currentDownConfig?.name ?? "暂无下发配置"}
 
               <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value) => {
                 const targetConfigs = configsStore.map(config => {
@@ -168,17 +182,526 @@ const TestConfig = () => {
         style={{marginTop: "20px"}}
         locale={{emptyText: '暂无协议数据'}}
       />
-      <TestConfigModel
-        belongVehicle={undefined}
-        onFinished={
-          () => {
-            fetchConfigs();
-            setOpenTestConfigModal(false);
-          }
-        }
-        open={openTestConfigModal}
-      />
+      <CreateTestTask onFinished={() => {
+        fetchConfigs()
+        setCurrentTaskStep(undefined)
+      }} open={currentTaskStep?.step === TaskStep.CREATE}/>
+      <TestUnitManage onFinished={() => {
+        fetchConfigs()
+        setCurrentTaskStep(undefined)
+      }} open={currentTaskStep?.step === TaskStep.UNIT && currentTaskStep?.config !== undefined} initValue={currentTaskStep?.config}/>
+      <CollectItemManage onFinished={() => {
+        fetchConfigs()
+        setCurrentTaskStep(undefined)
+      }} open={currentTaskStep?.step === TaskStep.COLLECT && currentTaskStep?.config !== undefined} initValue={currentTaskStep?.config}/>
+      <CollectDataWrap onFinished={() => {
+        fetchConfigs()
+        setCurrentTaskStep(undefined)
+      }} open={currentTaskStep?.step === TaskStep.WRAP && currentTaskStep?.config !== undefined} initValue={currentTaskStep?.config}/>
     </Card>
   );
 };
 export default TestConfig
+
+
+// 新建测试任务
+export const CreateTestTask: React.FC<{
+  onFinished: () => void,
+  open: boolean,
+  initValue?: IVehicle
+}> = ({
+        onFinished,
+        open,
+        initValue
+      }) => {
+
+  const title = (initValue === undefined ? "新建" : "编辑") + "测试任务"
+  const [form] = Form.useForm()
+  const [configName, setConfigName] = React.useState<string>("")
+  const [belongVehicle, setBelongVehicle] = React.useState<IVehicle>(undefined)
+
+  useEffect(() => {
+    if (initValue !== undefined) {
+      form.setFieldsValue(initValue)
+    }
+  }, [form, initValue])
+
+  useEffect(() => {
+    if (open === false) {
+      form.resetFields()
+    }
+  }, [form, open])
+
+  const createTestConfigApi = async () => {
+    const result: ITestConfig = {
+      name: configName,
+      configs: [{
+        vehicle: {
+          ...belongVehicle,
+          collectUnits: [],
+          protocols: []
+        },
+        projects: []
+      }],
+      dataWrap: {
+        equipmentType: "",
+        equipmentId: "",
+        version: ""
+      },
+      template: undefined
+    }
+    console.log(result)
+
+    createTestConfig(result).then((res) => {
+      if (res.code === SUCCESS_CODE) {
+        onFinished()
+      } else {
+        message.error("创建失败")
+      }
+    })
+
+  }
+
+  return (
+    <>
+      <Modal
+        title={title}
+        open={open}
+        onOk={() => {
+          form.validateFields().then(() => {
+            createTestConfigApi()
+          })
+          // onFinished()
+        }}
+        onCancel={() => {
+          onFinished()
+        }}
+        okText="确定"
+        cancelText="取消"
+      >
+        <Form form={form}>
+          <Form.Item name={"name"} rules={[{required: true, message: '请输入测试任务名称'}]}
+                     label={"测试任务名称"}>
+            <Input placeholder="测试任务名称" onChange={(value) => {
+              setConfigName(value.target.value)
+            }}/>
+          </Form.Item>
+          <Form.Item label={"测试车辆名称"}
+                     name={"vehicle"}
+                     rules={[{required: true, message: '请输入车辆名称'}]}
+          >
+            <Input value={belongVehicle?.vehicleName} onChange={(value) => {
+              const newVehicle: IVehicle = {
+                ...belongVehicle,
+                vehicleName: value.target.value
+              }
+              setBelongVehicle(newVehicle)
+            }}/>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  );
+}
+
+
+// 测试单元管理
+export const TestUnitManage: React.FC<{
+  onFinished: () => void,
+  open: boolean,
+  initValue: ITestConfig
+}> = ({
+        onFinished,
+        open,
+        initValue
+      }) => {
+
+  const title = "编辑采集单元"
+  const [form] = Form.useForm()
+  const [selectUnits, setSelectUnits] = React.useState<ICollectUnit[]>([])
+  const [addUnitOpen, setAddUnitOpen] = React.useState<boolean>(false)
+
+  useEffect(() => {
+    if (initValue !== undefined) {
+      form.setFieldsValue(initValue)
+    }
+  }, [form, initValue])
+
+  useEffect(() => {
+    if (open === false) {
+      form.resetFields()
+    }
+  }, [form, open])
+
+  useEffect(() => {
+    if (initValue) {
+      setSelectUnits(initValue.configs[0].vehicle.collectUnits)
+    }
+  }, [initValue])
+
+  const updateTestConfigApi = async () => {
+    const result: ITestConfig = {
+      id: initValue.id,
+      name: initValue.name,
+      configs: [{
+        vehicle: {
+          ...initValue.configs[0].vehicle,
+          collectUnits: selectUnits,
+          protocols: []
+        },
+        projects: []
+      }],
+      dataWrap: initValue.dataWrap,
+      template: undefined
+    }
+
+    updateTestConfigById(result.id, result).then((res) => {
+      if (res.code === SUCCESS_CODE) {
+        onFinished()
+      } else {
+        message.error("更新失败")
+      }
+    })
+  }
+
+  return (
+    <>
+      <Modal
+        title={title}
+        open={open}
+        onOk={() => {
+          form.validateFields().then(() => {
+            updateTestConfigApi()
+          })
+        }}
+        onCancel={() => {
+          onFinished()
+          setSelectUnits([])
+        }}
+        okText="确定"
+        cancelText="取消"
+      >
+        {
+          selectUnits.map((unit) => {
+            return <Card title={unit.collectUnitName} key={uuid()} style={{marginBottom: "20px"}}
+                         extra={<Button type="link" onClick={() => {
+                           setSelectUnits(selectUnits.filter((value) => {
+                             return value !== unit
+                           }))
+                         }}>删除</Button>}
+            >
+              <Space>
+                <span>核心板卡：{unit.core.controllerName}</span>
+                <span>采集器：{
+                  unit.collectors.map((collector) => {
+                    return collector.collectorName
+                  }).join("，")
+                }</span>
+              </Space>
+            </Card>
+          })
+        }
+        <Button type="dashed"
+                onClick={() => {
+                  setAddUnitOpen(true)
+                }}>
+          <PlusOutlined/>添加采集单元
+        </Button>
+        <CollectUnitEdit open={
+          addUnitOpen
+        } onClose={
+          (unit) => {
+            if (unit) {
+              setSelectUnits([...selectUnits, unit])
+            }
+            setAddUnitOpen(false)
+          }
+        }/>
+      </Modal>
+    </>
+  );
+}
+
+
+// 数据采集项
+export const CollectItemManage: React.FC<{
+  onFinished: () => void,
+  open: boolean,
+  initValue?: ITestConfig
+}> = ({
+        onFinished,
+        open,
+        initValue
+      }) => {
+
+  const title = (initValue === undefined ? "新建" : "编辑")
+  const [projects, setProjects] = React.useState<ITestConfig["configs"][0]["projects"]>([])
+
+  useEffect(() => {
+    if (open === false) {
+      setProjects([])
+    }
+    if (open === true) {
+      setProjects(initValue.configs[0].projects)
+      if (initValue.configs[0].projects.length === 0) {
+        setProjects([{
+          name: "defaultProject",
+          indicators: []
+        }])
+      }
+    }
+  }, [open])
+
+  const getSelectOptions = (collectUnits: ICollectUnit[]) => {
+    const result = []
+    collectUnits.forEach((collectUnit) => {
+      collectUnit.collectors.forEach((collector) => {
+        collector.protocols.forEach((protocol) => {
+          protocol.signalsParsingConfig.forEach((spConfig) => {
+            spConfig.signals.forEach((signal) => {
+              result.push(<Select.Option key={collectUnit.collectUnitName + "/" + collector.collectorName + "/" + protocol.protocolName + "/" + signal.name}
+                                         onClick={() => console.log(signal)}
+                                         value={JSON.stringify(signal)}>{collectUnit.collectUnitName + "/" + collector.collectorName + "/" + protocol.protocolName + "/" + signal.name}</Select.Option>)
+
+            })
+          })
+        })
+      })
+    })
+    return result
+  }
+
+  const updateTestConfigApi = async () => {
+    const prores = assignForEachProtocolSignal()
+
+    const result: ITestConfig = {
+      ...initValue,
+      configs: [{
+        ...initValue.configs[0],
+        projects: prores
+      }]
+    }
+
+    updateTestConfigById(result.id, result).then((res) => {
+      if (res.code === SUCCESS_CODE) {
+        onFinished()
+      } else {
+        message.error("更新失败")
+      }
+    })
+  }
+
+  const assignForEachProtocolSignal = () => {
+    const result = projects
+    result.forEach((project) => {
+      project.indicators.forEach((indicator) => {
+        if (indicator.signal === undefined) {
+          indicator.signal = {
+            ...indicator.signal,
+            id: uuid()
+          }
+        }
+      })
+    })
+    return result
+  }
+
+  return (
+    <>
+      <Modal
+        title={title}
+        open={open}
+        onOk={() => {
+          updateTestConfigApi().then(() => {
+            onFinished()
+          })
+        }}
+        onCancel={() => {
+          onFinished()
+        }}
+        okText="确定"
+        cancelText="取消"
+      >
+        {
+          projects.map((project) => {
+            return <Card style={{marginBottom: "20px"}}>
+              {
+                project.indicators.map((indicator) => {
+                  return <Row style={{marginBottom: "20px"}}>
+                    <Space>
+                      <Input placeholder="指标名称" value={indicator.name} onChange={(value) => {
+                        const newName = value.target.value
+                        setProjects(projects.map((value) => {
+                          if (value === project) {
+                            return {
+                              ...value,
+                              indicators: value.indicators.map((value) => {
+                                if (value === indicator) {
+                                  return {
+                                    ...value,
+                                    name: newName
+                                  }
+                                }
+                                return value
+                              })
+                            }
+                          }
+                          return value
+                        }))
+                      }}/>
+                      <Select placeholder="选择信号"
+                              value={indicator.signal && JSON.stringify(indicator.signal)}
+                              onChange={(targetSignal) => {
+                                setProjects(projects.map((value) => {
+                                  if (value === project) {
+                                    return {
+                                      ...value,
+                                      indicators: value.indicators.map((value) => {
+                                        if (value === indicator) {
+                                          return {
+                                            ...value,
+                                            signal: JSON.parse(targetSignal)
+                                          }
+                                        }
+                                        return value
+                                      })
+                                    }
+                                  }
+                                  return value
+                                }))
+                              }}>
+                        {
+                          initValue && getSelectOptions(initValue.configs[0].vehicle.collectUnits)
+                        }
+                      </Select>
+                      <Button type="link" onClick={() => {
+                        setProjects(projects.map((value) => {
+                          if (value === project) {
+                            return {
+                              ...value,
+                              indicators: value.indicators.filter((value) => {
+                                return value !== indicator
+                              })
+                            }
+                          }
+                          return value
+                        }))
+                      }}><DeleteOutlined/></Button>
+                    </Space>
+                  </Row>
+                })}
+              <Button type="dashed"
+                      onClick={() => {
+                        setProjects(projects.map((value) => {
+                          if (value === project) {
+                            return {
+                              ...value,
+                              indicators: [...value.indicators, {
+                                name: "",
+                                signal: undefined
+                              }]
+                            }
+                          }
+                          return value
+                        }))
+                      }}>
+                <PlusOutlined/>添加指标
+              </Button>
+
+            </Card>
+          })
+        }
+      </Modal>
+    </>
+  );
+}
+
+export const CollectDataWrap: React.FC<{
+  onFinished: () => void,
+  open: boolean,
+  initValue?: ITestConfig
+}> = ({
+        onFinished,
+        open,
+        initValue
+      }) => {
+
+  const title = "采集数据封装"
+
+  const [wrapForm, setWrapForm] = React.useState<{
+    equipmentType: string,
+    equipmentId: number,
+    version: string,
+  }>(null)
+
+  const [form] = Form.useForm()
+
+  useEffect(() => {
+    if (open === false) form.resetFields()
+    if (open === true) {
+      console.log(initValue.dataWrap)
+      form.setFieldsValue(initValue.dataWrap)
+    }
+  }, [open])
+
+
+  const updateTestConfigApi = async (dataWrap) => {
+    const result: ITestConfig = {
+      ...initValue,
+      dataWrap: dataWrap
+    }
+
+    updateTestConfigById(result.id, result).then((res) => {
+      if (res.code === SUCCESS_CODE) {
+        onFinished()
+      } else {
+        message.error("更新失败")
+      }
+    })
+  }
+
+
+  return (
+    <>
+      <Modal
+        title={title}
+        open={open}
+        onOk={() => {
+          form.validateFields().then(() => {
+            updateTestConfigApi(wrapForm)
+          })
+        }}
+        onCancel={() => {
+          onFinished()
+        }}
+        okText="确定"
+        cancelText="取消"
+      >
+        <Form
+          form={form}
+          onValuesChange={(changedValues, allValues) => {
+            setWrapForm(allValues)
+          }}>
+          <Form.Item label={"设备类型"}
+                     name={"equipmentType"}
+                     rules={[{required: true, message: '请输入设备类型'}]}>
+            <Input/>
+          </Form.Item>
+          <Form.Item label={"设备ID"}
+                     name={"equipmentId"}
+                     rules={[{required: true, message: '请输入设备ID'}]}>
+            <Input/>
+          </Form.Item>
+          <Form.Item label={"版本号"}
+                     name={"version"}
+                     rules={[{required: true, message: '请输入版本号'}]}>
+            <Input/>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </>
+  );
+}
+
+
+

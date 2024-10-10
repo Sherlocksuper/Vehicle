@@ -16,6 +16,11 @@ export interface ITestConfig {
       }[]
     }[]
   }[]
+  dataWrap: {
+    equipmentType: string,
+    equipmentId: string,
+    version: string,
+  }
   template: ITemplate
 }
 
@@ -57,6 +62,13 @@ export default class TestConfig extends Model<ITestConfig> {
   //
   // @BelongsTo(() => User)
   // user!: User
+
+  @Column(DataType.JSON)
+  dataWrap!: {
+    equipmentType: string,
+    equipmentId: string,
+    version: string,
+  }
 
   @Column(DataType.JSON)
   template!: ITemplate

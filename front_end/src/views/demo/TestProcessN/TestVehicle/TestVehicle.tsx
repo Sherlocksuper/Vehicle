@@ -364,7 +364,6 @@ export const TestConfigModel: React.FC<{
   const [form] = Form.useForm()
   const [collectUnits, setCollectUnits] = React.useState<ICollectUnit[]>([])
   const [selectUnits, setSelectUnits] = React.useState<ICollectUnit[]>([])
-  const [vehicleStore,setVehicleStore] = React.useState<IVehicle[]>(undefined)
   const [belongVehicle, setBelongVehicle] = React.useState<IVehicle>(undefined)
 
   useEffect(() => {
@@ -378,12 +377,6 @@ export const TestConfigModel: React.FC<{
       form.resetFields()
     }
   }, [form, open])
-
-  useEffect(() => {
-    getVehicles().then((res) => {
-      setVehicleStore(res.data)
-    })
-  }, [])
 
   useEffect(() => {
     getCollectUnits().then((res) => {
@@ -487,16 +480,13 @@ export const TestConfigModel: React.FC<{
           <Form.Item label={"选择测试车辆"}
                      name={"vehicle"}
           >
-            <Select
-              onChange={(value) => {
-                setBelongVehicle(JSON.parse(value))
-              }}>
-              {
-                vehicleStore?.map((item) => (
-                  <Select.Option key={JSON.stringify(item)} value={JSON.stringify(item)}>{item.vehicleName}</Select.Option>
-                )) ?? []
+            <Input value={belongVehicle?.vehicleName} onChange={(value) => {
+              const newVehicle: IVehicle = {
+                ...belongVehicle,
+                vehicleName: value.target.value
               }
-            </Select>
+              setBelongVehicle(newVehicle)
+            }}/>
           </Form.Item>
           <Form.Item label={"选择采集单元"}
                      name={"collectUnits"}>
