@@ -31,6 +31,7 @@ export interface IFlexRayBaseConfig {
     macroticksPerCycle: number
     transmissionStartTime: number
     staticFramepayload: number
+    staticSlotLength: number
     staticSlotsCount: number
     dynamicSlotCount: number
     dynamicSlotLength: number
@@ -61,6 +62,8 @@ export interface IMICBaseConfig {
 
 export interface IB1552BBaseConfig{
     listenAddress: number
+    modadd: number
+    dataUpdateRate: number
 }
 
 

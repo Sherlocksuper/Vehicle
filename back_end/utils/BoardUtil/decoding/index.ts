@@ -51,18 +51,18 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   result.collectType = buffer[3] >> 4;
   // 总线种类,如果是总线采集，表示总线种类，如果是数模采集，表示A还是D
   result.busType = buffer[3] & 0x0f;
-  // 时间戳 4、5
-  result.timestamp = buffer[4] << 8 | buffer[5]
-  // 帧id 6、7、8、9
-  result.frameId = buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | buffer[9];
+  // 时间戳 4、5、6、7、8、9
+  result.timestamp = buffer[4] << 40 | buffer[5] << 32 | buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | buffer[9];
+  // 帧id 10、11、12、13
+  result.frameId = buffer[10] << 24 | buffer[11] << 16 | buffer[12] << 8 | buffer[13];
   // 10字节是信号数量
-  result.signalCount = buffer[10];
+  result.signalCount = buffer[14];
   // 11字节是预留
-  result.reserved = buffer[11];
+  result.reserved = buffer[15];
   // const signals = splitBufferByDelimiter(buffer.subarray(12), Buffer.from([0xff, 0xff]));
 
   // 去掉前面11个字节
-  const signalsPart = buffer.subarray(12);
+  const signalsPart = buffer.subarray(16);
 
 
   const key = getSignalMapKey(

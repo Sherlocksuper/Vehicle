@@ -182,6 +182,7 @@ const CollectorUpdateModal: React.FC<{
                 <span>采集板卡代号:</span>
                 <Input value={newName} onChange={(e) => {
                     collector.collectorName = e.target.value
+                    setNewName(e.target.value)
                 }}/>
             </div>
             <div>

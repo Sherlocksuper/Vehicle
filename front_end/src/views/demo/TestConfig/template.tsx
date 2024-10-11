@@ -220,6 +220,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data)
+      console.log(event)
       if (message.type === "DATA") {
         updateDataRecorder(message.message)
       } else if (message.type === "NOTIFICATION") {

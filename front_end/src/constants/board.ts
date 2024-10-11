@@ -1,11 +1,11 @@
-//使用情况
-export const USED_INFO = '使用情况';
+//使用状态
+export const USED_INFO = '状态';
 
 
-export const ON_USED = '正在使用';
+export const ON_USED = '正常';
 
 //已被禁用
-export const NOT_ON_USED = '已被禁用';
+export const NOT_ON_USED = '禁用';
 
 //禁用
 export const DISABLE = '禁用';

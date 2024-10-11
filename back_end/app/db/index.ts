@@ -3,9 +3,6 @@ import DB_CONFIG from '../config/db_config'
 import User from '../model/User.model'
 import UserService from '../service/UserService'
 import TokenBlackListItem from '../model/TokenBlackListItem.model'
-import ControllerService from '../service/BoardManage/ControllerService'
-import CollectorService from '../service/BoardManage/CollectorService'
-import SignalService from '../service/BoardManage/SignalService'
 import Controller from '../model/BoardManage/Controller.model'
 import Collector from '../model/BoardManage/Collector.model'
 import Signal from '../model/BoardManage/Signal.model'
@@ -40,7 +37,8 @@ const DB_OPT = {
     },
     async initDB() {
         try {
-            await sequelize.sync({force: true})
+            // TODO 更新数据库
+            // await sequelize.sync({force: true})
             // // 初始化核心板卡
             // await ControllerService.initControllers()
             // // 初始化采集板卡

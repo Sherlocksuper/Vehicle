@@ -6,6 +6,7 @@ import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx"
 export enum ProtocolType {
   FlexRay = 'FlexRay',
   CAN = 'CAN',
+  TTCAN = 'TTCAN',
   MIC = 'MIC',
   B1552B = 'B1552B',
   Serial422 = "Serial422",
@@ -23,6 +24,7 @@ export interface IFlexRayBaseConfig {
   macroticksPerCycle: number
   transmissionStartTime: number
   staticFramepayload: number
+  staticSlotLength: number
   staticSlotsCount: number
   dynamicSlotCount: number
   dynamicSlotLength: number
@@ -52,6 +54,8 @@ export interface IMICBaseConfig {
 }
 
 export interface IB1552BBaseConfig{
+  modadd: number
+  dataUpdateRate: number
   listenAddress: number
 }
 

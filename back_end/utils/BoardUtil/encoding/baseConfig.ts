@@ -47,12 +47,13 @@ const getFlexrayBaseConfig = (protocol: IPro) => {
   const macroticksPerCycle = transferTo16(flexConfig.macroticksPerCycle)
   const transmissionStartTime = transferTo8(flexConfig.transmissionStartTime)
   const staticFramepayload = transferTo8(flexConfig.staticFramepayload)
+  const staticSlotLength = transferTo16(flexConfig.staticSlotLength)
   const staticSlotsCount = transferTo16(flexConfig.staticSlotsCount)
   const dynamicSlotCount = transferTo16(flexConfig.dynamicSlotCount)
   const dynamicSlotLength = transferTo8(flexConfig.dynamicSlotLength)
   const setAsSyncNode = transferTo8(flexConfig.setAsSyncNode)
 
-  result = Buffer.concat([result, microticksPerCycle, macroticksPerCycle, transmissionStartTime, staticFramepayload, staticSlotsCount, dynamicSlotCount, dynamicSlotLength, setAsSyncNode])
+  result = Buffer.concat([result, microticksPerCycle, macroticksPerCycle, transmissionStartTime, staticFramepayload, staticSlotLength, staticSlotsCount, dynamicSlotCount, dynamicSlotLength, setAsSyncNode])
   return result
 }
 
@@ -106,8 +107,10 @@ const get1552BBaseConfig = (protocol: IPro) => {
   result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
 
   const b1552BConfig = (protocol.protocol.baseConfig as IB1552BBaseConfig)
-  const listenAddress = transferTo32(b1552BConfig.listenAddress)
-  result = Buffer.concat([result, listenAddress])
+  // const listenAddress = transferTo32(b1552BConfig.listenAddress)
+  const modadd = transferTo8(b1552BConfig.modadd)
+  const dataUpdateRate = transferTo8(b1552BConfig.dataUpdateRate)
+  result = Buffer.concat([result, modadd, dataUpdateRate])
   return result
 }
 
@@ -142,7 +145,7 @@ const getSerial232BaseConfig = (protocol: IPro) => {
   const serial422Config = (protocol.protocol.baseConfig as ISerialBaseConfig)
   const baudRate = transferTo32(serial422Config.baudRate)
   const stopBits = serial422Config.stopBits
-  console.log("stopBits is ",stopBits)
+  console.log("stopBits is ", stopBits)
   const check = serial422Config.check
   const checkType = serial422Config.checkType
   result = Buffer.concat([result, baudRate, Buffer.from([stopBits, check, checkType])])

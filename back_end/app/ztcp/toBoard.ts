@@ -1,5 +1,5 @@
 import net from "node:net";
-import {decodingBoardMessage, decodingBoardMessageWithMap, splitBufferByDelimiter} from "../../utils/BoardUtil/decoding";
+import {decodingBoardMessage, decodingBoardMessageWithMap, IReceiveData, splitBufferByDelimiter} from "../../utils/BoardUtil/decoding";
 import {IFrontMessage, sendMessageToFront} from "./toFront";
 import TestConfigService from "../service/TestConfig";
 import {getSignalMapKey} from "../../utils/BoardUtil/encoding/spConfig";
@@ -39,13 +39,17 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
 
     client.on('data', (data) => {
       try {
-        console.log("data", data)
         // 1. 解析数据,
         const datas = splitBufferByDelimiter(data, Buffer.from([0xcd, 0xef]));
-        const messages = datas.map((item) => {
-          console.log(item)
-          return decodingBoardMessage(item);
+        const messages: IReceiveData[] = []
+        datas.forEach((item) => {
+          if (item[0] === 0xcd && item[1] === 0xef && item[2] === 0x03 && item[3] === 0x18) {
+
+          } else {
+            messages.push(decodingBoardMessage(item))
+          }
         })
+
         // TODO 调试专用
         // console.log("this is message 0", messages[0])
         // const message0 = messages[0];
