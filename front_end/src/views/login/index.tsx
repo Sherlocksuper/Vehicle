@@ -33,11 +33,6 @@ const Login: React.FC = () => {
             <div className="login-content">
                 <h1>车辆数据采集系统</h1>
                 {isLogin ? <ToLogin/> : <ChangePassword/>}
-                <div className="login-footer">
-                    <Button type="link" onClick={() => setIsLogin(!isLogin)}>
-                        {isLogin ? 'Change Password' : 'Back to Login'}
-                    </Button>
-                </div>
             </div>
         </div>
     );
@@ -142,7 +137,7 @@ const ToLogin = () => {
         </Form.Item>
         <Form.Item>
             <Button type="primary" htmlType="submit" className="login-button">
-                Log in
+                登录
             </Button>
         </Form.Item>
     </Form>

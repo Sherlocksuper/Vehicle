@@ -150,7 +150,13 @@ const TestConfig = () => {
         <Space>
           <Button type="link" onClick={() => copyConfig(record)}>复制</Button>
           <Button type="link" onClick={() => deleteConfig(record.id)}>删除</Button>
-          <Button type="link" onClick={() => downConfig(record)}>下发</Button>
+          {
+            currentDownConfig?.id === record.id ? <Button type="link" onClick={() => handleStopCurrentCollect()}>停止下发</Button> :
+              <Button type="link" onClick={() => downConfig(record)}>下发</Button>
+          }
+          {
+            currentDownConfig?.id === record.id ? <Button type="link" onClick={() => handleShowCurrentData()}>可视化监视</Button> : null
+          }
         </Space>
       ),
     },
@@ -169,12 +175,6 @@ const TestConfig = () => {
               <Button type="primary" onClick={() => {
                 setCurrentTaskStep({step: TaskStep.CREATE, config: undefined})
               }}>{"添加测试任务"}</Button>
-
-              <Button type={"primary"} disabled={!currentDownConfig} onClick={() => handleShowCurrentData()}>{
-                currentDownConfig ? (currentDownConfig.name) : "暂无在下发任务"
-              }</Button>
-
-              <Button type={"primary"} onClick={() => handleStopCurrentCollect()}>停止当前采集</Button>
 
               <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value) => {
                 const targetConfigs = configsStore.map(config => {

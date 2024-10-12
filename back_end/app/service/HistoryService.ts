@@ -30,4 +30,14 @@ export default class HistoryService {
         })
         return res
     }
+
+    async getHistoryFile(recordId: number) {
+        const res = await HistoryModel.findOne({
+            where: {
+                id: recordId
+            }
+        })
+        const targetFile = fs.readFileSync(res!.path)
+        return targetFile
+    }
 }

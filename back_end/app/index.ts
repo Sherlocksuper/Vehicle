@@ -7,19 +7,19 @@ import DB from '../app/db';
 import fileServer from 'koa-static';
 import path from 'node:path';
 import bodyparser from 'koa-body';
-import serve from 'koa-static';
 import * as http from 'http';
 import {addWebSocket, removeWebSocket, sendMessageToFront} from "./ztcp/toFront";
 
 const app = new Koa();
+const staticPath = './public';
 
 // 静态文件服务
-app.use(fileServer(path.join(__dirname, 'assets')));
+app.use(fileServer(path.join(__dirname, staticPath)));
+console.log(path.join(__dirname, staticPath));
 app.use(bodyparser({
   multipart: true,
 }));
 app.use(router.routes());
-app.use(serve(path.join(__dirname, '../public')));
 
 const server = http.createServer(app.callback());
 const wss = new WebSocket.Server({noServer: true});

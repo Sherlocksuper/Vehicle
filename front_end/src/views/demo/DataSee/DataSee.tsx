@@ -19,20 +19,7 @@ const DataSee = () => {
       }}
     >
       <Button onClick={() => {
-        getCurrentTestConfig().then(res => {
-          if (res.code === FAIL_CODE) {
-            message.error(res.msg);
-          } else {
-            console.log(res.data);
-            const config: ITestConfig = (res.data);
-            if (config.id === undefined) {
-              message.error("当前无测试配置");
-              return
-            }
-            const win = window.open(`/test-template-for-config?testConfigId=${config?.id}`);
-            if (!win) return
-          }
-        });
+
       }}
       >接收数据动态监视</Button>
     </Card>

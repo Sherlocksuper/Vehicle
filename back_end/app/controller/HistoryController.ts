@@ -2,7 +2,7 @@ import HistoryService from "../service/HistoryService";
 import {Context} from "koa";
 import {IResBody} from "../types";
 import {
-    FAIL_CODE,
+    FAIL_CODE, SEARCH_FAIL_MSG,
     SEARCH_SUCCESS_MSG,
     SUCCESS_CODE,
     WRITE_FAIL_MSG,
@@ -91,6 +91,22 @@ export class HistoryController {
         !res && ((context.body as IResBody) = {
             code: FAIL_CODE,
             msg: WRITE_FAIL_MSG,
+            data: null
+        })
+    }
+
+    // 返回给前端对应路径的文件
+    async getHistoryFile(context: Context) {
+        const recordId = context.params.id as number
+        const res = await historyService.getHistoryFile(recordId)
+        res && ((context.body as IResBody) = {
+            code: SUCCESS_CODE,
+            msg: SEARCH_SUCCESS_MSG,
+            data: res
+        })
+        !res && ((context.body as IResBody) = {
+            code: FAIL_CODE,
+            msg: SEARCH_FAIL_MSG,
             data: null
         })
     }
