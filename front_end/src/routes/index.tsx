@@ -1,5 +1,5 @@
 import Login from "@/views/login";
-import RequirAuthRoute from "../components/RequireAuthRoute.tsx/index.tsx";
+import RequireAuthRoute from "../components/RequireAuthRoute.tsx/index.tsx";
 import SystemTotalPage from "@/views/demo";
 import {createBrowserRouter, Outlet} from "react-router-dom";
 import {DndProvider} from "react-dnd";
@@ -98,7 +98,7 @@ export const my_router = createBrowserRouter([
     },
     {
       path: "/",
-      element: <RequirAuthRoute><SystemTotalPage/></RequirAuthRoute>,
+      element: <RequireAuthRoute><SystemTotalPage/></RequireAuthRoute>,
       children: routeItems.map(item => ({
         path: item.key,
         element: item.element,

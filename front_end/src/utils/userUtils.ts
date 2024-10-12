@@ -12,7 +12,7 @@ const saveUserInfo = (userInfo: UserInfo) => {
     sessionStorage.setItem('userInfo', JSON.stringify(userInfo));
 }
 
-const getUserInfo = (): UserInfo => {
+const getUserInfo = (): UserInfo | null => {
     const userInfo = sessionStorage.getItem('userInfo');
     return userInfo ? JSON.parse(userInfo) : null;
 }
@@ -40,7 +40,7 @@ const getUserId = () => {
     return userInfo ? userInfo.userId : null;
 }
 
-const getToken = () => {
+const getToken = (): string | null => {
     const userInfo = getUserInfo();
     return userInfo ? userInfo.token : null;
 }

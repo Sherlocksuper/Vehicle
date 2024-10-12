@@ -140,6 +140,8 @@ const TestConfig = () => {
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.UNIT, config: record})}>测试单元管理</Button>
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.COLLECT, config: record})}>数据采集项</Button>
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.WRAP, config: record})}>采集数据封装</Button>
+          {currentDownConfig?.id === record.id?
+              (<Button type={"link"} onClick={() => handleShowCurrentData()}>数据监视</Button>):(" ")}
         </Space>
       ),
     },
@@ -150,7 +152,12 @@ const TestConfig = () => {
         <Space>
           <Button type="link" onClick={() => copyConfig(record)}>复制</Button>
           <Button type="link" onClick={() => deleteConfig(record.id)}>删除</Button>
-          <Button type="link" onClick={() => downConfig(record)}>下发</Button>
+          {currentDownConfig?.id===record.id?
+              (<Button type="link" onClick={() => handleStopCurrentCollect()}>停止下发</Button>)
+              :
+              (<Button type="link" onClick={() => downConfig(record)}>下发</Button>)
+          }
+
         </Space>
       ),
     },
@@ -170,11 +177,11 @@ const TestConfig = () => {
                 setCurrentTaskStep({step: TaskStep.CREATE, config: undefined})
               }}>{"添加测试任务"}</Button>
 
-              <Button type={"primary"} disabled={!currentDownConfig} onClick={() => handleShowCurrentData()}>{
-                currentDownConfig ? (currentDownConfig.name) : "暂无在下发任务"
-              }</Button>
+              {/*<Button type={"primary"} disabled={!currentDownConfig} onClick={() => handleShowCurrentData()}>{*/}
+              {/*  currentDownConfig ? (currentDownConfig.name) : "暂无在下发任务"*/}
+              {/*}</Button>*/}
 
-              <Button type={"primary"} onClick={() => handleStopCurrentCollect()}>停止当前采集</Button>
+              {/*<Button type={"primary"} onClick={() => handleStopCurrentCollect()}>停止当前采集</Button>*/}
 
               <Search placeholder="请输入关键词" enterButton="搜索" size="large" onSearch={(value) => {
                 const targetConfigs = configsStore.map(config => {
