@@ -1,10 +1,9 @@
-import {Button, Card, message, Modal, Row, Space, Table, TableProps} from "antd";
+import {Button, Card, message, Space, Table, TableProps} from "antd";
 import React, {useEffect} from "react";
 import {FAIL_CODE} from "@/constants";
-import {deleteProtocolApi, getProtocols, IProtocol} from "@/apis/request/protocol.ts";
+import {deleteProtocolApi, getProtocols, IProtocol, ProtocolType} from "@/apis/request/protocol.ts";
 import {ProtocolModel} from "@/views/demo/ProtocolTable/protocols.tsx";
 import Search from "antd/es/input/Search";
-import {ExpandAltOutlined} from "@ant-design/icons";
 
 
 const ProtocolTable = () => {
@@ -43,6 +42,12 @@ const ProtocolTable = () => {
             title: "协议类型",
             dataIndex: "protocolType",
             key: "protocolType",
+            render:(value,record)=>{
+              if (record.protocolType === ProtocolType.B1552B) {
+                return "1553B"
+              }
+              return value
+            }
         },
         {
             title: "操作",

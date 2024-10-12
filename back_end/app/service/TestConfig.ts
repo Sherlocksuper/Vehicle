@@ -186,11 +186,13 @@ class TestConfigService {
     if (this.currentTestConfig) return false
     const testConfig = await this.getTestConfigById(testConfigId);
     console.log("下发的消息", testConfig)
+    console.log("對應車輛",JSON.stringify(testConfig?.configs[0].vehicle))
     if (!testConfig) return false
 
     const res = getConfigBoardMessage(testConfig!)
     const hostPortList = await this.getHostPortList(testConfig)
 
+    // TODO 连接下位机并且发送消息,调试的时候没有下位机所以注释掉，使用startMock
     // try {
     //   await connectWithMultipleBoards(hostPortList, 0)
     // } catch (e) {

@@ -11,10 +11,7 @@ import TestConfig from "@/views/demo/TestConfig";
 import TestTemplateForConfig from "@/views/demo/TestConfig/template.tsx";
 import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
-import {message} from "antd";
-import {getCurrentTestConfig} from "@/apis/request/testConfig.ts";
-import {FAIL_CODE} from "@/constants";
-import {ITestConfig} from "@/apis/standard/test.ts";
+import DataSee from "@/views/demo/DataSee/DataSee.tsx";
 
 interface RouteItem {
   key: string;
@@ -37,24 +34,8 @@ export const routeItems: RouteItem[] = [
     children: [
       {
         key: '/test-receive/view',
-        label: <p
-          onClick={() => {
-            getCurrentTestConfig().then(res => {
-              if (res.code === FAIL_CODE) {
-                message.error(res.msg);
-              } else {
-                console.log(res.data);
-                const config: ITestConfig = (res.data);
-                if(config.id === undefined) {
-                  message.error("当前无测试配置");
-                  return
-                }
-                const win = window.open(`/test-template-for-config?testConfigId=${config?.id}`);
-                if (!win) return
-              }
-            });
-          }}
-        >接收数据动态监视</p>
+        label: <p>接收数据动态监视</p>,
+        element: <DataSee/>
       },
       {
         key: '/test-receive/offline-management',

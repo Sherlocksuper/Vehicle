@@ -1,4 +1,4 @@
-import {Button, Card, Divider, Form, Input, message, Modal, Row, Select, Space, Table, TableProps} from "antd";
+import {Button, Card, Form, Input, message, Modal, Row, Select, Space, Table, TableProps} from "antd";
 import React, {useEffect} from "react";
 import {FAIL_CODE, SUCCESS_CODE} from "@/constants";
 import {ITestConfig} from "@/apis/standard/test.ts";
@@ -7,17 +7,16 @@ import {confirmDelete} from "@/utils";
 import Search from "antd/es/input/Search";
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {ICollectUnit} from "@/apis/standard/collectUnit.ts";
-import {getCollectUnits} from "@/apis/request/collectUnit.ts";
 import {v4 as uuid} from "uuid";
-import {DeleteOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {DeleteOutlined, PlusOutlined} from "@ant-design/icons";
 import {CollectUnitEdit} from "@/views/demo/CollectUnit/collectUnit.tsx";
-import {IProject} from "@/apis/standard/project.ts";
 
 enum TaskStep {
   CREATE = "CREATE",
   UNIT = "UNIT",
   COLLECT = "COLLECT",
-  WRAP = "WRAP"
+  WRAP = "WRAP",
+  BASEINFO = "BASEINFO"
 }
 
 
@@ -84,6 +83,17 @@ const TestConfig = () => {
     });
   };
 
+  const copyConfig = (config: ITestConfig) => {
+    delete config["id"]
+    createTestConfig(config).then(res => {
+      if (res.code === SUCCESS_CODE) {
+        message.success("复制成功")
+        fetchConfigs()
+      }
+      if (res.code === FAIL_CODE) message.success("复制失败")
+    })
+  }
+
   // 前往查看当前数据
   const handleShowCurrentData = () => {
     const win = window.open(`/test-template-for-config?testConfigId=${currentDownConfig?.id}`);
@@ -126,6 +136,7 @@ const TestConfig = () => {
       key: 'set',
       render: (text, record) => (
         <Space>
+          <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.BASEINFO, config: record})}>任务信息修改</Button>
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.UNIT, config: record})}>测试单元管理</Button>
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.COLLECT, config: record})}>数据采集项</Button>
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.WRAP, config: record})}>采集数据封装</Button>
@@ -137,6 +148,7 @@ const TestConfig = () => {
       key: 'action',
       render: (text, record) => (
         <Space>
+          <Button type="link" onClick={() => copyConfig(record)}>复制</Button>
           <Button type="link" onClick={() => deleteConfig(record.id)}>删除</Button>
           <Button type="link" onClick={() => downConfig(record)}>下发</Button>
         </Space>
@@ -198,6 +210,10 @@ const TestConfig = () => {
         fetchConfigs()
         setCurrentTaskStep(undefined)
       }} open={currentTaskStep?.step === TaskStep.WRAP && currentTaskStep?.config !== undefined} initValue={currentTaskStep?.config}/>
+      <ConfigBaseInfo onFinished={() => {
+        fetchConfigs()
+        setCurrentTaskStep(undefined)
+      }} open={currentTaskStep?.step === TaskStep.BASEINFO && currentTaskStep?.config !== undefined} initValue={currentTaskStep?.config}/>
     </Card>
   );
 };
@@ -347,7 +363,27 @@ export const TestUnitManage: React.FC<{
         vehicle: {
           ...initValue.configs[0].vehicle,
           collectUnits: selectUnits,
-          protocols: []
+          protocols: selectUnits.map(unit => {
+            return unit.collectors.map(collector => {
+              return collector.protocols.map(protocol => {
+                protocol.signalsParsingConfig = protocol.signalsParsingConfig.map(spConfig => {
+                  spConfig.signals = spConfig.signals.map(signal => {
+                    return {
+                      ...signal,
+                      id: uuid()
+                    }
+                  })
+                  return spConfig
+                })
+
+                return {
+                  protocol: protocol,
+                  core: unit.core,
+                  collector: collector,
+                }
+              })
+            })
+          }).flat(3)
         },
         projects: []
       }],
@@ -506,6 +542,30 @@ export const CollectItemManage: React.FC<{
     return result
   }
 
+  // 一键导入所有
+  const handleImportAll = (collectUnits: ICollectUnit[]) => {
+    const result = []
+    collectUnits.forEach((collectUnit) => {
+      collectUnit.collectors.forEach((collector) => {
+        collector.protocols.forEach((protocol) => {
+          protocol.signalsParsingConfig.forEach((spConfig) => {
+            spConfig.signals.forEach((signal) => {
+              result.push({
+                name: signal.name,
+                signal: {
+                  ...signal,
+                }
+              })
+            })
+          })
+        })
+      })
+    })
+    const newProjects = Array.from(projects)
+    newProjects[0].indicators = result
+    setProjects(newProjects)
+  }
+
   return (
     <>
       <Modal
@@ -521,10 +581,18 @@ export const CollectItemManage: React.FC<{
         }}
         okText="确定"
         cancelText="取消"
+        width={"80%"}
       >
+        <Button
+          onClick={() => {
+            handleImportAll(initValue.configs[0].vehicle.collectUnits)
+          }}
+        >
+          一键导入所有
+        </Button>
         {
           projects.map((project) => {
-            return <Card style={{marginBottom: "20px"}}>
+            return <Card style={{marginBottom: "20px", width: "100%"}}>
               {
                 project.indicators.map((indicator) => {
                   return <Row style={{marginBottom: "20px"}}>
@@ -569,7 +637,9 @@ export const CollectItemManage: React.FC<{
                                   }
                                   return value
                                 }))
-                              }}>
+                              }}
+                              style={{width: "700px"}}
+                      >
                         {
                           initValue && getSelectOptions(initValue.configs[0].vehicle.collectUnits)
                         }
@@ -682,19 +752,19 @@ export const CollectDataWrap: React.FC<{
           onValuesChange={(changedValues, allValues) => {
             setWrapForm(allValues)
           }}>
-          <Form.Item label={"设备类型"}
-                     name={"equipmentType"}
-                     rules={[{required: true, message: '请输入设备类型'}]}>
-            <Input/>
-          </Form.Item>
-          <Form.Item label={"设备ID"}
-                     name={"equipmentId"}
-                     rules={[{required: true, message: '请输入设备ID'}]}>
-            <Input/>
-          </Form.Item>
           <Form.Item label={"版本号"}
                      name={"version"}
                      rules={[{required: true, message: '请输入版本号'}]}>
+            <Input/>
+          </Form.Item>
+          <Form.Item label={"装备类型"}
+                     name={"equipmentType"}
+                     rules={[{required: true, message: '请输入装备类型类型'}]}>
+            <Input/>
+          </Form.Item>
+          <Form.Item label={"装备ID"}
+                     name={"equipmentId"}
+                     rules={[{required: true, message: '请输入装备ID'}]}>
             <Input/>
           </Form.Item>
         </Form>
@@ -704,4 +774,74 @@ export const CollectDataWrap: React.FC<{
 }
 
 
+// 新建测试任务
+export const ConfigBaseInfo: React.FC<{
+  onFinished: () => void,
+  open: boolean,
+  initValue?: ITestConfig
+}> = ({
+        onFinished,
+        open,
+        initValue
+      }) => {
 
+  const title = (initValue === undefined ? "新建" : "编辑") + "测试任务"
+  const [form] = Form.useForm()
+  const [configName, setConfigName] = React.useState<string>("")
+  const [belongVehicle, setBelongVehicle] = React.useState<IVehicle>(undefined)
+
+  useEffect(() => {
+    if (open === true) {
+      setConfigName(initValue.name)
+      setBelongVehicle(initValue.configs[0].vehicle)
+    }
+  }, [form, open])
+
+  const updateTestConfigApi = async () => {
+    const result: ITestConfig = Object.assign(initValue)
+    result.name = configName
+    result.configs[0].vehicle = belongVehicle
+
+    updateTestConfigById(initValue.id, result).then((res) => {
+      if (res.code === SUCCESS_CODE) {
+        onFinished()
+      } else {
+        message.error("创建失败")
+      }
+    })
+  }
+
+  return (
+    <>
+      <Modal
+        title={title}
+        open={open}
+        onOk={() => {
+          form.validateFields().then(() => {
+            updateTestConfigApi()
+          })
+          // onFinished()
+        }}
+        onCancel={() => {
+          onFinished()
+        }}
+        okText="确定"
+        cancelText="取消"
+      >
+        <Input value={configName} placeholder="测试任务名称" onChange={(value) => {
+          setConfigName(value.target.value)
+        }}/>
+        <Input value={belongVehicle?.vehicleName} onChange={(value) => {
+          const newVehicle: IVehicle = {
+            ...belongVehicle,
+            vehicleName: value.target.value
+          }
+          setBelongVehicle(newVehicle)
+        }} style={{
+          marginTop: 20
+        }}
+        />
+      </Modal>
+    </>
+  );
+}

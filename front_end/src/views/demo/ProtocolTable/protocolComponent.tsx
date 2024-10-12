@@ -95,6 +95,15 @@ export const FlexRayBaseConfig = () => {
       </Col>
       <Col className="gutter-row" span={6}>
         <Form.Item
+          name={["baseConfig", "staticSlotLength"]}
+          rules={[{required: true, message: "请输入静态槽长度(staticSlotLength)"}]}
+          label={"静态槽长度(staticSlotLength)"}
+        >
+          <InputNumber min={0} precision={0}/>
+        </Form.Item>
+      </Col>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
           name={["baseConfig", "staticSlotsCount"]}
           rules={[{required: true, message: "请输入静态槽(staticSlotsCount)"}]}
           label={"静态槽(staticSlotsCount)"}
@@ -174,11 +183,11 @@ export const MICBaseConfig = () => {
           <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
-      <Col className="gutter-row" span={6}>
+      <Col className="gutter-row">
         <Form.Item
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
-          label={"数据更新速率（Hz）"}
+          label={"数据更新速率(0-5挡，0:1000Hz，1:500Hz，2:200Hz，3:100Hz，4:10Hz，5:1Hz)"}
         >
           <InputNumber min={0} precision={0}/>
         </Form.Item>
@@ -194,13 +203,21 @@ export const B1552BaseConfig = () => {
     <Row gutter={[8, 0]}>
       <Col className="gutter-row" span={6}>
         <Form.Item
-          name={["baseConfig", "listenAddress"]}
-          rules={[{required: true, message: "请输入监听地址"}]}
-          label={"监听地址"}
-        >
+          name={["baseConfig", "modadd"]}
+          rules={[{required: true, message: "请输入ModAdd"}]}
+          label={"MODADD"}>
           <InputNumber min={0} precision={0}/>
         </Form.Item>
       </Col>
+      <Col className="gutter-row" span={6}>
+        <Form.Item
+          name={["baseConfig", "dataUpdateRate"]}
+          rules={[{required: true, message: "请输入数据更新速率"}]}
+          label={"数据更新速率(0-5挡，0:1000Hz，1:500Hz，2:200Hz，3:100Hz，4:10Hz，5:1Hz)"}>
+          <InputNumber min={0} precision={0}/>
+        </Form.Item>
+      </Col>
+
     </Row>
   )
 }
@@ -239,7 +256,7 @@ export const Serial422BaseConfig = () => {
         <Form.Item
           name={["baseConfig", "checkType"]}
           rules={[{required: true, message: "请输入校验类型"}]}
-          label={"校验类型"}
+          label={"校验类型(0偶校验，1奇校验)"}
         >
           <InputNumber min={0} precision={0}/>
         </Form.Item>
@@ -254,9 +271,9 @@ export const Serial232BaseConfig = Serial422BaseConfig
 export const AnalogBaseConfig = () => {
   return (
     <Row gutter={[8, 0]}>
-      <Col className="gutter-row" span={6}>
+      <Col className="gutter-row">
         <Form.Item
-          label={"数据更新速率（Hz）"}
+          label={"数据更新速率(0-5挡，0:1000Hz，1:500Hz，2:200Hz，3:100Hz，4:10Hz，5:1Hz)"}
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
         >
@@ -279,9 +296,9 @@ export const AnalogBaseConfig = () => {
 export const DigitalBaseConfig = () => {
   return (
     <Row gutter={[8, 0]}>
-      <Col className="gutter-row" span={6}>
+      <Col className="gutter-row">
         <Form.Item
-          label={"数据更新速率（Hz）"}
+          label={"数据更新速率(0-5挡，0:1000Hz，1:500Hz，2:200Hz，3:100Hz，4:10Hz，5:1Hz)"}
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
         >
@@ -405,8 +422,13 @@ export const MICSignalsParsingForm = () => {
                     <InputNumber min={0} precision={0}/>
                   </Form.Item>
                   <Form.Item  {...restField} name={[name, 'devid']} label={"DEVID"}
-                              rules={[{required: true, message: '请输入DEVID'}]}>
-                    <InputNumber min={0} precision={0}/>
+                              rules={[{required: true, message: '请输入DEVID'}]}
+                  >
+                    <InputNumber min={0} precision={0}
+                                 style={{
+                                   width: '200px'
+                                 }}
+                    />
                   </Form.Item>
                   <MinusCircleOutlined onClick={() => remove(name)}/>
 
@@ -697,7 +719,7 @@ export const SignalForm = ({fields, add, remove, onlyName = false}) => {
               <InputNumber min={0} precision={0}/>
             </Form.Item>
             <Form.Item {...restField} name={[name, 'offset']} rules={[{required: true, message: '请输入偏移'}]} label={"偏移"}
-                       initialValue={"0"} >
+                       initialValue={"0"}>
               <InputNumber min={0} precision={0}/>
             </Form.Item>
             <MinusCircleOutlined onClick={() => remove(name)}/>

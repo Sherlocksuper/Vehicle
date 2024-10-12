@@ -133,11 +133,13 @@ export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
             }}>
               {
                 Object.values(ProtocolType).map((item) => {
-                  if (ProtocolType.B1552B === item) return <Select.Option key={item} value={item}>{"B1553B"}</Select.Option>
+                  if (ProtocolType.B1552B === item) return <Select.Option key={item} value={item}>{"1553B"}</Select.Option>
                   if (ProtocolType.Serial232 === item) return <Select.Option key={item} value={item}>{"RS232"}</Select.Option>
-                  if (ProtocolType.Serial422 === item) return <Select.Option key={item} value={item}>{"RS422"}</Select.Option>
+                  if (ProtocolType.Serial422 === item) return <Select.Option key={item} value={item}>{"RS422/RS485"}</Select.Option>
                   if (ProtocolType.Analog === item) return <Select.Option key={item} value={item}>{"模拟量"}</Select.Option>
                   if (ProtocolType.Digital === item) return <Select.Option key={item} value={item}>{"数字量"}</Select.Option>
+
+                  if (ProtocolType.TTCAN === item) return <Select.Option key={item} value={ProtocolType.CAN}>{"TTCAN"}</Select.Option>
                   return <Select.Option key={item} value={item}>{item}</Select.Option>
                 })
               }
