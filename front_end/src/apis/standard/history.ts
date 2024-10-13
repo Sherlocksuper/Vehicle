@@ -1,4 +1,6 @@
 import {ITemplate} from "@/apis/standard/template.ts";
+import {ITestConfig} from "@/apis/standard/test.ts";
+import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 
 /**
  * 两个属性，一个是模板，一个是历史记录
@@ -15,12 +17,14 @@ export interface IHistory {
     startTime: number
     endTime: number
     template: ITemplate
+    testConfig: ITestConfig
     historyData: {
         time: number
         data: {
             [key: number]: number
         }
     }[]
+    dataParseResult?: IProtocolSignal[]
 }
 
 /**

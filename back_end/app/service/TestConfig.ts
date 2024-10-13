@@ -297,6 +297,7 @@ class TestConfigService {
       startTime: this.currentTestConfigHistoryData[0].time,
       endTime: this.currentTestConfigHistoryData[this.currentTestConfigHistoryData.length - 1].time,
       template: testConfig?.template,
+      testConfig: testConfig,
       historyData: this.currentTestConfigHistoryData
     }
 

@@ -4,7 +4,13 @@ self.onmessage = async (event: MessageEvent<File>) => {
 
     const result = event.data;
     const text = await result.text()
-    const history = JSON.parse(text) as IHistory
+    let history = JSON.parse(text) as IHistory
+    history = parsingDataForProtocolSignal(history)
 
     self.postMessage(history)
+}
+
+// 解析history，
+const parsingDataForProtocolSignal = (history: IHistory): IHistory => {
+  return history
 }
