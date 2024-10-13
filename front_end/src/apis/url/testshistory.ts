@@ -20,5 +20,10 @@ export const HISTORY_API: UrlMap = {
         url: '/deleteHistory/:id',
         method: Method.POST,
         format: ContentType.JSON
+    },
+    getTargetHistoryFile:{
+        url:'/getTargetHistoryFile',
+        method:Method.GET,
+        format:ContentType.JSON
     }
 }

@@ -149,4 +149,6 @@ router.post('/deleteCollectUnit/:id', CollectUnitController.deleteCollectUnit);
 router.post('/updateCollectUnit', CollectUnitController.updateCollectUnit);
 router.get('/getCollectUnits', CollectUnitController.getCollectUnits);
 
+router.get('/getTargetHistoryFile', HistoryController.getHistoryFile);
+
 export default router

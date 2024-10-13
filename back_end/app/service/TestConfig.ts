@@ -186,7 +186,7 @@ class TestConfigService {
     if (this.currentTestConfig) return false
     const testConfig = await this.getTestConfigById(testConfigId);
     console.log("下发的消息", testConfig)
-    console.log("對應車輛",JSON.stringify(testConfig?.configs[0].vehicle))
+    console.log("對應車輛", JSON.stringify(testConfig?.configs[0].vehicle))
     if (!testConfig) return false
 
     const res = getConfigBoardMessage(testConfig!)
@@ -215,6 +215,7 @@ class TestConfigService {
     await this.setTestConfigSignalMapping(testConfig!)
     await this.getSpecialDigitalKeyList(testConfig!)
 
+    // TODO 模拟数据
     startMockBoardMessage(this.signalsMappingRelation)
     return true
   }
@@ -299,11 +300,14 @@ class TestConfigService {
       historyData: this.currentTestConfigHistoryData
     }
 
-    let dir = '../public/uploads/' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
+    const currentDate = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
+    // 存储到的目录文件夹
+    let dir = '../public/uploads/' + currentDate
     dir = path.resolve(__dirname, dir)
-
-    // 年-月-日
-    const targetPath = dir + '/' + historyName + '.json'
+    // 文件路径
+    const targetPath = path.resolve(__dirname, `../public/uploads/${currentDate}/${historyName}.json`)
+    // 静态资源路径
+    const staticPath = `/uploads/${currentDate}/${historyName}.json`
     // 确保文件夹存在
     try {
       fs.mkdirSync(dir, {recursive: true});
@@ -316,7 +320,7 @@ class TestConfigService {
       await historyService.addHistory({
         fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
         size: transferFileSize(fileSize.size),
-        path: targetPath
+        path: staticPath
       })
 
       // await this.downReceiveDataToXlsx(this.currentTestConfig?.name ?? "默认名称")

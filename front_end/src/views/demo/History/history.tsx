@@ -3,109 +3,101 @@ import React, {useEffect} from "react";
 import {deleteTestsHistory, getTestsHistory} from "@/apis/request/testhistory.ts";
 import {FAIL_CODE} from "@/constants";
 import {confirmDelete} from "@/utils";
+import Search from "antd/es/input/Search";
+import {BASE_URL} from "@/apis/url/myUrl.ts";
 
 interface IHistoryList {
-    id?: number
-    fatherConfigName: string
-    path: string
-    size: number
-    createdAt: Date
-    updatedAt: Date
+  id?: number
+  fatherConfigName: string
+  path: string
+  size: number
+  createdAt: Date
+  updatedAt: Date
 }
 
 const columns: TableProps<IHistoryList>['columns'] = [
-    {
-        title: "ID",
-        dataIndex: "id",
-        key: "id",
-    },
-    {
-        title: "所属配置名称",
-        dataIndex: "fatherConfigName",
-        key: "fatherConfigName",
-    },
-    {
-        title: "路径",
-        dataIndex: "path",
-        key: "path",
-        // 可复制
-        render: (text) => (
-            <a
-              onClick={() => {
-                  const input = document.createElement('input');
-                  input.value = text;
-                  document.body.appendChild(input);
-                  input.select();
-                  document.execCommand('copy');
-                  document.body.removeChild(input);
-                  message.success('复制成功');
-              }}
-            >{text}</a>
-        )
-    },
+  {
+    title: "ID",
+    dataIndex: "id",
+    key: "id",
+  },
+  {
+    title: "所属配置名称",
+    dataIndex: "fatherConfigName",
+    key: "fatherConfigName",
+  },
   {
     title: "大小",
     dataIndex: "size",
     key: "size",
   },
-    {
-        title: "创建时间",
-        dataIndex: "createdAt",
-        key: "createdAt",
-        render: (text) => new Date(text).toLocaleString()
-    },
-    {
-        title: "操作",
-        key: "action",
-    }
+  {
+    title: "创建时间",
+    dataIndex: "createdAt",
+    key: "createdAt",
+    render: (text) => new Date(text).toLocaleString()
+  },
+  {
+    title: "操作",
+    key: "action",
+  }
 ];
 
 const HistoryData = () => {
-    const [historyData, setHistoryData] = React.useState<IHistoryList[]>([])
+  const [historyDataStore, setHistoryDataStore] = React.useState<IHistoryList[]>([])
+  const [historyData, setHistoryData] = React.useState<IHistoryList[]>([])
 
-    columns[columns.length - 1].render = (text, record) => (
-        <Space>
-            <a onClick={() => deleteHistory(record.id!)}>删除</a>
-        </Space>
-    )
+  columns[columns.length - 1].render = (text, record) => (
+    <Space>
+      <a onClick={() => deleteHistory(record.id!)}>删除</a>
+      <a href={BASE_URL + record.path} download>导出</a>
+    </Space>
+  )
 
-    const fetchHistoryData = () => {
-        getTestsHistory().then(res => {
-          if (res.code === FAIL_CODE) {
-            message.error('获取历史数据失败' + res.msg)
-            return
-          }
-          setHistoryData(res.data)
-        })
-    }
+  const fetchHistoryData = () => {
+    getTestsHistory().then(res => {
+      if (res.code === FAIL_CODE) {
+        message.error('获取历史数据失败' + res.msg)
+        return
+      }
+      setHistoryData(res.data)
+      setHistoryDataStore(res.data)
+    })
+  }
 
-    const deleteHistory = (id: number) => {
-        confirmDelete() && deleteTestsHistory(id).then(res => {
-            if (res.code === FAIL_CODE) return
-            fetchHistoryData()
-        })
-    }
+  const deleteHistory = (id: number) => {
+    confirmDelete() && deleteTestsHistory(id).then(res => {
+      if (res.code === FAIL_CODE) return
+      fetchHistoryData()
+    })
+  }
 
-    useEffect(() => {
-        fetchHistoryData()
-    }, [])
+  useEffect(() => {
+    fetchHistoryData()
+  }, [])
 
-    return (
-        <Card
-            title="历史数据"
-            extra={<Button onClick={fetchHistoryData}>刷新</Button>}
-            style={{
-              height: "100vh",
-              overflow: "scroll",
-            }}
-        >
-            <Table
-                columns={columns}
-                dataSource={historyData}
-                rowKey="id"
-            />
-        </Card>
-    )
+  return (
+    <Card
+      title="历史数据"
+      extra={<Space>
+        <Search placeholder="搜索" onSearch={value => {
+          setHistoryData(historyDataStore.filter(item => item.fatherConfigName.includes(value) || item.createdAt.toString().includes(value)))
+        }}/>
+        <Space/>
+        <Button onClick={fetchHistoryData}>刷新</Button>
+      </Space>}
+      style={{
+        height: "100vh",
+        overflow: "scroll",
+      }}
+    >
+      <Table
+        columns={columns}
+        dataSource={historyData}
+        rowKey="id"
+      />
+    </Card>
+  )
 }
 
 export default HistoryData

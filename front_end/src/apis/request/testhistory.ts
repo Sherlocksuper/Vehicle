@@ -28,3 +28,11 @@ export const getTestsHistory = () => {
         api: api
     })
 }
+
+export const getTargetHistoryFile = (id: number) => {
+    const api = {...HISTORY_API.getTargetHistoryFile}
+    api.url = api.url.replace(':id', id.toString())
+    return request({
+        api: api
+    })
+}

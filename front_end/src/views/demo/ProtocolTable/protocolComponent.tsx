@@ -38,6 +38,7 @@ export interface IProtocolSignal {
   length: string
   slope: string
   offset: string
+  birth: string
 }
 
 export const CanBaseConfig = () => {
