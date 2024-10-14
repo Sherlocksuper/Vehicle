@@ -69,7 +69,8 @@ export function transferToDragItems(template: ITemplate): IDragItem[] {
                 during: item.during,
                 min: item.min,
                 max: item.max,
-                label: item.label
+                label: item.label,
+                windowSize: item.windowSize
             }
         }
         return newItem

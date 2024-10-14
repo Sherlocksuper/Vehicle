@@ -16,7 +16,6 @@ import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
 import {getFileToHistoryWorker} from "@/worker/app.ts";
 import {IHistory} from "@/apis/standard/history.ts";
-import {addTestsHistory} from "@/apis/request/testhistory.ts";
 
 export interface IDragItem {
   id: string
@@ -38,6 +37,7 @@ export interface IDragItem {
     min?: number
     max?: number
     label?: string
+    windowSize?: number
   }
 }
 
@@ -163,7 +163,6 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data)
-      console.log(event)
       if (message.type === "DATA") {
         updateDataRecorder(message.message)
       } else if (message.type === "NOTIFICATION") {
@@ -296,6 +295,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   }
 
   const updateDragItem = (id: string, itemConfig: IDragItem['itemConfig']) => {
+    console.log("新的", itemConfig)
     const result = dragItems.map((item) => {
       if (item.id === id) {
         return {
@@ -452,7 +452,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
           during: item.itemConfig.during,
           min: item.itemConfig.min,
           max: item.itemConfig.max,
-          label: item.itemConfig.label
+          label: item.itemConfig.label,
+          windowSize: item.itemConfig.windowSize
         } as ITemplateItem
       })
     } as ITemplate
@@ -478,7 +479,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
           during: item.during,
           min: item.min,
           max: item.max,
-          label: item.label
+          label: item.label,
+          windowSize: item.windowSize
         }
       }
     })

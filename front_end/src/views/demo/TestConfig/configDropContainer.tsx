@@ -140,6 +140,7 @@ const UpdateItemModal: React.FC<{
     itemConfig.trueValue = newConfig.trueValue
     itemConfig.trueLabel = newConfig.trueLabel
     itemConfig.falseLabel = newConfig.falseLabel
+    itemConfig.windowSize = (newConfig.windowSize % 2) === 0 ? newConfig.windowSize + 1 : newConfig.windowSize
     setOpenItemId("");
     updateDragItem(item.id, itemConfig);
   };
@@ -173,6 +174,18 @@ const UpdateItemModal: React.FC<{
             ))}
           </Select>
         </Form.Item>
+        {
+          item.type === DragItemType.LINES && (
+            <>
+              <Form.Item label="滤波窗口长度" name="windowSize" initialValue={0}>
+                <Input type={"number"} defaultValue={0}/>
+                <p style={{fontSize: 12, color: "grey"}}>
+                  滤波窗口长度为奇数,若为偶数则自动加一,0为不设置滤波
+                </p>
+              </Form.Item>
+            </>
+          )
+        }
         {
           item.type === DragItemType.NUMBER && (
             <>
@@ -252,6 +265,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
       unit,
       min,
       max,
+      windowSize,
     },
   } = item as IDragItem;
 
@@ -273,6 +287,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
         currentTestChartData={
           memoizedTestData
         }
+        windowSize={windowSize}
       />
     ),
     [DragItemType.NUMBER]: (

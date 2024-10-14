@@ -26,7 +26,8 @@ interface ISeries {
 const LinesChart: React.FC<IChartInterface> = (props) => {
   const {
     requestSignals,
-    currentTestChartData
+    currentTestChartData,
+    windowSize
   } = props
 
 
@@ -43,6 +44,21 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       data: []
     }
   }))
+
+  const medianFilter = (arr, windowSize) => {
+    const padSize = Math.floor(windowSize / 2);
+    const paddedArr = [...Array(padSize).fill(arr[0]), ...arr, ...Array(padSize).fill(arr[arr.length - 1])];
+    const result = [];
+
+    for (let i = padSize; i < paddedArr.length - padSize; i++) {
+      const window = paddedArr.slice(i - padSize, i + padSize + 1);
+      window.sort((a, b) => a - b);
+      const median = window[Math.floor(window.length / 2)];
+      result.push(median);
+    }
+
+    return result;
+  }
 
   const pushData = useCallback((data: Map<string, number[]>) => {
     if (!requestSignals || requestSignals.length === 0) {
@@ -72,7 +88,21 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
 
     // Iterate through each series in dataRef
     dataRef.current.forEach((seriesItem, index) => {
-      const signalData = data.get(seriesItem.id); // Get data for this particular signal
+      let signalData = data.get(seriesItem.id); // Get data for this particular signal
+      let ws = windowSize;
+      if (typeof ws === "string") {
+        ws = parseInt(ws)
+        //如果是NaN
+        if (isNaN(ws)) {
+          ws = 0
+        } else {
+          if (ws % 2 === 0) ws += 1; // Ensure window size is odd
+        }
+      }
+
+      if (windowSize && windowSize >= 2) {
+        signalData = medianFilter(signalData, ws); // Apply median filter to the data
+      }
       const lastExistingValue = seriesItem.data[seriesItem.data.length - 1]; // Last value in the chart series
 
       // Only update the data for this signal if it's changed

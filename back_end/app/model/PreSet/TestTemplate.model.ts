@@ -34,6 +34,7 @@ export interface ITemplate {
         min?: number
         max?: number
         label?: string
+        windowSize?: number
     }[]
 }
 

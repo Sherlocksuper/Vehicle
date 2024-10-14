@@ -27,4 +27,5 @@ export interface IChartInterface {
     min?: number
     max?: number
     label?: string
+    windowSize?: number
 }
