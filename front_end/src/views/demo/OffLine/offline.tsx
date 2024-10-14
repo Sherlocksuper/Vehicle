@@ -1,4 +1,4 @@
-import {Button, Card, Input, message, Modal, Row, Slider, Space, Typography, Upload, UploadProps} from "antd";
+import {Button, Card, Descriptions, Input, message, Modal, Row, Slider, Space, Typography, Upload, UploadProps} from "antd";
 import React, {useState} from "react";
 import {IHistory} from "@/apis/standard/history.ts";
 import {InboxOutlined} from "@ant-design/icons";
@@ -102,7 +102,6 @@ const OfflineDate = () => {
     {
       (file) && <>
         <FileInfo file={file}/>
-        操作时间段：
         <Slider range
                 defaultValue={[history.startTime, history.endTime]}
                 min={history.startTime}
@@ -137,6 +136,7 @@ const OfflineDate = () => {
           <ShowButton selectTime={period} buttonFunction={() => {
             buttonFunction('SHOW')
           }}/>
+          <ShowHistoryDataParsing history={history}/>
         </Space>
       </>
     }
@@ -207,6 +207,46 @@ const ShowButton = (props: {
     }}>
       <Title level={5}>操作时间段：</Title>
       <Text>{formatTime(props.selectTime[0])} - {formatTime(props.selectTime[1])}</Text>
+    </Modal>
+  </>
+}
+
+
+const ShowHistoryDataParsing = ({history}: { history: IHistory }) => {
+  const [open, setOpen] = useState(false)
+
+  return <>
+    <Button onClick={() => {
+      setOpen(true)
+    }}>
+      展示历史数据分析
+    </Button>
+    <Modal open={open}
+           onCancel={() => {
+             setOpen(false)
+           }}
+           onOk={() => {
+             setOpen(false)
+           }}
+           width={"80%"}
+    >
+      {
+        history.dataParseResult!.map((item, index) => {
+          // 计算最大值、最小值和平均值
+          const max = item.dataArr[0];
+          const min = item.dataArr[1];
+          const avg = item.dataArr[2]
+
+          return (
+            <Descriptions title={item.name} key={index}
+                          style={{marginTop: '20px'}}>
+              <Descriptions.Item label="最大值">{max}</Descriptions.Item>
+              <Descriptions.Item label="最小值">{min}</Descriptions.Item>
+              <Descriptions.Item label="平均值">{avg}</Descriptions.Item>
+            </Descriptions>
+          );
+        })
+      }
     </Modal>
   </>
 }

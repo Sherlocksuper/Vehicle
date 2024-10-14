@@ -14,7 +14,7 @@ import {downHistoryDataAsJson, getTestConfigById, updateTestConfigById} from "@/
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
-import {getFileToHistoryWorker, getHistoryToFileWorker} from "@/worker/app.ts";
+import {getFileToHistoryWorker} from "@/worker/app.ts";
 import {IHistory} from "@/apis/standard/history.ts";
 import {addTestsHistory} from "@/apis/request/testhistory.ts";
 
@@ -52,16 +52,17 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   const [dragItems, setDragItems] = useState<IDragItem[]>([])
   const socketRef = useRef<WebSocket>(null)
   const history = useRef<IHistory>({
+    testConfig: undefined,
     historyName: "默认名称",
     configName: '默认配置',
     startTime: Date.now(),
     endTime: Date.now(),
     template: null,
-    historyData: []
+    historyData: [],
+    dataParseResult: []
   })
   const [netDataRecorder, setNetDataRecorder] = useState<Map<string, number[]>>(new Map())
   const historyManagers = useRef(undefined)
-  const downFileIndex = useRef(0)
 
   const updateDataRecorder = (data, time = undefined) => {
     const currentData = {
@@ -206,7 +207,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       return () => {
       }
     }
-    window.onbeforeunload = function() {
+    window.onbeforeunload = function () {
       return "你确定要离开吗？";
     }
 
