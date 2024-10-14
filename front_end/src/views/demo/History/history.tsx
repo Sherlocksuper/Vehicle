@@ -9,6 +9,7 @@ import {BASE_URL} from "@/apis/url/myUrl.ts";
 interface IHistoryList {
   id?: number
   fatherConfigName: string
+  vehicleName: string
   path: string
   size: number
   createdAt: Date
@@ -25,6 +26,11 @@ const columns: TableProps<IHistoryList>['columns'] = [
     title: "所属配置名称",
     dataIndex: "fatherConfigName",
     key: "fatherConfigName",
+  },
+  {
+    title: "测试车辆",
+    dataIndex: "vehicleName",
+    key: "vehicleName",
   },
   {
     title: "大小",
@@ -81,7 +87,7 @@ const HistoryData = () => {
       title="历史数据"
       extra={<Space>
         <Search placeholder="搜索" onSearch={value => {
-          setHistoryData(historyDataStore.filter(item => item.fatherConfigName.includes(value) || item.createdAt.toString().includes(value)))
+          setHistoryData(historyDataStore.filter(item => item.fatherConfigName.includes(value) || item.createdAt.toString().includes(value) || item.vehicleName.toString().includes(value)))
         }}/>
         <Space/>
         <Button onClick={fetchHistoryData}>刷新</Button>

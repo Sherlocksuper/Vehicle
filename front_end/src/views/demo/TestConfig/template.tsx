@@ -117,64 +117,6 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       },
     };
   };
-
-  const downFile = (file, configName, mode: 'ACTIVE' | 'SCHEDULED', index = 0) => {
-    // TODO 是否要从浏览器下载一份
-    // const a = document.createElement('a')
-    // a.href = URL.createObjectURL(file)
-    // const mod = mode === 'ACTIVE' ? '主动下载' : '定时下载'
-    // a.download = configName + '-' + index + '-' + mod + '.json'
-    // downFileIndex.current++
-    // a.click()
-
-    addTestsHistory({
-      fatherConfigName: configName,
-      file: file
-    }).then((res) => {
-      if (res.code === SUCCESS_CODE) {
-        message.success('上传成功')
-      } else {
-        message.error('上传失败')
-      }
-    })
-  }
-
-  // TODO 清除之前记录的逻辑和定时下载的逻辑
-  //
-  // const clearFileData = () => {
-  //   history.current.startTime = Date.now()
-  //   history.current.historyData = []
-  //   setNetDataRecorder(new Map())
-  // }
-  //
-  // const downFileIndex = useRef(0)
-  // const downFileInterval = useRef<any>(0)
-  //
-  // // 设置一个internal，ONLINE模式下每半个小时自动下载当前文件
-  // useEffect(() => {
-  //   if (!testConfig) {
-  //     return
-  //   }
-  //   if (dataMode !== "ONLINE") {
-  //     return;
-  //   }
-  //   console.log("开始定时下载")
-  //   downFileInterval.current = setInterval(() => {
-  //     const worker = getHistoryToFileWorker()
-  //     worker.onmessage = (event) => {
-  //       const file = event.data
-  //       downFile(file, testConfig.name, 'SCHEDULED', downFileIndex.current)
-  //     }
-  //
-  //     history.current.endTime = Date.now()
-  //     worker.postMessage(history.current)
-  //     clearFileData()
-  //   }, 3000)
-  //   return () => {
-  //     clearInterval(downFileInterval.current)
-  //   }
-  // }, [dataMode, testConfig?.name])
-
   // 在线数据的时候获取testConfig
   useEffect(() => {
     if (dataMode === "OFFLINE") {

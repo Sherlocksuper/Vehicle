@@ -3,6 +3,7 @@ import {AutoIncrement, Column, CreatedAt, DataType, Model, PrimaryKey, UpdatedAt
 export interface IRecordHistory {
     id?: number
     fatherConfigName: string
+    vehicleName: string
     path: string
     size?: string
     createdAt?: Date
@@ -14,6 +15,9 @@ export default class HistoryModel extends Model<IRecordHistory> {
     @AutoIncrement
     @Column(DataType.INTEGER)
     id!: number;
+
+    @Column(DataType.STRING)
+    vehicleName!: string;
 
     @Column(DataType.STRING)
     fatherConfigName!: string;

@@ -62,6 +62,7 @@ export class HistoryController {
 
         const record: IRecordHistory = {
             fatherConfigName: fatherConfigName,
+            vehicleName: fileName,
             size: transferFileSize(file.size),
             path: storePath,
         }

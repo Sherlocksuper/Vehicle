@@ -38,7 +38,7 @@ const DB_OPT = {
     async initDB() {
         try {
             // TODO 更新数据库
-            // await sequelize.sync({force: true})
+            await sequelize.sync({force: true})
             // // 初始化核心板卡
             // await ControllerService.initControllers()
             // // 初始化采集板卡

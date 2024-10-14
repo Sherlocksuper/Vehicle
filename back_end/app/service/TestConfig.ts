@@ -318,9 +318,12 @@ class TestConfigService {
 
       const fileSize = fs.statSync(targetPath)
 
+      console.log("车辆名称",this.currentTestConfig?.configs[0].vehicle.vehicleName)
+
       await historyService.addHistory({
         fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
         size: transferFileSize(fileSize.size),
+        vehicleName: this.currentTestConfig?.configs[0].vehicle.vehicleName!,
         path: staticPath
       })
 
@@ -379,6 +382,7 @@ class TestConfigService {
     await historyService.addHistory({
       fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
       size: transferFileSize(fileSize.size),
+      vehicleName: this.currentTestConfig?.configs[0].vehicle.vehicleName!,
       path: targetPath
     })
     return true
