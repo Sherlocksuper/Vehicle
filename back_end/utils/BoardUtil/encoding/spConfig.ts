@@ -1,6 +1,8 @@
 import {IProtocolSignal, ProtocolType} from "../../../app/model/PreSet/Protocol.model";
 import {IPro} from "./baseConfig";
 import {getBusCategory, getCollectItem, getCollectType, transferTo16, transferTo32, transferTo8} from "./index";
+import {off} from "process";
+import {start} from "repl";
 
 
 export const totalHeader = [0xff, 0x00]
@@ -49,7 +51,24 @@ export const getSpConfig = (protocol: IPro): ISpConfigResult => {
  * 起点、长度、斜率、偏移
  */
 const getOneSignalConfig = (protocol: IProtocolSignal) => {
-  return Buffer.from([Number(protocol.startPoint), Number(protocol.length) << 2, Number(protocol.slope), Number(protocol.offset)])
+  const startPoint = Number(protocol.startPoint)
+  const startPointResult = transferTo8(startPoint)
+  const length = Number(protocol.length)
+
+  // 斜率
+  let slope = Number(protocol.slope)
+  const isDivided = slope > 1 ? 0 : 1  // 0乘1除
+  slope = slope > 1 ? Math.floor(slope) : Math.floor(1 / slope)
+  const slopeResult = transferTo8(slope)
+
+  let offset = Number(protocol.offset)
+  const isNegative = offset > 0 ? 0 : 1 // 0正1负
+  offset = offset > 0 ? offset : -offset
+  const offsetResult = transferTo8(offset)
+
+  const lengthResult = transferTo8(length << 2 | isDivided << 1 | isNegative)
+
+  return Buffer.concat([startPointResult, lengthResult, slopeResult, offsetResult])
 }
 
 //用来提示模块进行下发		目标ID	采集项	功能码	……依据配置内容而定，最长80字节

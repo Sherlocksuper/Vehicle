@@ -718,11 +718,11 @@ export const SignalForm = ({fields, add, remove, onlyName = false}) => {
             </Form.Item>
             <Form.Item {...restField} name={[name, 'slope']} rules={[{required: true, message: '请输入斜率'}]} label={"斜率"}
                        initialValue={"1"}>
-              <InputNumber min={0} precision={0}/>
+              <InputNumber min={0}/>
             </Form.Item>
             <Form.Item {...restField} name={[name, 'offset']} rules={[{required: true, message: '请输入偏移'}]} label={"偏移"}
                        initialValue={"0"}>
-              <InputNumber min={0} precision={0}/>
+              <InputNumber/>
             </Form.Item>
             <MinusCircleOutlined onClick={() => remove(name)}/>
           </Space>
