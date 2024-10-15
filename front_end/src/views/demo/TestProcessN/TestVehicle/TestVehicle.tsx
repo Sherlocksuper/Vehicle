@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Button, Card, Descriptions, Divider, Form, Input, message, Modal, Select, Space, Table, Tag} from 'antd';
+import {Button, Card, Descriptions, Divider, Form, Input, message, Modal, Select, Space, Table} from 'antd';
 import type {TableProps} from 'antd';
 import {IVehicle} from "@/apis/standard/vehicle.ts";
 import {createVehicle, deleteVehicle, getVehicles, updateVehicle} from "@/apis/request/vehicle.ts";
@@ -419,6 +419,11 @@ export const TestConfigModel: React.FC<{
         },
         projects: value.projects
       }],
+      dataWrap:{
+        equipmentId: "",
+        equipmentType: "",
+        version: ""
+      },
       template: undefined
     }
     console.log(result)

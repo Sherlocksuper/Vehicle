@@ -256,6 +256,8 @@ export const CreateTestTask: React.FC<{
   }, [form, open])
 
   const createTestConfigApi = async () => {
+
+    // @ts-ignore
     const result: ITestConfig = {
       name: configName,
       configs: [{
