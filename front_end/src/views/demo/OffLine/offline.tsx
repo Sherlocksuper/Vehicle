@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import {IHistory} from "@/apis/standard/history.ts";
 import {InboxOutlined} from "@ant-design/icons";
 import {debounce, formatFileSize, formatTime} from "@/utils";
-import {getExportFileWorker, getFileToHistoryWorker} from "@/worker/app.ts";
+import {getExportFileWorker, getFileToHistoryWorker, getHistoryToData, getHistoryToFileWorker} from "@/worker/app.ts";
 
 const {Title, Text} = Typography;
 
@@ -57,6 +57,18 @@ const OfflineDate = () => {
     } else {
       showData()
     }
+  }
+
+  const exportForMatFile = () => {
+    const worker = getHistoryToData()
+    worker.onmessage = (e) => {
+      const file = e.data
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(file)
+      a.download = file.name
+      a.click()
+    }
+    worker.postMessage(history)
   }
 
   return <Card style={{
@@ -137,6 +149,7 @@ const OfflineDate = () => {
             buttonFunction('SHOW')
           }}/>
           <ShowHistoryDataParsing history={history}/>
+          <Button onClick={() => exportForMatFile()}> 导出格式化文件 </Button>
         </Space>
       </>
     }
