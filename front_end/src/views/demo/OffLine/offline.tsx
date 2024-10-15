@@ -1,5 +1,5 @@
 import {Button, Card, Descriptions, Input, message, Modal, Row, Slider, Space, Typography, Upload, UploadProps} from "antd";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {IHistory} from "@/apis/standard/history.ts";
 import {InboxOutlined} from "@ant-design/icons";
 import {debounce, formatFileSize, formatTime} from "@/utils";
@@ -16,6 +16,30 @@ const OfflineDate = () => {
   const debounceSetPeriod = debounce((value) => {
     setPeriod(value as number[])
   })
+
+  useEffect(() => {
+    console.log(window.location.toString());
+    const url = new URL(window.location.toString());
+    const targetFile = url.searchParams.get("fileAdd");
+    if (targetFile && targetFile !== "") {
+      fetch(targetFile)
+        .then(async (res) => {
+          if (res.ok) {
+            const data = await res.json();
+            // 将JSON数据转换为Blob对象
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            // 创建一个File对象
+            const file = new File([blob], 'filename.json', { type: 'application/json' });
+            manageTargetFile(file)
+          } else {
+            console.error('Failed to fetch the file:', res.status);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching the file:', error);
+        });
+    }
+  }, []);
 
   const exportFile = () => {
     const worker = getExportFileWorker()
@@ -59,6 +83,21 @@ const OfflineDate = () => {
     }
   }
 
+  const manageTargetFile = (file: File) => {
+    // 加载
+    message.loading('文件加载中', 0)
+    const worker = getFileToHistoryWorker()
+    worker.onmessage = (e) => {
+      const history = e.data as IHistory
+      setHistory(history)
+      setFile(file)
+      setPeriod([history.startTime, history.endTime])
+      message.destroy()
+    }
+    worker.postMessage(file)
+  }
+
+  // 导出附件一 格式的文件
   const exportForMatFile = () => {
     const worker = getHistoryToData()
     worker.onmessage = (e) => {
@@ -81,26 +120,12 @@ const OfflineDate = () => {
     overflow: 'scroll'
   }}>
     {
-      !file && <Upload.Dragger
+      (!file || !history) && <Upload.Dragger
         name='file'
         multiple={false}
         customRequest={(options) => {
           const file = options.file as File
-          if (file.size > 1024 * 1024 * 100) {
-            message.error('文件大小不能超过100M')
-            return
-          }
-          // 加载
-          message.loading('文件加载中', 0)
-          const worker = getFileToHistoryWorker()
-          worker.onmessage = (e) => {
-            const history = e.data as IHistory
-            setHistory(history)
-            setFile(file)
-            setPeriod([history.startTime, history.endTime])
-            message.destroy()
-          }
-          worker.postMessage(file)
+          manageTargetFile(file)
         }}
         showUploadList={false}
       >
@@ -112,7 +137,7 @@ const OfflineDate = () => {
       </Upload.Dragger>
     }
     {
-      (file) && <>
+      (file && history) && <>
         <FileInfo file={file}/>
         <Slider range
                 defaultValue={[history.startTime, history.endTime]}

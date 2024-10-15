@@ -56,7 +56,7 @@ const HistoryData = () => {
   columns[columns.length - 1].render = (text, record) => (
     <Space>
       <a onClick={() => deleteHistory(record.id!)}>删除</a>
-      <a href={BASE_URL + record.path} download>导出</a>
+      <a href={"/test-receive/offline-management?fileAdd=" + BASE_URL + record.path}>可视化分析</a>
     </Space>
   )
 
