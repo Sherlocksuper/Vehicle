@@ -177,7 +177,7 @@ const getMICSpConfig = (protocol: IPro) => {
         signalsMap.set(key, [signal.id])
       }
       // MIC没有信号配置，所以不需要加到后面
-      // a = Buffer.concat([a, getOneSignalConfig(signal)])
+      a = Buffer.concat([a, getOneSignalConfig(signal)])
     })
 
     results.push(a)
@@ -218,7 +218,7 @@ const getB1552BSpConfig = (protocol: IPro) => {
         signalsMap.set(key, [signal.id])
       }
       // 1552B没有信号配置，所以不需要加到后面
-      // a = Buffer.concat([a, getOneSignalConfig(signal)])
+      a = Buffer.concat([a, getOneSignalConfig(signal)])
     })
     results.push(a)
   })

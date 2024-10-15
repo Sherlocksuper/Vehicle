@@ -6,7 +6,7 @@ import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx"
 export enum ProtocolType {
   FlexRay = 'FlexRay',
   CAN = 'CAN',
-  TTCAN = 'TTCAN',
+  // TTCAN = 'TTCAN',
   MIC = 'MIC',
   B1552B = 'B1552B',
   Serial422 = "Serial422",

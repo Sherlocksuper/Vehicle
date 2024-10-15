@@ -139,7 +139,7 @@ export const ProtocolModel = ({open, close, onOk, mode, initValue}: {
                   if (ProtocolType.Analog === item) return <Select.Option key={item} value={item}>{"模拟量"}</Select.Option>
                   if (ProtocolType.Digital === item) return <Select.Option key={item} value={item}>{"数字量"}</Select.Option>
 
-                  if (ProtocolType.TTCAN === item) return <Select.Option key={item} value={ProtocolType.CAN}>{"TTCAN"}</Select.Option>
+                  if (ProtocolType.CAN === item) return <Select.Option key={item} value={item}>{"CAN/TTCAN"}</Select.Option>
                   return <Select.Option key={item} value={item}>{item}</Select.Option>
                 })
               }

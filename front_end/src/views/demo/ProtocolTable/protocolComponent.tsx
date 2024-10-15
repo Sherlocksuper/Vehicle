@@ -447,7 +447,7 @@ export const MICSignalsParsingForm = () => {
                       addSignal()
                     }} remove={(index) => {
                       removeSignal(index)
-                    }} onlyName={true}
+                    }} onlyName={false}
                     />
                   )}
                 </Form.List>
@@ -500,7 +500,7 @@ export const B1552BSignalParsingForm = () => {
                       addSignal()
                     }} remove={(index) => {
                       removeSignal(index)
-                    }} onlyName={true}
+                    }} onlyName={false}
                     />
                   )}
                 </Form.List>
