@@ -55,9 +55,9 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   result.timestamp = buffer[4] << 40 | buffer[5] << 32 | buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | buffer[9];
   // 帧id 10、11、12、13
   result.frameId = buffer[10] << 24 | buffer[11] << 16 | buffer[12] << 8 | buffer[13];
-  // 10字节是信号数量
+  // 14字节是信号数量
   result.signalCount = buffer[14];
-  // 11字节是预留
+  // 15字节是预留
   result.reserved = buffer[15];
   // const signals = splitBufferByDelimiter(buffer.subarray(12), Buffer.from([0xff, 0xff]));
 

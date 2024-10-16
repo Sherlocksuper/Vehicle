@@ -86,7 +86,8 @@ const getFlexraySpConfig = (protocol: IPro) => {
 
   protocol.protocol.signalsParsingConfig.forEach(spConfig => {
     let a: Buffer = Buffer.from(middleHeader)
-    a = Buffer.concat([a, Buffer.from([Number(spConfig.frameNumber), Number(spConfig.frameId), Number(spConfig.cycleNumber), Number(spConfig.signals.length)])])
+    const tNull = 0x00
+    a = Buffer.concat([a, Buffer.from([Number(spConfig.frameNumber), Number(spConfig.frameId), tNull,Number(spConfig.cycleNumber), Number(spConfig.signals.length)])])
 
     const collectType = getCollectType(protocol)
     const collectCategory = getBusCategory(protocol)
@@ -94,12 +95,12 @@ const getFlexraySpConfig = (protocol: IPro) => {
 
     // 加入每个信号的配置, 通过key（帧id）来把不同signal分组,
     spConfig.signals.forEach(signal => {
-      a = Buffer.concat([a, getOneSignalConfig(signal)])
       if (signalsMap.has(key)) {
         signalsMap.get(key)!.push(signal.id)
       } else {
         signalsMap.set(key, [signal.id])
       }
+      a = Buffer.concat([a, getOneSignalConfig(signal)])
     })
     results.push(a)
   })
@@ -217,7 +218,7 @@ const getB1552BSpConfig = (protocol: IPro) => {
       } else {
         signalsMap.set(key, [signal.id])
       }
-      // 1552B没有信号配置，所以不需要加到后面
+      // 1552B有信号配置，所以需要加到后面
       a = Buffer.concat([a, getOneSignalConfig(signal)])
     })
     results.push(a)
@@ -231,9 +232,6 @@ const getSerialSpConfig = (protocol: IPro) => {
   const targetId = protocol.collector.collectorAddress!
   const collectItem = getCollectItem(protocol)
 
-  const collectType = getCollectType(protocol)
-  const collectCategory = getBusCategory(protocol)
-
   const functionCode = 0xc2
   middleHeader = Buffer.concat([middleHeader, Buffer.from([targetId, collectItem, functionCode])])
 
@@ -246,6 +244,8 @@ const getSerialSpConfig = (protocol: IPro) => {
     const frameNumber = 0x00
     a = Buffer.concat([a, Buffer.from([frameNumber, Number(spConfig.signals.length)])])
 
+    const collectType = getCollectType(protocol)
+    const collectCategory = getBusCategory(protocol)
     const key = getSignalMapKey(targetId, collectType, collectCategory, 0)
 
     spConfig.signals.forEach(signal => {
@@ -265,28 +265,38 @@ const getSerialSpConfig = (protocol: IPro) => {
 
 // 获取模拟量SpConfig
 const getAnalogSpConfig = (protocol: IPro) => {
+  let middleHeader = Buffer.from(totalHeader)
   const targetId = protocol.collector.collectorAddress!
-  const collectType = getCollectType(protocol)
-  const collectCategory = getBusCategory(protocol)
+  const collectItem = getCollectItem(protocol)
 
+  const functionCode = 0xc2
+  middleHeader = Buffer.concat([middleHeader, Buffer.from([targetId, collectItem, functionCode])])
+
+  const results: Buffer[] = []
   const signalsMap = new Map<string, string[]>()
 
   protocol.protocol.signalsParsingConfig.forEach(spConfig => {
+    let a: Buffer = Buffer.from(middleHeader)
+
+    const frameNumber = 0x00
+    a = Buffer.concat([a, Buffer.from([frameNumber, Number(spConfig.signals.length)])])
+
+    const collectType = getCollectType(protocol)
+    const collectCategory = getBusCategory(protocol)
     const key = getSignalMapKey(targetId, collectType, collectCategory, 0)
+
     spConfig.signals.forEach(signal => {
       if (signalsMap.has(key)) {
         signalsMap.get(key)!.push(signal.id)
       } else {
         signalsMap.set(key, [signal.id])
       }
+      a = Buffer.concat([a, getOneSignalConfig(signal)])
     })
+    results.push(a)
   })
 
-
-  return {
-    resultMessages: [],
-    signalsMap: signalsMap
-  }
+  return {resultMessages: results, signalsMap}
 }
 
 const getDigitalSpConfig = (protocol: IPro) => {

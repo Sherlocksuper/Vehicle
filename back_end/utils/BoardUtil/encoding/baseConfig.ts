@@ -2,6 +2,7 @@ import {IAIOBaseConfig, IB1552BBaseConfig, ICanBaseConfig, IFlexRayBaseConfig, I
 import {IControllerModel} from "../../../app/model/BoardManage/Controller.model";
 import {ICollectorModel} from "../../../app/model/BoardManage/Collector.model";
 import {getCollectItem, transferTo16, transferTo24, transferTo32, transferTo8} from "./index";
+import {createSecureServer} from "http2";
 
 export const totalHeader = [0xff, 0x00]
 
@@ -103,8 +104,9 @@ const get1552BBaseConfig = (protocol: IPro) => {
   const targetId = protocol.collector.collectorAddress!
   const collectItem = getCollectItem(protocol)
   const functionCode = 0xc1
-  const reversed = 0x00
-  result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
+  const tNull = transferTo8(0)
+  const reversed = transferTo24(0)
+  result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode]), tNull, reversed])
 
   const b1552BConfig = (protocol.protocol.baseConfig as IB1552BBaseConfig)
   // const listenAddress = transferTo32(b1552BConfig.listenAddress)
@@ -119,16 +121,16 @@ const getSerial422BaseConfig = (protocol: IPro) => {
   const targetId = protocol.collector.collectorAddress!
   const collectItem = getCollectItem(protocol)
   const functionCode = 0xc1
-  const reversed = 0x00
+  const tNull = 0x00
 
-  result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
+  result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, tNull])])
 
   const serial422Config = (protocol.protocol.baseConfig as ISerialBaseConfig)
   const baudRate = transferTo32(serial422Config.baudRate)
-  const stopBits = serial422Config.stopBits
-  const check = serial422Config.check
-  const checkType = serial422Config.checkType
-  result = Buffer.concat([result, baudRate, Buffer.from([stopBits, check, checkType])])
+  const stopBits = transferTo8(serial422Config.stopBits)
+  const check = transferTo8(serial422Config.check)
+  const checkType = transferTo8(serial422Config.checkType)
+  result = Buffer.concat([result, baudRate, stopBits, check, checkType])
 
   return result
 }
@@ -138,17 +140,16 @@ const getSerial232BaseConfig = (protocol: IPro) => {
   const targetId = protocol.collector.collectorAddress!
   const collectItem = getCollectItem(protocol)
   const functionCode = 0xc1
-  const reversed = 0x00
+  const tNull = 0x00
 
-  result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
+  result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, tNull])])
 
-  const serial422Config = (protocol.protocol.baseConfig as ISerialBaseConfig)
-  const baudRate = transferTo32(serial422Config.baudRate)
-  const stopBits = serial422Config.stopBits
-  console.log("stopBits is ", stopBits)
-  const check = serial422Config.check
-  const checkType = serial422Config.checkType
-  result = Buffer.concat([result, baudRate, Buffer.from([stopBits, check, checkType])])
+  const serial232Config = (protocol.protocol.baseConfig as ISerialBaseConfig)
+  const baudRate = transferTo32(serial232Config.baudRate)
+  const stopBits = transferTo8(serial232Config.stopBits)
+  const check = transferTo8(serial232Config.check)
+  const checkType = transferTo8(serial232Config.checkType)
+  result = Buffer.concat([result, baudRate, stopBits, check, checkType])
 
   return result
 }
@@ -159,9 +160,9 @@ const getAnalogBaseConfig = (protocol: IPro) => {
   const targetId = protocol.collector.collectorAddress!
   const collectItem = getCollectItem(protocol)
   const functionCode = 0xc1
-  const reversed = 0x00
+  const tNull = 0x00
 
-  result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, reversed])])
+  result = Buffer.concat([result, Buffer.from([targetId, collectItem, functionCode, tNull])])
 
   const analogConfig = (protocol.protocol.baseConfig as IAIOBaseConfig)
   result = Buffer.concat([result, Buffer.from([analogConfig.dataUpdateRate])])
