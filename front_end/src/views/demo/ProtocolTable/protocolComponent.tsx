@@ -595,7 +595,7 @@ export const AnalogSignalsParsingForm = () => {
                   addSignal()
                 }} remove={(index) => {
                   removeSignal(index)
-                }} onlyName={true}
+                }} onlyName={false}
                 />
               )}
             </Form.List>

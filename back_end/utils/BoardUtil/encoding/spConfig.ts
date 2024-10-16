@@ -12,7 +12,7 @@ export const getSignalMapKey = (moduleId: number,
                                 collectType: number,
                                 busType: number,
                                 frameId: number) => {
-  if (!frameId) frameId = -1
+  if (!frameId) frameId = 0
 
   return `${moduleId}-${collectType}-${busType}-${frameId}`
 }
@@ -169,7 +169,7 @@ const getMICSpConfig = (protocol: IPro) => {
 
     const collectType = getCollectType(protocol)
     const collectCategory = getBusCategory(protocol)
-    const key = getSignalMapKey(targetId, collectType, collectCategory, Number(spConfig.frameId))
+    const key = getSignalMapKey(targetId, collectType, collectCategory, 0)
 
     spConfig.signals.forEach(signal => {
       if (signalsMap.has(key)) {

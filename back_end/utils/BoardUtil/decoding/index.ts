@@ -1,6 +1,8 @@
 import {getSignalMapKey} from "../encoding/spConfig";
 import TestConfigService from "../../../app/service/TestConfig"
 import {Buffer} from "buffer";
+import {getCollectItemFromId} from "../encoding";
+import {ProtocolType} from "../../../app/model/PreSet/Protocol.model";
 
 export const splitBufferByDelimiter = (buffer: Buffer, delimiter: Buffer): Buffer[] => {
   let start = 0;
@@ -54,14 +56,14 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   // 时间戳 4、5、6、7、8、9
   result.timestamp = buffer[4] << 40 | buffer[5] << 32 | buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | buffer[9];
   // 帧id 10、11、12、13
-  result.frameId = buffer[10] << 24 | buffer[11] << 16 | buffer[12] << 8 | buffer[13];
+  result.frameId = getFrameId(buffer);
   // 14字节是信号数量
   result.signalCount = buffer[14];
   // 15字节是预留
   result.reserved = buffer[15];
   // const signals = splitBufferByDelimiter(buffer.subarray(12), Buffer.from([0xff, 0xff]));
 
-  // 去掉前面11个字节
+  // 去掉前面16个字节
   const signalsPart = buffer.subarray(16);
 
 
@@ -156,6 +158,31 @@ const decodingOneSignal = (buffer: Buffer): IReceiveSignal => {
     integer,
     decimal,
     value
+  }
+}
+
+// 根据buffer的信号获取frameId
+const getFrameId = (buffer: Buffer): number => {
+  const type = getCollectItemFromId(buffer[3])!
+  switch (type) {
+    case ProtocolType.FlexRay:
+      return buffer[10] << 8 | buffer[11]
+    case ProtocolType.CAN:
+      return buffer[10] << 24 | buffer[11] << 16 | buffer[12] << 8 | buffer[13]
+    case ProtocolType.MIC:
+      return 0x00
+    case ProtocolType.B1552B:
+      return 0x00
+    case ProtocolType.Serial422:
+      return 0x00
+    case ProtocolType.Serial232:
+      return 0x00
+    case ProtocolType.Analog:
+      return 0x00
+    case ProtocolType.Digital:
+      return 0x00
+    default:
+      return 0x00
   }
 }
 
