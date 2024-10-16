@@ -80,9 +80,9 @@ export interface IProtocolModel {
         frameId: string,
         cycleNumber?: number
         modadd?: number
-        devId?: number
+        devId?: number[]
         rtAddress?: number
-        childAddress?: number
+        childAddress?: number[]
         signals: IProtocolSignal[]
     }[]
 }
@@ -114,7 +114,7 @@ export default class Protocol extends Model<IProtocolModel> {
         modadd?: number
         devId?: number
         rtAddress?: number
-        childAddress?: number
+        childAddress?: number[]
         signals: IProtocolSignal[]
     }[]
 }

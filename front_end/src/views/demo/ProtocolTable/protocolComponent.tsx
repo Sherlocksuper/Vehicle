@@ -1,6 +1,7 @@
-import {Button, Col, Form, Input, InputNumber, Row, Space, Tooltip} from "antd";
+import {Button, Checkbox, Col, Form, FormInstance, Input, InputNumber, Modal, Row, Select, Space, Tooltip} from "antd";
 import React, {useEffect, useState} from "react";
 import {MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined} from "@ant-design/icons";
+import {IProtocol} from "@/apis/request/protocol.ts";
 
 const HexInput = ({
                     value = '0',
@@ -189,9 +190,16 @@ export const MICBaseConfig = () => {
         <Form.Item
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
-          label={"数据更新速率(0-5挡，0:1000Hz，1:500Hz，2:200Hz，3:100Hz，4:10Hz，5:1Hz)"}
+          label={"数据更新速率"}
         >
-          <InputNumber min={0} precision={0}/>
+          <Select>
+            <Select.Option key={0} value={0}>1000Hz</Select.Option>
+            <Select.Option key={1} value={1}>500Hz</Select.Option>
+            <Select.Option key={2} value={2}>200Hz</Select.Option>
+            <Select.Option key={3} value={3}>100Hz</Select.Option>
+            <Select.Option key={4} value={4}>10Hz</Select.Option>
+            <Select.Option key={5} value={5}>1Hz</Select.Option>
+          </Select>
         </Form.Item>
       </Col>
     </Row>
@@ -215,8 +223,16 @@ export const B1552BaseConfig = () => {
         <Form.Item
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
-          label={"数据更新速率(0-5挡，0:1000Hz，1:500Hz，2:200Hz，3:100Hz，4:10Hz，5:1Hz)"}>
-          <InputNumber min={0} precision={0}/>
+          label={"数据更新速率"}>
+          <Select>
+            <Select.Option key={0} value={0}>1000Hz</Select.Option>
+            <Select.Option key={1} value={1}>500Hz</Select.Option>
+            <Select.Option key={2} value={2}>200Hz</Select.Option>
+            <Select.Option key={3} value={3}>100Hz</Select.Option>
+            <Select.Option key={4} value={4}>10Hz</Select.Option>
+            <Select.Option key={5} value={5}>1Hz</Select.Option>
+          </Select>
+          {/*<InputNumber min={0} precision={0}/>*/}
         </Form.Item>
       </Col>
 
@@ -275,11 +291,19 @@ export const AnalogBaseConfig = () => {
     <Row gutter={[8, 0]}>
       <Col className="gutter-row">
         <Form.Item
-          label={"数据更新速率(0-5挡，0:1000Hz，1:500Hz，2:200Hz，3:100Hz，4:10Hz，5:1Hz)"}
+          label={"数据更新速率"}
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
         >
-          <InputNumber min={0} precision={0}/>
+          <Select>
+            <Select.Option key={0} value={0}>1000Hz</Select.Option>
+            <Select.Option key={1} value={1}>500Hz</Select.Option>
+            <Select.Option key={2} value={2}>200Hz</Select.Option>
+            <Select.Option key={3} value={3}>100Hz</Select.Option>
+            <Select.Option key={4} value={4}>10Hz</Select.Option>
+            <Select.Option key={5} value={5}>1Hz</Select.Option>
+          </Select>
+          {/*<InputNumber min={0} precision={0}/>*/}
         </Form.Item>
       </Col>
       {/*<Col className="gutter-row" span={6}>*/}
@@ -300,11 +324,19 @@ export const DigitalBaseConfig = () => {
     <Row gutter={[8, 0]}>
       <Col className="gutter-row">
         <Form.Item
-          label={"数据更新速率(0-5挡，0:1000Hz，1:500Hz，2:200Hz，3:100Hz，4:10Hz，5:1Hz)"}
+          label={"数据更新速率"}
           name={["baseConfig", "dataUpdateRate"]}
           rules={[{required: true, message: "请输入数据更新速率"}]}
         >
-          <InputNumber min={0} precision={0}/>
+          <Select>
+            <Select.Option key={0} value={0}>1000Hz</Select.Option>
+            <Select.Option key={1} value={1}>500Hz</Select.Option>
+            <Select.Option key={2} value={2}>200Hz</Select.Option>
+            <Select.Option key={3} value={3}>100Hz</Select.Option>
+            <Select.Option key={4} value={4}>10Hz</Select.Option>
+            <Select.Option key={5} value={5}>1Hz</Select.Option>
+          </Select>
+          {/*<InputNumber min={0} precision={0}/>*/}
         </Form.Item>
       </Col>
       {/*<Col className="gutter-row" span={6}>*/}
@@ -419,17 +451,18 @@ export const MICSignalsParsingForm = () => {
                               rules={[{required: true, message: '请输入帧编号'}]}>
                     <InputNumber min={0} precision={0}/>
                   </Form.Item>
-                  <Form.Item  {...restField} name={[name, 'modadd']} label={"MODADD"}
+                  <Form.Item  {...restField} name={[name, 'modadd']} label={"MOD地址"}
                               rules={[{required: true, message: '请输入MODADD'}]}>
                     <InputNumber min={0} precision={0}/>
                   </Form.Item>
-                  <Form.Item  {...restField} name={[name, 'devid']} label={"DEVID"}
-                              rules={[{required: true, message: '请输入DEVID'}]}
+                  <Form.Item  {...restField} name={[name, 'devid']} label={"Devices"}
+                              rules={[{required: true, message: '请选择设备'}]}
                   >
-                    <InputNumber min={0} precision={0}
-                                 style={{
-                                   width: '200px'
-                                 }}
+                    <Checkbox.Group
+                      options={Array.from({length: 32}, (_, i) => ({
+                        label: `设备${i + 1}`, // 设备1代表最大位
+                        value: i + 1    // 32位的值，从最大位到最小位
+                      }))}
                     />
                   </Form.Item>
                   <MinusCircleOutlined onClick={() => remove(name)}/>
@@ -483,8 +516,13 @@ export const B1552BSignalParsingForm = () => {
                   <InputNumber min={0} precision={0}/>
                 </Form.Item>
                 <Form.Item  {...restField} name={[name, 'childAddress']} label={"子地址"}
-                            rules={[{required: true, message: '请输入子地址'}]}>
-                  <InputNumber min={0} precision={0}/>
+                            rules={[{required: true, message: '请选择字地址'}]}>
+                  <Checkbox.Group
+                    options={Array.from({length: 32}, (_, i) => ({
+                      label: `设备${i + 1}`, // 设备1代表最大位
+                      value: i + 1    // 32位的值，从最大位到最小位
+                    }))}
+                  />
                 </Form.Item>
                 <MinusCircleOutlined onClick={() => remove(name)}/>
                 <Form.Item>

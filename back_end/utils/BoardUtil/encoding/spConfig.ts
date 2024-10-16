@@ -87,7 +87,7 @@ const getFlexraySpConfig = (protocol: IPro) => {
   protocol.protocol.signalsParsingConfig.forEach(spConfig => {
     let a: Buffer = Buffer.from(middleHeader)
     const tNull = 0x00
-    a = Buffer.concat([a, Buffer.from([Number(spConfig.frameNumber), Number(spConfig.frameId), tNull,Number(spConfig.cycleNumber), Number(spConfig.signals.length)])])
+    a = Buffer.concat([a, Buffer.from([Number(spConfig.frameNumber), Number(spConfig.frameId), tNull, Number(spConfig.cycleNumber), Number(spConfig.signals.length)])])
 
     const collectType = getCollectType(protocol)
     const collectCategory = getBusCategory(protocol)
@@ -163,7 +163,8 @@ const getMICSpConfig = (protocol: IPro) => {
 
     const frameNumber = transferTo8(Number(spConfig.frameNumber))
     const modadd = transferTo8(spConfig.modadd!)
-    const devSelect = transferTo32(spConfig.devId!)
+    // const devSelect = transferTo32(spConfig.devId!)
+    const devSelect = transferDevAndChildAdd(spConfig.devId!)
 
     a = Buffer.concat([a, frameNumber, modadd, devSelect, Buffer.from([Number(spConfig.signals.length)])])
 
@@ -204,9 +205,10 @@ const getB1552BSpConfig = (protocol: IPro) => {
 
     const frameNumber = transferTo8(Number(spConfig.frameNumber))
     const rtAddress = transferTo8(spConfig.rtAddress!)
-    const devSelect = transferTo32(spConfig.devId!)
+    // const devSelect = transferTo32(spConfig.devId!)
+    const childAddress = transferDevAndChildAdd(spConfig.childAddress!)
 
-    a = Buffer.concat([a, frameNumber, rtAddress, devSelect, Buffer.from([Number(spConfig.signals.length)])])
+    a = Buffer.concat([a, frameNumber, rtAddress, childAddress, Buffer.from([Number(spConfig.signals.length)])])
 
     const collectType = getCollectType(protocol)
     const collectCategory = getBusCategory(protocol)
@@ -323,3 +325,21 @@ const getDigitalSpConfig = (protocol: IPro) => {
     signalsMap: signalsMap
   }
 }
+export const transferDevAndChildAdd = (values: number[]) => {
+  const calculateResult = (start: number, end: number) => {
+    let result = 0;
+    for (let i = start; i <= end; i++) {
+      if (!values.includes(i)) continue;
+      const offset = end - i;
+      result |= (1 << offset);
+    }
+    return result;
+  };
+
+  const result1 = calculateResult(1, 8);
+  const result2 = calculateResult(9, 16);
+  const result3 = calculateResult(17, 24);
+  const result4 = calculateResult(25, 32);
+
+  return Buffer.concat([transferTo8(result1), transferTo8(result2), transferTo8(result3), transferTo8(result4)]);
+};

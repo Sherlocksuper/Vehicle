@@ -73,9 +73,9 @@ export interface IProtocol {
     frameId: string,
     cycleNumber?: number
     modadd?: number
-    devId?: number
+    devId?: number[]
     rtAddress?: number
-    childAddress?: number
+    childAddress?: number[]
     signals: IProtocolSignal[]
   }[]
 }

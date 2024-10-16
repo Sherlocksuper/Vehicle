@@ -4,6 +4,7 @@ import {FAIL_CODE} from "@/constants";
 import {deleteProtocolApi, getProtocols, IProtocol, ProtocolType} from "@/apis/request/protocol.ts";
 import {ProtocolModel} from "@/views/demo/ProtocolTable/protocols.tsx";
 import Search from "antd/es/input/Search";
+import {confirmDelete} from "@/utils";
 
 
 const ProtocolTable = () => {
@@ -74,7 +75,7 @@ const ProtocolTable = () => {
     };
 
     const deleteProtocol = (id: number) => {
-        confirm() && deleteProtocolApi(id).then(res => {
+        confirmDelete() && deleteProtocolApi(id).then(res => {
             if (res.code === FAIL_CODE) {
                 message.error(res.msg);
             } else {
