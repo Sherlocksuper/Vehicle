@@ -329,7 +329,7 @@ export const transferDevAndChildAdd = (values: number[]) => {
   const calculateResult = (start: number, end: number) => {
     let result = 0;
     for (let i = start; i <= end; i++) {
-      if (!values.includes(i)) continue;
+      if (!(values?.includes(i))) continue;
       const offset = end - i;
       result |= (1 << offset);
     }

@@ -41,6 +41,10 @@ export interface IProtocolSignal {
   offset: string
   birth: string
   dataArr?: number[]  // 第一个值是最大值，第二个值是平均值，第三个值是最小值
+  totalDataArr?: {
+    time: number,
+    value: number
+  }[]
 }
 
 export const CanBaseConfig = () => {

@@ -1,9 +1,10 @@
-import {Button, Card, Descriptions, Input, message, Modal, Row, Slider, Space, Typography, Upload, UploadProps} from "antd";
+import {Button, Card, Descriptions, Input, message, Modal, Slider, Space, Typography, Upload, UploadProps} from "antd";
 import React, {useEffect, useState} from "react";
 import {IHistory} from "@/apis/standard/history.ts";
 import {InboxOutlined} from "@ant-design/icons";
 import {debounce, formatFileSize, formatTime} from "@/utils";
-import {getExportFileWorker, getFileToHistoryWorker, getHistoryToData, getHistoryToFileWorker} from "@/worker/app.ts";
+import {getExportFileWorker, getFileToHistoryWorker, getHistoryToData, getSearchHistoryWorker} from "@/worker/app.ts";
+import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 
 const {Title, Text} = Typography;
 
@@ -27,9 +28,9 @@ const OfflineDate = () => {
           if (res.ok) {
             const data = await res.json();
             // 将JSON数据转换为Blob对象
-            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
             // 创建一个File对象
-            const file = new File([blob], 'filename.json', { type: 'application/json' });
+            const file = new File([blob], 'filename.json', {type: 'application/json'});
             manageTargetFile(file)
           } else {
             console.error('Failed to fetch the file:', res.status);
@@ -175,6 +176,7 @@ const OfflineDate = () => {
           }}/>
           <ShowHistoryDataParsing history={history}/>
           <Button onClick={() => exportForMatFile()}> 导出格式化文件 </Button>
+          <DetailSearch history={history}/>
         </Space>
       </>
     }
@@ -269,7 +271,7 @@ const ShowHistoryDataParsing = ({history}: { history: IHistory }) => {
            width={"80%"}
     >
       {
-        history.dataParseResult!.map((item, index) => {
+        open && history.dataParseResult!.map((item, index) => {
           // 计算最大值、最小值和平均值
           const max = item.dataArr[0];
           const min = item.dataArr[1];
@@ -285,6 +287,126 @@ const ShowHistoryDataParsing = ({history}: { history: IHistory }) => {
           );
         })
       }
+    </Modal>
+  </>
+}
+
+const DetailSearch = ({history}: { history: IHistory }) => {
+  const [open, setOpen] = useState(false)
+  const [result, setResult] = useState<IProtocolSignal[]>([])
+
+  const [targetName, setTargetName] = useState("")
+  const [targetPeriod, setTargetPeriod] = useState<number[]>([history.startTime, history.endTime])
+
+  const [targetSignal, setTargetSignal] = useState<IProtocolSignal>(undefined)
+
+  const debounceSetPeriod = debounce((value) => {
+    setTargetPeriod(value as number[])
+  })
+
+  const startSearch = () => {
+    message.loading("正在检索数据")
+    const worker = getSearchHistoryWorker()
+    worker.onmessage = (e) => {
+      const result = e.data as IProtocolSignal[]
+      setResult(result)
+      console.log(result)
+      message.destroy()
+    }
+    worker.postMessage({
+      history: history,
+      searchName: targetName,
+      startTime: targetPeriod[0],
+      endTime: targetPeriod[1]
+    })
+  }
+
+  return <>
+    <Button onClick={() => {
+      setOpen(true)
+    }}>
+      查询历史数据
+    </Button>
+    <Modal open={open}
+           onCancel={() => {
+             setOpen(false)
+           }}
+           onOk={() => {
+             if (!targetName) {
+               message.error("请输入信号名称")
+               return;
+             }
+             startSearch()
+           }}
+           okText={"开始搜索"}
+           cancelText={"取消"}
+    >
+      <Space>
+        输入搜索名称:<Input onChange={(e) => {
+        setTargetName(e.target.value)
+      }}/>
+      </Space>
+      <div style={{
+        marginTop: 20
+      }}>
+        拖动选择搜索时间:
+        <Slider range
+                defaultValue={[history.startTime, history.endTime]}
+                min={history.startTime}
+                max={history.endTime}
+                tooltip={{
+                  formatter: (value: number | number[] | undefined) => {
+                    if (typeof value === 'number') {
+                      return <div>{formatTime(value)}</div>;
+                    } else if (Array.isArray(value)) {
+                      return <div>{formatTime(value[0])} - {formatTime(value[1])}</div>
+                    }
+                    return null;
+                  }
+                }}
+                onChange={(value) => {
+                  debounceSetPeriod(value)
+                }}/>
+      </div>
+      <div>
+        <p style={{}}>
+          搜索到的结果：
+        </p>
+        <p style={{
+          fontSize: 10,
+          marginBottom: 20,
+          color: "grey"
+        }}>
+          (点击对应信号查看结果)
+        </p>
+        {
+          result.map((signal, index) => {
+            return <div style={{display: "flex", justifyItems: "center",}}>
+              <p style={{display: "inline"}} onClick={() => {
+                setTargetSignal(signal)
+              }}>{`${index + 1}: ${signal.name}`}</p>
+            </div>
+          })
+        }
+      </div>
+      <Modal
+        open={targetSignal !== undefined}
+        onCancel={() => {
+          setTargetSignal(undefined)
+        }}
+        onOk={() => {
+          setTargetSignal(undefined)
+        }}
+        title={`${targetSignal?.name ?? ""}(${targetSignal?.dimension ?? ""})`}
+      >
+        {
+          (targetSignal?.totalDataArr ?? []).map(data => {
+            return <div>
+              <p>{`时间:${(new Date(data.time)).toLocaleString()}:       值:${data.value}`}</p>
+            </div>
+          })
+        }
+      </Modal>
     </Modal>
   </>
 }
