@@ -328,6 +328,7 @@ const getDigitalSpConfig = (protocol: IPro) => {
   }
 }
 export const transferDevAndChildAdd = (values: number[]) => {
+  if (!values) values = []
   const calculateResult = (start: number, end: number) => {
     let result = 0;
     for (let i = start; i <= end; i++) {

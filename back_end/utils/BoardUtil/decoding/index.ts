@@ -81,12 +81,11 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
     // 第9、10个信号是03的二进制1-2位置，都是0
     const values = [];
     for (let i = 0; i < 8; i++) {
-      values.push((signalsPart[0] & (1 << i)) === 0 ? 0 : 1);
+      values.push((signalsPart[0] & (1 << (7 - i))) === 0 ? 0 : 1);
     }
     for (let i = 0; i < 2; i++) {
-      values.push((signalsPart[1] & (1 << i)) === 0 ? 0 : 1);
+      values.push((signalsPart[1] & (1 << (1 - i))) === 0 ? 0 : 1);
     }
-    console.log(values)
     result.signals = values.map((value, index) => {
       return {
         signalId: index,
@@ -167,7 +166,7 @@ const getFrameId = (buffer: Buffer): number => {
   const type = getCollectItemFromId(buffer[3])!
   switch (type) {
     case ProtocolType.FlexRay:
-      return buffer[10] << 8 | buffer[11]
+      return buffer[12] << 8 | buffer[13]
     case ProtocolType.CAN:
       return buffer[10] << 24 | buffer[11] << 16 | buffer[12] << 8 | buffer[13]
     case ProtocolType.MIC:

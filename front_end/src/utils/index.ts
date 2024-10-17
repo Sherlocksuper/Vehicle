@@ -142,9 +142,9 @@ export const wrapData = (history: IHistory) => {
   const usedSignals: IProtocolSignal[] = getUsedSignals(history)
 
   const wrapHeader = (history: IHistory, bodySize: number) => {
-    const version = history.testConfig.dataWrap.version
-    const equipmentType = history.testConfig.dataWrap.equipmentType
-    const equipmentId = history.testConfig.dataWrap.equipmentId
+    const version = history.testConfig.dataWrap.version ?? "未定义"
+    const equipmentType = history.testConfig.dataWrap.equipmentType ?? "未定义"
+    const equipmentId = history.testConfig.dataWrap.equipmentId ?? "未定义"
     let dataLength = 0 // 初始化dataLength
 
     let dataStat = ''

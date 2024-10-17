@@ -192,7 +192,17 @@ class TestConfigService {
     const res = getConfigBoardMessage(testConfig!)
     const hostPortList = await this.getHostPortList(testConfig)
 
+    // 解析下发的配置，获取需要下发的信息、信号的映射
+    this.resultMessages = res.resultMessages
+    this.signalsMappingRelation = res.signalsMap
+    this.banMessage = res.banMessages
+    this.currentTestConfig = testConfig
+    await this.storeCurrentConfigToSql(testConfig!)
+    await this.setTestConfigSignalMapping(testConfig!)
+    await this.getSpecialDigitalKeyList(testConfig!)
+
     // TODO 连接下位机并且发送消息,调试的时候没有下位机所以注释掉，使用startMock
+    // 下发逻辑放到后面，因为要等到所有的数据都准备好了才能下发,并且如果失败、停止下发的时候比较Ok
     try {
       await connectWithMultipleBoards(hostPortList, 0)
     } catch (e) {
@@ -206,14 +216,6 @@ class TestConfigService {
       return false
     }
 
-    // 解析下发的配置，获取需要下发的信息、信号的映射
-    this.resultMessages = res.resultMessages
-    this.signalsMappingRelation = res.signalsMap
-    this.banMessage = res.banMessages
-    this.currentTestConfig = testConfig
-    await this.storeCurrentConfigToSql(testConfig!)
-    await this.setTestConfigSignalMapping(testConfig!)
-    await this.getSpecialDigitalKeyList(testConfig!)
 
     // TODO 模拟数据
     // startMockBoardMessage(this.signalsMappingRelation)
@@ -318,7 +320,7 @@ class TestConfigService {
 
       const fileSize = fs.statSync(targetPath)
 
-      console.log("车辆名称",this.currentTestConfig?.configs[0].vehicle.vehicleName)
+      console.log("车辆名称", this.currentTestConfig?.configs[0].vehicle.vehicleName)
 
       await historyService.addHistory({
         fatherConfigName: this.currentTestConfig?.name ?? "默认名称",

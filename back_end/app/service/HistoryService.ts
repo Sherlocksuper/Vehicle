@@ -20,8 +20,10 @@ export default class HistoryService {
             }
         })
 
-        // 删除deleteFile.path
-        fs.unlinkSync(deleteFile!.path)
+        const exist = fs.existsSync(deleteFile!.path)
+        if (exist){
+            fs.unlinkSync(deleteFile!.path)
+        }
 
         const res = await HistoryModel.destroy({
             where: {
