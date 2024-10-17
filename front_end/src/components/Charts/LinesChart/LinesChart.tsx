@@ -38,7 +38,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
   const dataRef = useRef<ISeries[]>(requestSignals.map((item, index) => {
     return {
       id: item.id,
-      name: item.name + ' ' + item.name + ' ' + item.name,
+      name: item.name,
       type: 'line',
       symbol: 'none',
       data: []

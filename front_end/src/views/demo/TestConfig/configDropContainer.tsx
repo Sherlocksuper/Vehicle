@@ -130,6 +130,7 @@ const UpdateItemModal: React.FC<{
   const handleUpdate = () => {
     console.log(itemConfig)
     const newConfig = form.getFieldsValue()
+    console.log(newConfig)
     newConfig.requestSignals = newConfig.requestSignals.map((signal: string) => {
       return JSON.parse(signal)
     })
@@ -176,14 +177,14 @@ const UpdateItemModal: React.FC<{
         </Form.Item>
         {
           item.type === DragItemType.LINES && (
-            <>
-              <Form.Item label="滤波窗口长度" name="windowSize" initialValue={0}>
-                <Input type={"number"} defaultValue={0}/>
-                <p style={{fontSize: 12, color: "grey"}}>
-                  滤波窗口长度为奇数,若为偶数则自动加一,0为不设置滤波
-                </p>
-              </Form.Item>
-            </>
+            <Form.Item label="滤波窗口长度" name="windowSize" initialValue={0}
+                       extra={
+                         <Tooltip title={"滤波窗口长度为奇数"}>
+                           <QuestionCircleOutlined/>
+                         </Tooltip>
+                       }>
+              <Input type={"number"} defaultValue={0}/>
+            </Form.Item>
           )
         }
         {

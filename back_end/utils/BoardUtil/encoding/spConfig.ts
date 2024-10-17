@@ -87,7 +87,9 @@ const getFlexraySpConfig = (protocol: IPro) => {
   protocol.protocol.signalsParsingConfig.forEach(spConfig => {
     let a: Buffer = Buffer.from(middleHeader)
     const tNull = 0x00
-    a = Buffer.concat([a, Buffer.from([Number(spConfig.frameNumber), Number(spConfig.frameId), tNull, Number(spConfig.cycleNumber), Number(spConfig.signals.length)])])
+    const frameNumber = transferTo8(Number(spConfig.frameNumber))
+    const frameId = transferTo16(Number(spConfig.frameId))
+    a = Buffer.concat([a, frameNumber, frameId, Buffer.from([tNull, Number(spConfig.cycleNumber), Number(spConfig.signals.length)])])
 
     const collectType = getCollectType(protocol)
     const collectCategory = getBusCategory(protocol)

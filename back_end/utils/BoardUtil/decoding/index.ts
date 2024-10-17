@@ -75,7 +75,7 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   )
 
   if (TestConfigService.digitalKeyList.includes(key)) {
-    console.log("is Digital Key")
+    console.log("is Digital Key", signalsPart)
     // 第1-8个信号分别是第1-8位置，第9、10个信号是第9、10位置
     // 比如ff 03,第1-8个信号是ff的二进制1-8位置，都是1
     // 第9、10个信号是03的二进制1-2位置，都是0
@@ -86,6 +86,7 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
     for (let i = 0; i < 2; i++) {
       values.push((signalsPart[1] & (1 << i)) === 0 ? 0 : 1);
     }
+    console.log(values)
     result.signals = values.map((value, index) => {
       return {
         signalId: index,

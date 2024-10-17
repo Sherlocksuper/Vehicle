@@ -292,6 +292,10 @@ const ShowHistoryDataParsing = ({history}: { history: IHistory }) => {
 }
 
 const DetailSearch = ({history}: { history: IHistory }) => {
+  const itemHeight = 30
+  const containerHigh = 500
+  const [scrollTop, setScrollTop] = useState(0)
+
   const [open, setOpen] = useState(false)
   const [result, setResult] = useState<IProtocolSignal[]>([])
 
@@ -319,6 +323,36 @@ const DetailSearch = ({history}: { history: IHistory }) => {
       startTime: targetPeriod[0],
       endTime: targetPeriod[1]
     })
+  }
+
+  // 获取虚拟列表
+  const getVirtualList = (scrollTop: number) => {
+    if (targetSignal === undefined) {
+      return []
+    }
+
+    const virtualList = []
+
+    const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - 5)
+    const endIndex = Math.min(targetSignal.totalDataArr.length - 1, startIndex + Math.floor(containerHigh / itemHeight) + 5)
+    for (let i = startIndex; i < endIndex; i++) {
+      const data = targetSignal.totalDataArr[i]
+      data && virtualList.push(
+        <div
+          key={i + startIndex}
+          style={{
+            position: "relative",
+            display: "flex",
+            justifyContent: "space-between",
+            height: itemHeight,
+          }}>
+          <p style={{display: "inline", marginRight: 30}}>{`${(new Date(data.time)).toLocaleString()}`}</p>
+          <p style={{display: "inline"}}>{`${data.value}`}</p>
+        </div>
+      )
+    }
+
+    return virtualList
   }
 
   return <>
@@ -372,11 +406,7 @@ const DetailSearch = ({history}: { history: IHistory }) => {
         <p style={{}}>
           搜索到的结果：
         </p>
-        <p style={{
-          fontSize: 10,
-          marginBottom: 20,
-          color: "grey"
-        }}>
+        <p style={{fontSize: 10, marginBottom: 20, color: "grey"}}>
           (点击对应信号查看结果)
         </p>
         {
@@ -398,14 +428,21 @@ const DetailSearch = ({history}: { history: IHistory }) => {
           setTargetSignal(undefined)
         }}
         title={`${targetSignal?.name ?? ""}(${targetSignal?.dimension ?? ""})`}
-      >
-        {
-          (targetSignal?.totalDataArr ?? []).map(data => {
-            return <div>
-              <p>{`时间:${(new Date(data.time)).toLocaleString()}:       值:${data.value}`}</p>
+        height={containerHigh}
+        styles={{body: {maxHeight: containerHigh}}}
+        style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+
+        <div style={{overflowY: "scroll", padding: 20, border: "1px solid #f0f0f0", height: containerHigh}}
+             onScroll={(e) => {
+               const currentScrollTop = e.currentTarget.scrollTop
+               setScrollTop(currentScrollTop)
+             }}>
+          <div style={{height: itemHeight * targetSignal?.totalDataArr.length}}>
+            <div style={{transform: `translateY(${Math.floor(scrollTop / itemHeight) * itemHeight}px)`,}}>
+              {getVirtualList(scrollTop)}
             </div>
-          })
-        }
+          </div>
+        </div>
       </Modal>
     </Modal>
   </>

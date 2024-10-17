@@ -43,6 +43,7 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
         const datas = splitBufferByDelimiter(data, Buffer.from([0xcd, 0xef]));
         const messages: IReceiveData[] = []
         datas.forEach((item) => {
+          console.log(item)
           if (item[0] === 0xcd && item[1] === 0xef && item[2] === 0x03 && item[3] === 0x18) {
 
           } else {
