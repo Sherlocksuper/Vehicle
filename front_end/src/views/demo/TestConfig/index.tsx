@@ -374,6 +374,7 @@ export const TestUnitManage: React.FC<{
   }, [initValue])
 
   const updateTestConfigApi = async () => {
+    let index = 1
     const result: ITestConfig = {
       id: initValue.id,
       name: initValue.name,
@@ -388,8 +389,7 @@ export const TestUnitManage: React.FC<{
                   spConfig.signals = spConfig.signals.map(signal => {
                     return {
                       ...signal,
-                      // 更新采集单元
-                      id: uuid()
+                      id: String(index++),
                     }
                   })
                   return spConfig
@@ -558,19 +558,19 @@ export const CollectItemManage: React.FC<{
   }
 
   const assignForEachProtocolSignal = () => {
-    const result = projects
-    result.forEach((project) => {
-      project.indicators.forEach((indicator) => {
-        if (indicator.signal === undefined) {
-          indicator.signal = {
-            ...indicator.signal,
-            // 数据采集项
-            id: uuid()
-          }
-        }
-      })
-    })
-    return result
+    // const result = projects
+    // let index = 1
+    // result.forEach((project) => {
+    //   project.indicators.forEach((indicator) => {
+    //     if (indicator.signal === undefined) {
+    //       indicator.signal = {
+    //         ...indicator.signal,
+    //       }
+    //     }
+    //   })
+    // })
+    // return result
+    return projects
   }
 
   // 一键导入所有

@@ -1,5 +1,6 @@
 import HistoryModel, {IRecordHistory} from "../model/History.model";
 import * as fs from "fs";
+import path from "node:path";
 
 
 export default class HistoryService {
@@ -20,9 +21,10 @@ export default class HistoryService {
             }
         })
 
-        const exist = fs.existsSync(deleteFile!.path)
+        const absolutePath = path.join(__dirname, '..', 'public', deleteFile!.path)
+        const exist = fs.existsSync(absolutePath)
         if (exist){
-            fs.unlinkSync(deleteFile!.path)
+            fs.unlinkSync(absolutePath)
         }
 
         const res = await HistoryModel.destroy({

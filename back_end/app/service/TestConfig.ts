@@ -241,12 +241,13 @@ class TestConfigService {
     this.currentTestConfig = null
     this.signalsMappingRelation.clear()
     this.currentTestConfigReceiveData = []
+    this.currentTestConfigHistoryData = []
     this.resultMessages = []
     this.banMessage = []
-    disconnectWithBoard()
-    await this.deleteCurrentConfigFromSql()
     this.signalsIdNameMap.clear()
     this.digitalKeyList = []
+    await this.deleteCurrentConfigFromSql()
+    disconnectWithBoard()
   }
 
   async storeCurrentConfigToSql(config: ITestConfig) {
