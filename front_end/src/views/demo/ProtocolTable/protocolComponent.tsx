@@ -363,9 +363,9 @@ export const CanSignalsParsingForm = () => (
           <Space key={key} style={{display: 'flex', flexDirection: 'column'}} align="baseline">
             <Space key={key} style={{display: 'flex'}} align="baseline">
               <Form.Item label={"帧编号"} {...restField} name={[name, 'frameNumber']}
-                         initialValue={(name + 1).toString(16)}
+                         initialValue={(name).toString(16)}
                          rules={[{required: true, message: '请输入帧编号'}]}>
-                <InputNumber min={0} precision={0}/>
+                <InputNumber min={0} precision={0} disabled={true}/>
               </Form.Item>
               <Form.Item label={"帧ID"} {...restField} name={[name, 'frameId']}
                          rules={[{required: true, message: '请输入帧ID'}]}>

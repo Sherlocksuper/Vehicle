@@ -1,10 +1,12 @@
-import {Button, Input, message, Modal, Space, Table} from "antd";
-import {IController} from "../PhyTopology.tsx";
+import {Button, Descriptions, Input, message, Modal, Space, Table, Tag} from "antd";
+import {ICollector, IController} from "../PhyTopology.tsx";
 import {NOT_ON_USED, ENABLE, ON_USED, USED_INFO, DISABLE} from "@/constants/board.ts";
 import {deleteController, updateController} from "@/apis/request/board-signal/controller.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {confirmDelete} from "@/utils";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
+import {IProtocol} from "@/apis/request/protocol.ts";
+import {ProtocolModel} from "@/views/demo/ProtocolTable/protocols.tsx";
 
 const ControllerInfoTable: React.FC<{
   dataSource: IController[],
@@ -134,3 +136,21 @@ const ControllerEditModal: React.FC<{
     </div>
   </Modal>
 }
+
+
+export const ControllerDetailModal = ({controller, onClose}: { controller: IController, onClose: () => void }) => {
+
+  return (
+    <Modal width={800} title="采集板卡信息" open={controller !== undefined} onOk={() => {
+      onClose()
+    }} onCancel={() => {
+      onClose()
+    }}>
+      <Descriptions bordered>
+        <Descriptions.Item label="采集板卡代号">{controller?.controllerName}</Descriptions.Item>
+        <Descriptions.Item label="采集板卡地址">{controller?.controllerAddress}</Descriptions.Item>
+      </Descriptions>
+    </Modal>
+  )
+}
+

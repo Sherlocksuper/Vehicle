@@ -21,6 +21,7 @@ const columns: TableProps<IHistoryList>['columns'] = [
     title: "ID",
     dataIndex: "id",
     key: "id",
+    sorter: (a, b) => a.id - b.id,
   },
   {
     title: "所属配置名称",

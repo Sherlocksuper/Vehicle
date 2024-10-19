@@ -2,7 +2,6 @@ import net from "node:net";
 import {decodingBoardMessage, decodingBoardMessageWithMap, IReceiveData, splitBufferByDelimiter} from "../../utils/BoardUtil/decoding";
 import {IFrontMessage, sendMessageToFront} from "./toFront";
 import TestConfigService from "../service/TestConfig";
-import {getSignalMapKey} from "../../utils/BoardUtil/encoding/spConfig";
 
 let client: net.Socket;
 let reconnectInterval = 5000; // 重连间隔 5 秒
@@ -44,11 +43,7 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
         const messages: IReceiveData[] = []
         datas.forEach((item) => {
           console.log(item)
-          if (item[0] === 0xcd && item[1] === 0xef && item[2] === 0x03 && item[3] === 0x18) {
-
-          } else {
-            messages.push(decodingBoardMessage(item))
-          }
+          messages.push(decodingBoardMessage(item))
         })
 
         // TODO 调试专用
@@ -56,22 +51,28 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
         // const message0 = messages[0];
         // console.log(getSignalMapKey(message0.moduleId, message0.frameId, message0.busType, message0.collectType))
         // console.log(TestConfigService.signalsMappingRelation)
-        const result = decodingBoardMessageWithMap(messages[0]);
-        TestConfigService.pushReceiveData(messages);
+        const resolveMessage = (message: IReceiveData) => {
+          const result = decodingBoardMessageWithMap(message);
+          TestConfigService.pushReceiveData(messages);
 
-        console.log("decodingBoardMessageWith Map result ", result);
-        const msg = mapToJson(result);
+          console.log("decodingBoardMessageWith Map result ", result);
+          const msg = mapToJson(result);
 
-        TestConfigService.currentTestConfigHistoryData.push({
-          time: new Date().getTime(),
-          data: JSON.parse(msg)
-        });
+          TestConfigService.currentTestConfigHistoryData.push({
+            time: new Date().getTime(),
+            data: JSON.parse(msg)
+          });
 
-        // 发送消息给前端
-        sendMessageToFront({
-          type: 'DATA',
-          message: mapToJson(result)
-        });
+          // 发送消息给前端
+          sendMessageToFront({
+            type: 'DATA',
+            message: mapToJson(result)
+          });
+        }
+
+        messages.forEach((message) => {
+          resolveMessage(message)
+        })
       } catch (e) {
         console.log("这里出错了")
       }

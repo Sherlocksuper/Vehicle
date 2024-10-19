@@ -1,5 +1,5 @@
 import {Button, Card, Form, Input, message, Modal, Row, Select, Space, Table, TableProps} from "antd";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {FAIL_CODE, SUCCESS_CODE} from "@/constants";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import {createTestConfig, deleteTestConfig, downTestConfig, getCurrentTestConfig, getTestConfigs, stopCurrentTestConfig, updateTestConfigById} from "@/apis/request/testConfig.ts";
@@ -10,6 +10,9 @@ import {ICollectUnit} from "@/apis/standard/collectUnit.ts";
 import {v4 as uuid} from "uuid";
 import {DeleteOutlined, PlusOutlined} from "@ant-design/icons";
 import {CollectUnitEdit} from "@/views/demo/CollectUnit/collectUnit.tsx";
+import {ICollector, IController} from "@/views/demo/Topology/PhyTopology.tsx";
+import {CollectorDetailModal} from "@/views/demo/Topology/CollectorInfoTable";
+import {ControllerDetailModal} from "@/views/demo/Topology/ControllerInfoTabl";
 
 enum TaskStep {
   CREATE = "CREATE",
@@ -116,6 +119,7 @@ const TestConfig = () => {
       title: 'id',
       dataIndex: 'id',
       key: 'id',
+      sorter: (a, b) => a.id - b.id,
     },
     {
       title: '测试任务名称',
@@ -348,6 +352,9 @@ export const TestUnitManage: React.FC<{
   const [selectUnits, setSelectUnits] = React.useState<ICollectUnit[]>([])
   const [addUnitOpen, setAddUnitOpen] = React.useState<boolean>(false)
 
+  const [showCoreBoard, setShowCoreBoard] = useState<IController>(undefined)
+  const [showCollectBoard, setShowCollectBoard] = useState<ICollector>(undefined)
+
   useEffect(() => {
     if (initValue !== undefined) {
       form.setFieldsValue(initValue)
@@ -441,13 +448,15 @@ export const TestUnitManage: React.FC<{
                            }))
                          }}>删除</Button>}
             >
-              <Space>
-                <span>核心板卡：{unit.core.controllerName}</span>
-                <span>采集器：{
+              <Space direction={"vertical"}>
+                <p>核心板卡:</p>
+                <a onClick={() => setShowCoreBoard(unit.core)}>{unit.core.controllerName}</a>
+                <p>采集器:</p>
+                {
                   unit.collectors.map((collector) => {
-                    return collector.collectorName
-                  }).join("，")
-                }</span>
+                    return <a onClick={() => setShowCollectBoard(collector)}> {`${collector.collectorName},`}</a>
+                  })
+                }
               </Space>
             </Card>
           })
@@ -468,6 +477,12 @@ export const TestUnitManage: React.FC<{
             setAddUnitOpen(false)
           }
         }/>
+        <CollectorDetailModal collector={showCollectBoard} onClose={() => {
+          setShowCollectBoard(undefined)
+        }}/>
+        <ControllerDetailModal controller={showCoreBoard} onClose={() => {
+          setShowCoreBoard(undefined)
+        }}/>
       </Modal>
     </>
   );

@@ -2,7 +2,7 @@ import {Button, Card, Descriptions, Input, message, Modal, Select, Space, Table,
 import React, {useEffect} from "react";
 import {FAIL_CODE} from "@/constants";
 import {confirmDelete} from "@/utils";
-import {createCollectUnit, deleteCollectUnit, getCollectUnits, updateCollectUnit} from "@/apis/request/collectUnit.ts";
+import {deleteCollectUnit, getCollectUnits} from "@/apis/request/collectUnit.ts";
 import {ICollectUnit} from "@/apis/standard/collectUnit.ts";
 import {getActiveControllerList} from "@/apis/request/board-signal/controller.ts";
 import {getActiveCollectorList} from "@/apis/request/board-signal/collector.ts";
@@ -137,7 +137,7 @@ const CollectUnitPage = () => {
   )
 }
 
-const CollectUnitDetail = ({collectUnit, onClose}: { collectUnit?: ICollectUnit, onClose: () => void }) => {
+export const CollectUnitDetail = ({collectUnit, onClose}: { collectUnit?: ICollectUnit, onClose: () => void }) => {
   return <Modal open={collectUnit !== undefined}
                 onCancel={onClose}
                 onOk={onClose}>
