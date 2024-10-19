@@ -381,6 +381,7 @@ export const TestUnitManage: React.FC<{
                   spConfig.signals = spConfig.signals.map(signal => {
                     return {
                       ...signal,
+                      // 更新采集单元
                       id: uuid()
                     }
                   })
@@ -394,12 +395,15 @@ export const TestUnitManage: React.FC<{
                 }
               })
             })
-          }).flat(3)
+          }).flat(3),
         },
         projects: []
       }],
       dataWrap: initValue.dataWrap,
-      template: undefined
+      template: {
+        ...initValue.template,
+        itemsConfig: []
+      }
     }
 
     updateTestConfigById(result.id, result).then((res) => {
@@ -429,8 +433,8 @@ export const TestUnitManage: React.FC<{
         cancelText="取消"
       >
         {
-          selectUnits.map((unit) => {
-            return <Card title={unit.collectUnitName} key={uuid()} style={{marginBottom: "20px"}}
+          selectUnits.map((unit, index) => {
+            return <Card title={unit.collectUnitName} key={index} style={{marginBottom: "20px"}}
                          extra={<Button type="link" onClick={() => {
                            setSelectUnits(selectUnits.filter((value) => {
                              return value !== unit
@@ -545,6 +549,7 @@ export const CollectItemManage: React.FC<{
         if (indicator.signal === undefined) {
           indicator.signal = {
             ...indicator.signal,
+            // 数据采集项
             id: uuid()
           }
         }

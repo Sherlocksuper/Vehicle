@@ -153,7 +153,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       return "你确定要离开吗？";
     }
 
-    const socket = new WebSocket('http://localhost:8080/ws');
+    const socket = new WebSocket('http://192.168.1.88:8080/ws');
     socket.onopen = () => {
       socketRef.current = socket
     }
@@ -163,6 +163,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data)
+      console.log(message)
       if (message.type === "DATA") {
         updateDataRecorder(message.message)
       } else if (message.type === "NOTIFICATION") {

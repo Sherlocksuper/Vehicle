@@ -65,7 +65,7 @@ export const TEST_CONFIG_API = {
   startConnection :{
     // url: 'startConnection',
     // url: 'api/startConnection',
-    url: 'http://localhost:8080/startConnection',
+    url: '/startConnection',
     method: Method.GET,
   },
   //router.get('/downHistoryDataAsJson', TestConfigController.downHistoryDataAsJson);

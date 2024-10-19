@@ -3,7 +3,7 @@ import NumberGaugeChart from "@/components/Charts/NumberGaugeChart";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import React, {useEffect, useMemo, useRef} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import LinesChart from "@/components/Charts/LinesChart/LinesChart.tsx";
 import {DataSourceType} from "@/components/Charts/interface.ts";
 import {IHistory} from "@/apis/standard/history.ts";
@@ -116,7 +116,11 @@ const UpdateItemModal: React.FC<{
   const [form] = Form.useForm();
 
   const itemConfig = useMemo(() => item.itemConfig, [item])
-  const requestSignals = getAllProtocolSignalsFromTestConfig(testConfig)
+  const [requestSignals, setRequestSignals] = useState<IProtocolSignal[]>([])
+
+  useEffect(() => {
+    setRequestSignals(getAllProtocolSignalsFromTestConfig(testConfig))
+  }, [testConfig])
 
   const isSingleChart = (type: DragItemType) => !(type === DragItemType.LINES) && !(type === DragItemType.PURENUMBER)
 

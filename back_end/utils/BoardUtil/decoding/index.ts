@@ -149,7 +149,7 @@ const decodingOneSignal = (buffer: Buffer): IReceiveSignal => {
   const integer = buffer[2] << 12 | buffer[3] << 4 | buffer[4] >> 4;
   const decimal = (buffer[4] & 0x0f) << 8 | buffer[5];
   // 0表示正数，1表示负数
-  const value = integer + decimal / 1000 * (sign === 1 ? -1 : 1);
+  const value = (integer + decimal / 1000) * (sign === 1 ? -1 : 1);
 
   return {
     signalId,

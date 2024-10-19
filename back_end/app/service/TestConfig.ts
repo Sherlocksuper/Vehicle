@@ -194,6 +194,7 @@ class TestConfigService {
 
     // 解析下发的配置，获取需要下发的信息、信号的映射
     this.resultMessages = res.resultMessages
+    console.log(this.resultMessages)
     this.signalsMappingRelation = res.signalsMap
     this.banMessage = res.banMessages
     this.currentTestConfig = testConfig

@@ -328,6 +328,7 @@ const getDigitalSpConfig = (protocol: IPro) => {
   }
 }
 export const transferDevAndChildAdd = (values: number[]) => {
+  console.log(values)
   if (!values) values = []
   if (!Array.isArray(values)) values = Array.from(values)
   const calculateResult = (start: number, end: number) => {
@@ -340,10 +341,11 @@ export const transferDevAndChildAdd = (values: number[]) => {
     return result;
   };
 
-  const result1 = calculateResult(1, 8);
-  const result2 = calculateResult(9, 16);
-  const result3 = calculateResult(17, 24);
-  const result4 = calculateResult(25, 32);
+  const result1 = calculateResult(0, 7);
+  const result2 = calculateResult(8, 15);
+  const result3 = calculateResult(16, 23);
+  const result4 = calculateResult(24, 31);
+  console.log("transfer result", result1, result2, result3, result4)
 
   return Buffer.concat([transferTo8(result1), transferTo8(result2), transferTo8(result3), transferTo8(result4)]);
 };

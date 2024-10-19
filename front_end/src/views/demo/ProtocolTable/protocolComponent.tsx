@@ -52,11 +52,9 @@ export const CanBaseConfig = () => {
     <Form.Item
       name={["baseConfig", "baudRate"]}
       rules={[{required: true, message: "请输入波特率"}]} // 必填
-      label={"波特率"}
+      label={"波特率(k)"}
     >
-      <div style={{width: "100px"}}>
-        <HexInput/>
-      </div>
+      <InputNumber min={0} precision={0}/>
     </Form.Item>
   )
 }
@@ -251,7 +249,7 @@ export const Serial422BaseConfig = () => {
         <Form.Item
           name={["baseConfig", "baudRate"]}
           rules={[{required: true, message: "请输入波特率"}]}
-          label={"波特率"}
+          label={"波特率(k)"}
         >
           <InputNumber min={0} precision={0}/>
         </Form.Item>
@@ -459,7 +457,7 @@ export const MICSignalsParsingForm = () => {
                               rules={[{required: true, message: '请输入MODADD'}]}>
                     <InputNumber min={0} precision={0}/>
                   </Form.Item>
-                  <Form.Item  {...restField} name={[name, 'devid']} label={"Devices"}
+                  <Form.Item  {...restField} name={[name, 'devId']} label={"Devices"}
                               rules={[{required: true, message: '请选择设备'}]}
                   >
                     <Checkbox.Group

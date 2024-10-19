@@ -45,7 +45,9 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     }
   }))
 
+  // 中值滤波
   const medianFilter = (arr, windowSize) => {
+    if (!arr) return []
     const padSize = Math.floor(windowSize / 2);
     const paddedArr = [...Array(padSize).fill(arr[0]), ...arr, ...Array(padSize).fill(arr[arr.length - 1])];
     const result = [];
@@ -75,7 +77,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       requestSignals.forEach((item) => {
         dataRef.current.push({
           id: item.id,
-          name: (item.belongVehicle !== '' ? item.belongVehicle + '-' + item.name : item.name) + '/' + item.dimension,
+          name: item.name + '/' + item.dimension,
           type: 'line',
           symbol: 'none',
           data: []
@@ -128,6 +130,26 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     // console.log(option.series)
     chartRef.current?.setOption(option);
   }, [requestSignals]);
+
+  const requestSignalIds = requestSignals.map((signal) => signal.id).join('');
+
+  useEffect(() => {
+    // 如果需要采集的信号变了,更新dataref，并且清空time
+    let length = 0
+    dataRef.current = requestSignals.map((item, index) => {
+      length = currentTestChartData.get(item.id)?.length || 0
+      return {
+        id: item.id,
+        name: (item.dimension === '/') ? item.name : (item.name + '/' + item.dimension),
+        type: 'line',
+        symbol: 'none',
+        data: currentTestChartData.get(item.id) || []
+      }
+    })
+    // 截取时间 前length个
+    xAxis.current = xAxis.current.slice(-length)
+
+  }, [requestSignalIds])
 
   // 只有存在展示的信息发生变化的时候才更新
   const updateFlag = requestSignals.map((signal) => {
