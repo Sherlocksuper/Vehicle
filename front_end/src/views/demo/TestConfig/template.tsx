@@ -16,6 +16,7 @@ import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
 import {getFileToHistoryWorker} from "@/worker/app.ts";
 import {IHistory} from "@/apis/standard/history.ts";
+import {BASE_URL} from "@/apis/url/myUrl.ts";
 
 export interface IDragItem {
   id: string
@@ -64,27 +65,46 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   const [netDataRecorder, setNetDataRecorder] = useState<Map<string, number[]>>(new Map())
   const historyManagers = useRef(undefined)
 
-  const updateDataRecorder = (data, time = undefined) => {
-    const currentData = {
-      time: time ?? new Date().getTime(),
-      data: JSON.parse(data)
+  const dataCacheRef = useRef({});
+  const throttleTimeoutRef = useRef(null);
+
+// 节流函数：每500ms调用一次 updateDataRecorder
+  function throttleUpdate(data) {
+    Object.assign(dataCacheRef.current, data)
+    if (throttleTimeoutRef.current) {
+      return;
     }
 
-    history.current.historyData.push(currentData)
+    throttleTimeoutRef.current = setTimeout(() => {
+      updateDataRecorder(dataCacheRef.current);  // 调用 updateDataRecorder 处理缓存数据
 
-    const keys = Object.keys(JSON.parse(data))
-    keys.forEach((key) => {
-
-      if (netDataRecorder.has(key)) {
-        netDataRecorder.set(key, [...netDataRecorder.get(key), JSON.parse(data)[key]])
-      } else {
-        netDataRecorder.set(key, [JSON.parse(data)[key]])
-      }
-
-    })
-    // 更新触发状态更新
-    setNetDataRecorder(new Map(netDataRecorder))
+      dataCacheRef.current = {};  // 清空缓存
+      throttleTimeoutRef.current = null
+    }, 487);
   }
+
+  const updateDataRecorder = (data, time = undefined) => {
+    const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+    const currentData = {
+      time: time ?? new Date().getTime(),
+      data: parsedData
+    };
+
+    history.current.historyData.push(currentData);
+
+    const updatedNetDataRecorder = new Map(netDataRecorder);
+    Object.keys(parsedData).forEach((key) => {
+      if (updatedNetDataRecorder.has(key)) {
+        updatedNetDataRecorder.set(key, [...updatedNetDataRecorder.get(key), parsedData[key]]);
+      } else {
+        updatedNetDataRecorder.set(key, [parsedData[key]]);
+      }
+    });
+
+    // 更新触发状态更新
+    setNetDataRecorder(updatedNetDataRecorder);
+  };
+
   const startOfflineData = (dataToShow: { time: number, data: { [key: string]: number } }[]) => {
     let index = 0;
     let isPaused = true;  // 控制是否暂停
@@ -97,7 +117,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
 
       setTimeout(() => {
         if (!isPaused) {
-          updateDataRecorder(JSON.stringify(dataToShow[index].data), currentTime);
+          throttleUpdate(dataToShow[index].data);
           index++;
           scheduleNext();  // 递归调用，继续调度下一个
         }
@@ -153,7 +173,9 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       return "你确定要离开吗？";
     }
 
-    const socket = new WebSocket('http://192.168.1.88:8080/ws');
+
+    const url = String(BASE_URL).replace('3000/api', '8080')
+    const socket = new WebSocket(url + '/ws');
     socket.onopen = () => {
       socketRef.current = socket
     }
@@ -163,9 +185,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data)
-      console.log(message)
       if (message.type === "DATA") {
-        updateDataRecorder(message.message)
+        throttleUpdate(JSON.parse(message.message));
       } else if (message.type === "NOTIFICATION") {
         message.info(message.message)
       }
