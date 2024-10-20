@@ -336,7 +336,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
 
   const renderManageButton = () => {
     if (dataMode === "OFFLINE") {
-      return <Space>
+      return <Space direction={"vertical"}>
         <Button onClick={() => {
           if (dragItems.length === 0) {
             message.error('请等待数据加载完成,或重新载入数据')
@@ -352,11 +352,6 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
             historyManagers.current.pause()
           }
         }}>暂停</Button>
-        <Button onClick={() => {
-          if (historyManagers.current) {
-            historyManagers.current.reset()
-          }
-        }}>重置</Button>
       </Space>
     }
 
