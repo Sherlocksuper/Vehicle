@@ -38,5 +38,6 @@ export const EDIT = '编辑'
 //查看
 export const SEE = '查看'
 
-export const DEFAULT_TITLE = '请编辑默认标题'
+// export const DEFAULT_TITLE = '请编辑默认标题'
+export const DEFAULT_TITLE = ''
 export const TEST_INTERNAL = 300
