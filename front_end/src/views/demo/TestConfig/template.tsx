@@ -247,8 +247,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
         defaultTitle: DEFAULT_TITLE,
         defaultX: 0,
         defaultY: 0,
-        defaultWidth: 100,
-        defaultHeight: 100,
+        defaultWidth: 200,
+        defaultHeight: 200,
         defaultInterval: 1000,
         extra: {
           defaultTrueLabel: '是',
@@ -259,8 +259,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
         defaultTitle: DEFAULT_TITLE,
         defaultX: 0,
         defaultY: 0,
-        defaultWidth: 300,
-        defaultHeight: 300,
+        defaultWidth: 200,
+        defaultHeight: 200,
         defaultInterval: 1000,
         extra: {
           defaultUnit: '单位',
@@ -272,8 +272,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
         defaultTitle: DEFAULT_TITLE,
         defaultX: 0,
         defaultY: 0,
-        defaultWidth: 400,
-        defaultHeight: 400,
+        defaultWidth: 200,
+        defaultHeight: 200,
         defaultInterval: 1000,
         extra: {
           defaultDuring: 10,  // 10s
