@@ -7,6 +7,8 @@ const PureNumberChart: React.FC<IChartInterface> = (props) => {
         currentTestChartData,
 
         title,
+        height,
+        width,
     } = props
 
   const [map, setMap] = useState<Map<string, number>>(new Map<string, number>())
@@ -41,35 +43,38 @@ const PureNumberChart: React.FC<IChartInterface> = (props) => {
 
 
     return (
-        <div className="bc_container" style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
+      <div className="bc_container" style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "relative",
+        // 根据width和height来设置字体大小
+        fontSize: width && height ? Math.min(width, height) / 15 : "1em"
+      }}>
+        <div className='bc_title' style={{
+          color: "#333",
+          textAlign: "center",
+          fontSize: "2em" // 标题大小随着视口宽度变化
         }}>
-            <div className='bc_title' style={{
-                fontSize: "16px",
-                color: "#333",
-                textAlign: "center",
-            }}>
-                {title}
-            </div>
-            <div style={{
-                fontSize: "20px",
-                fontWeight: "bold",
-                color: "#666",
-            }}>
-              {
-                requestSignals.map((signal) => {
-                  return <div key={signal.id}>
-                    {signal.belongVehicle} :{signal.name}: {signal.dimension}: {map.get(signal.id) || 0}
-                  </div>
-                })
-              }
-            </div>
+          {(title && title !== "") ? title : (requestSignals[0]?.name ?? "")}
         </div>
+        <div style={{
+          fontWeight: "bold",
+          color: "#666",
+          fontSize: "1em" // 文字大小随着视口宽度变化
+        }}>
+          {
+            requestSignals.map((signal) => {
+              return <div key={signal.id}>
+                {signal.name}: {map.get(signal.id) || 0} : {signal.dimension}
+              </div>
+            })
+          }
+        </div>
+      </div>
     )
 }
 export default PureNumberChart

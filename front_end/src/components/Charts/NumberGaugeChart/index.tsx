@@ -53,7 +53,8 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
           data: [
             {
               value: value[value.length - 1],
-              name: title
+              // 如果有标题并且标题不为空字符串就显示标题，没有就显示信号名，没有信号名就显示空
+              name: (title && title !== "") ? title : (requestSignals[0]?.name ?? "")
             }
           ]
         }
@@ -124,7 +125,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
           data: [
             {
               value: 0,
-              name: title
+              name: (title && title !== "") ? title : (requestSignals[0]?.name ?? "")
             }
           ]
         }
@@ -141,7 +142,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
       resizeObserver.disconnect()
       chartRef.current?.dispose()
     }
-  }, [unit, title, width, height])
+  }, [unit, title, width, height, props.requestSignals])
 
   return <div ref={chartContainerRef} style={{
     width: '100%', height: '100%'

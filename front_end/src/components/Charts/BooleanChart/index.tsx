@@ -31,7 +31,7 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
         if (signalData) {
             setValue(signalData[signalData.length - 1] === (trueValue ? Number(trueValue) : 1))
         }
-    }, [requestSignals]);
+    }, [requestSignals, trueValue]);
 
     // 同步netWorkData
     useEffect(() => {
@@ -45,7 +45,7 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
         width: "100%",
         height: "100%",
     }}>
-        <div className='bc_title'>{title}</div>
+        <div className='bc_title'>{(title && title !== "") ? title : (requestSignals[0]?.name ?? "")}</div>
         <div className="bc_result" style={{backgroundColor: value ? '#52c41a' : '#f5222d'}}>
             {value ? trueLabel : falseLabel}
         </div>

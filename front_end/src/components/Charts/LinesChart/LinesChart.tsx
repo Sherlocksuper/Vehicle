@@ -151,20 +151,12 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
 
   }, [requestSignalIds])
 
-  // 只有存在展示的信息发生变化的时候才更新
-  const updateFlag = requestSignals.map((signal) => {
-    if (currentTestChartData.has(signal.id)) {
-      return currentTestChartData.get(signal.id).length
-    }
-    return 0
-  }).reduce((prev, curr) => prev + curr, 0)
-
   // 同步netWorkData
   useEffect(() => {
     if (currentTestChartData && !chartRef.current?.isDisposed()) {
       pushData(currentTestChartData)
     }
-  }, [updateFlag, pushData, requestSignals])
+  }, [pushData, requestSignals, currentTestChartData])
 
   useEffect(() => {
     chartRef.current = echarts.init(chartContainerRef.current)
