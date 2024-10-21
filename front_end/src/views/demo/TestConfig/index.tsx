@@ -44,7 +44,7 @@ const TestConfig = () => {
       console.log(res)
       if (res.code === FAIL_CODE) {
         message.destroy()
-        message.error("下发失败:" + res.msg + "请检查网络");
+        message.error("下发失败:" + res.msg);
       } else {
         message.destroy()
         message.success('下发成功');

@@ -87,14 +87,15 @@ class TestConfigController {
     // @ts-ignore
     const {id} = ctx.request.body;
     const res = await TestConfigService.downTestConfig(Number(id));
-    res && ((ctx.body as IResBody) = {
+    // 如果没有返回值，说明下发成功
+    !res && ((ctx.body as IResBody) = {
       code: SUCCESS_CODE,
       msg: SEARCH_SUCCESS_MSG,
       data: null
     })
-    !res && ((ctx.body as IResBody) = {
+    res && ((ctx.body as IResBody) = {
       code: FAIL_CODE,
-      msg: SEARCH_FAIL_MSG,
+      msg: res,
       data: null
     })
   }

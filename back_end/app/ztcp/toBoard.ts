@@ -28,11 +28,19 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
 
     console.log(`尝试连接: ${host}:${port}`);
 
+    let isTimeout = false;
+    const timeOut = setTimeout(() => {
+      client.end();
+      isTimeout = true;
+      reject(new Error('连接超时'));
+    }, 5000);
+
     client = net.connect({
       port,
       host,
     }, () => {
       console.log(`${port} ${host} 建立链接成功`);
+      clearTimeout(timeOut);
       resolve();
     });
 
@@ -89,10 +97,12 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
 
     client.on('error', (err) => {
       console.log(`连接错误: ${err.message}`, `中断类型`, isManuallyClosed ? '手动' : '被动');
-      sendMessageToFront({
-        type: 'NOTIFICATION',
-        message: '连接下位机失败: ' + err.message
-      });
+
+      // 如果client已经end，就不需要重连了
+      if (isTimeout) {
+        console.log("client 已经超时，不再重连")
+        return;
+      }
 
       if (!isManuallyClosed) {
         console.log('尝试下一个连接', 'ip:', hostPortList[index].host, 'port:', hostPortList[index].port);

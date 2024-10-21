@@ -158,7 +158,20 @@ class TestConfigService {
         })
       })
     })
-    return result
+
+    const map = new Map()
+    result.forEach(item => {
+      if (!map.has(item.host)) {
+        map.set(item.host, true)
+      }
+    })
+
+    return Array.from(map.keys()).map((item) => {
+      return {
+        host: item,
+        port: 66
+      }
+    })
   }
 
   async getSpecialDigitalKeyList(testConfig: ITestConfig) {
@@ -183,11 +196,9 @@ class TestConfigService {
    * 下发测试流程，设置当前的测试流程为testPrdcessN
    */
   async downTestConfig(testConfigId: number) {
-    if (this.currentTestConfig) return false
+    if (this.currentTestConfig) return "当前已经有测试配置在下发中"
     const testConfig = await this.getTestConfigById(testConfigId);
-    console.log("下发的消息", testConfig)
-    console.log("對應車輛", JSON.stringify(testConfig?.configs[0].vehicle))
-    if (!testConfig) return false
+    if (!testConfig) return "获取对应配置失败"
 
     const res = getConfigBoardMessage(testConfig!)
     const hostPortList = await this.getHostPortList(testConfig)
@@ -198,7 +209,6 @@ class TestConfigService {
     this.signalsMappingRelation = res.signalsMap
     this.banMessage = res.banMessages
     this.currentTestConfig = testConfig
-    await this.storeCurrentConfigToSql(testConfig!)
     await this.setTestConfigSignalMapping(testConfig!)
     await this.getSpecialDigitalKeyList(testConfig!)
 
@@ -207,20 +217,20 @@ class TestConfigService {
     try {
       await connectWithMultipleBoards(hostPortList, 0)
     } catch (e) {
-      return false
+      return "连接下位机失败"
     }
 
     // 发送所有消息给板子
     try {
       await sendMultipleMessagesBoard(res.resultMessages, 1000)
     } catch (e) {
-      return false
+      return "向下位机发送消息失败"
     }
-
+    await this.storeCurrentConfigToSql(testConfig!)
 
     // TODO 模拟数据
     // startMockBoardMessage(this.signalsMappingRelation)
-    return true
+    return undefined
   }
 
   /**
@@ -246,13 +256,13 @@ class TestConfigService {
     this.banMessage = []
     this.signalsIdNameMap.clear()
     this.digitalKeyList = []
+    // 清空状态
     await this.deleteCurrentConfigFromSql()
     disconnectWithBoard()
   }
 
   async storeCurrentConfigToSql(config: ITestConfig) {
     await this.deleteCurrentConfigFromSql()
-    console.log(config)
     await CurrentTestConfig.create(config)
   }
 
