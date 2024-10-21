@@ -37,25 +37,30 @@ export const routeItems: RouteItem[] = [
     label: '数据接收与管理',
     element: <Outlet/>,
     children: [
+      // {
+      //   key: '/test-receive/view',
+      //   label: <p
+      //     onClick={() => {
+      //       getCurrentTestConfig().then(res => {
+      //         if (res.code === FAIL_CODE) {
+      //           message.error(res.msg);
+      //         } else {
+      //           console.log(res.data);
+      //           const config: ITestConfig = (res.data);
+      //           if (config.id === undefined) {
+      //             message.error("当前无测试配置");
+      //             return
+      //           }
+      //           const win = window.open(`/test-template-for-config?testConfigId=${config?.id}`);
+      //           if (!win) return
+      //         }
+      //       });
+      //     }}>接收数据动态监视</p>,
+      // },
       {
         key: '/test-receive/view',
-        label: <p
-          onClick={() => {
-            getCurrentTestConfig().then(res => {
-              if (res.code === FAIL_CODE) {
-                message.error(res.msg);
-              } else {
-                console.log(res.data);
-                const config: ITestConfig = (res.data);
-                if (config.id === undefined) {
-                  message.error("当前无测试配置");
-                  return
-                }
-                const win = window.open(`/test-template-for-config?testConfigId=${config?.id}`);
-                if (!win) return
-              }
-            });
-          }}>接收数据动态监视</p>,
+        label: "接收数据动态监视",
+        element: <DataSee/>
       },
       {
         key: '/test-receive/offline-management',

@@ -144,8 +144,6 @@ const TestConfig = () => {
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.UNIT, config: record})}>测试单元管理</Button>
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.COLLECT, config: record})}>数据采集项</Button>
           <Button type="link" onClick={() => setCurrentTaskStep({step: TaskStep.WRAP, config: record})}>采集数据封装</Button>
-          {currentDownConfig?.id === record.id ?
-            (<Button type={"link"} onClick={() => handleShowCurrentData()}>数据监视</Button>) : (" ")}
         </Space>
       ),
     },

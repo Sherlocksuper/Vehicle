@@ -21,7 +21,7 @@ export const HomeMenu = () => {
 
 
     const onClick: MenuProps['onClick'] = (e) => {
-        if (e.key !== 'avatar' && e.key !== 'logout' && e.key !== 'changePassword' && e.key !== '/test-receive/view')
+        if (e.key !== 'avatar' && e.key !== 'logout' && e.key !== 'changePassword')
             navigate(e.key as string)
         else if (e.key === 'logout') {
             if (window.confirm("确定退出登录吗？"))
@@ -31,21 +31,6 @@ export const HomeMenu = () => {
                 })
         } else if (e.key === 'changePassword') {
             setVisible(true)
-        } else if (e.key === '/test-receive/view') {
-            getCurrentTestConfig().then(res => {
-                if (res.code === FAIL_CODE) {
-                    message.error(res.msg);
-                } else {
-                    console.log(res.data);
-                    const config: ITestConfig = (res.data);
-                    if (config === null || config.id === undefined) {
-                        message.error("当前无测试配置");
-                        return
-                    }
-                    const win=window.open(`/test-template-for-config?testConfigId=${config.id}`, '_blank')
-                    if (!win) return;
-                }
-            })
         }
     }
 
