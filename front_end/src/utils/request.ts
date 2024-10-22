@@ -2,12 +2,6 @@ import axios, {AxiosRequestConfig} from 'axios';
 import {BASE_URL} from "@/apis/url/myUrl.ts";
 import userUtils from "@/utils/userUtils.ts";
 import {APIStandard, ContentType, ResponseType} from "@/apis/standard/all.ts";
-import {FAIL_CODE, TOKEN_VALID_CODE} from "@/constants";
-import {message} from "antd";
-import {sleep} from "@/utils/index.ts";
-// import { FAIL_CODE,  TOKEN_VALID_CODE } from '@/constants';
-// import { message } from 'antd';
-// import { sleep } from '.';
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -81,12 +75,6 @@ function shouldUseData(method: string) {
 }
 
 axiosInstance.interceptors.response.use(async res => {
-    if (res.data?.code && res.data.code !== TOKEN_VALID_CODE && res.data.code !== FAIL_CODE) {
-        message.error(res.data.msg)
-        message.loading('即将返回登录页面')
-        await sleep(3000)
-        window.location.href = '/login'
-    }
     return res
 }, err => {
     return err

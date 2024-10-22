@@ -19,7 +19,7 @@ const Login: React.FC = () => {
 
     useEffect(() => {
         if (userUtils.getToken()) {
-            console.log("token:" + userUtils.getToken())
+            message.success("检测到已经登录，正在跳转")
             navigate('/test-info/protocol-management', {replace: true})
         }
     }, [])
@@ -37,30 +37,23 @@ const Login: React.FC = () => {
 
 const ToLogin = () => {
     const navigate = useNavigate()
-    const [messageApi, messageHandler] = message.useMessage()
     const onLogin = async (data: loginParams) => {
         try {
-
             const response = await loginApi(data)
             if (response.code === SUCCESS_CODE && response.data != null && !response.data.disabled) {
                 navigate('/test-info/protocol-management', {replace: true})
-            } else {
-
-                if (response.data?.disabled) {
-                    messageApi.error("登录失败，该用户不存在或已被禁用")
-                } else {
-                    messageApi.error(response?.msg)
-                }
-
             }
-
+            // 如果登录成功，将用户信息保存到本地
+            if (response.code === SUCCESS_CODE && response.data !== null) {
+                userUtils.setToken(response.data.accessToken)
+                message.success("登录成功"+response.data.accessToken)
+            }
         } catch (error) {
             console.error(error)
         }
     }
 
     const onFinish = async (formData: FormData) => {
-        console.log('Received values of form: ', formData)
         const data: loginParams = {
             username: formData.username,
             password: formData.password
@@ -72,7 +65,6 @@ const ToLogin = () => {
         onFinish={throttle(onFinish, 1000)}
         initialValues={{remember: true}}
     >
-        {messageHandler}
         <Form.Item
             name="username"
             rules={[{required: true, message: 'Please input your username!'}]}
