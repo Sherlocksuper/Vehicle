@@ -5,8 +5,6 @@ import {useNavigate} from 'react-router-dom';
 import {loginApi} from "@/apis/request/auth.ts";
 import {loginParams} from "@/apis/standard/auth.ts";
 import {throttle} from "@/utils";
-import {useForm} from "antd/es/form/Form";
-import {changePassword} from "@/apis/request/user.ts";
 import {SUCCESS_CODE} from "@/constants";
 import UserUtils from "@/utils/userUtils.ts";
 import userUtils from '@/utils/userUtils.ts';
@@ -17,7 +15,6 @@ interface FormData {
 }
 
 const Login: React.FC = () => {
-    const [isLogin, setIsLogin] = React.useState(true)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -32,57 +29,11 @@ const Login: React.FC = () => {
             <div className="background-image"></div>
             <div className="login-content">
                 <h1>车辆数据采集系统</h1>
-                {isLogin ? <ToLogin/> : <ChangePassword/>}
+                {<ToLogin/>}
             </div>
         </div>
     );
 };
-
-const ChangePassword = () => {
-    const [form] = useForm()
-    const onFinish = async () => {
-        const newPass = form.getFieldValue("newPassword")
-        const confirmPass = form.getFieldValue("confirmPassword")
-
-        if (newPass !== confirmPass) {
-            alert("两次输入密码不一致")
-            return
-        }
-        changePassword({password: newPass}).then((response) => {
-            if (response.code === SUCCESS_CODE) {
-                alert("修改成功")
-            } else {
-                alert(response.msg)
-            }
-        })
-    }
-
-    return (
-        <div>
-            <Form form={form}>
-                <Form.Item
-                    name="newPassword"
-                    label="New Password"
-                    rules={[{required: true, message: '请输入新密码'}]}
-                >
-                    <Input.Password placeholder="New Password"/>
-                </Form.Item>
-                <Form.Item
-                    name="confirmPassword"
-                    label="Confirm Password"
-                    rules={[{required: true, message: '请确认输入新密码'}]}
-                >
-                    <Input.Password placeholder="Confirm Password"/>
-                </Form.Item>
-                <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-button" onClick={onFinish}>
-                        Change Password
-                    </Button>
-                </Form.Item>
-            </Form>
-        </div>
-    )
-}
 
 const ToLogin = () => {
     const navigate = useNavigate()
@@ -101,7 +52,6 @@ const ToLogin = () => {
                     messageApi.error(response?.msg)
                 }
 
-                UserUtils.removeUserInfo()
             }
 
         } catch (error) {

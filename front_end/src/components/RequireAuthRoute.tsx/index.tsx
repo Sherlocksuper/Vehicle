@@ -7,7 +7,6 @@ const RequireAuthRoute: React.FC<React.PropsWithChildren> = ({ children }) => {
     const token = userUtils.getToken()
     const [content, setContent] = useState('')
     useEffect(() => {
-        setContent(!userUtils.isRootUser() ? userUtils.getUserInfo()?.username || '请勿泄密' : '')
     }, [])
     if (!token) {
         return <Navigate to="/login"></Navigate>

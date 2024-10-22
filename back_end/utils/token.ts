@@ -40,23 +40,7 @@ const tokenUtils = {
                         msg: TOKEN_MSG[TOKEN_USER_HAS_BEEN_DELETED_CODE]
                     }
                 }
-            } else if (user.disabled) { // 用户被禁用
-                return {
-                    admin: null,
-                    err: {
-                        code: TOKEN_USER_HAS_BEEN_DISABLED_CODE,
-                        msg: TOKEN_MSG[TOKEN_USER_HAS_BEEN_DISABLED_CODE]
-                    }
-                }
-            } else if (user.password !== res.password) { // 用户密码已修改
-                return {
-                    admin: null,
-                    err: {
-                        code: TOKEN_USER_PASSWORD_HAS_BEEN_CHANGED_CODE,
-                        msg: TOKEN_MSG[TOKEN_USER_PASSWORD_HAS_BEEN_CHANGED_CODE]
-                    }
-                }
-            } else { // 验证通过
+            }  else { // 验证通过
                 // 校验用户是否退出登录了
                 if (await TokenBlackListService.checkIfTokenInBlackList(token)) {
                     return {

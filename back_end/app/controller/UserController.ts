@@ -33,7 +33,7 @@ class UserController {
             msg: LOGIN_SUCCESS,
             data: {
                 username: res.username,
-                isRootUser: res.root_user_id === null ? true : false,
+                isRootUser: res.root_user_id === null,
                 userId: res.id,
                 token: tokenUtils.sign({username: res.username, password: res.password, userId: res.id!}),
                 disabled: res.disabled

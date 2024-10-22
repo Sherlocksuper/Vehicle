@@ -84,7 +84,6 @@ axiosInstance.interceptors.response.use(async res => {
     if (res.data?.code && res.data.code !== TOKEN_VALID_CODE && res.data.code !== FAIL_CODE) {
         message.error(res.data.msg)
         message.loading('即将返回登录页面')
-        userUtils.removeUserInfo()
         await sleep(3000)
         window.location.href = '/login'
     }

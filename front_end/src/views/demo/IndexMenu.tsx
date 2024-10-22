@@ -1,13 +1,9 @@
 import React from "react";
-import {Form, Menu, MenuProps, Modal, Input, message} from "antd";
+import {Form, Menu, MenuProps, Modal, Input} from "antd";
 import {NavigateFunction, useNavigate} from "react-router-dom";
 import {logout} from "@/apis/request/auth.ts";
-import {changePassword} from "@/apis/request/user.ts";
-import {FAIL_CODE, SUCCESS_CODE} from "@/constants";
 import userUtils from "@/utils/userUtils.ts";
 import {routeItems} from "@/routes";
-import {getCurrentTestConfig} from "@/apis/request/testConfig.ts";
-import {ITestConfig} from "@/apis/standard/test.ts";
 
 export const HomeMenu = () => {
     const navigate: NavigateFunction = useNavigate()
@@ -26,7 +22,6 @@ export const HomeMenu = () => {
         else if (e.key === 'logout') {
             if (window.confirm("确定退出登录吗？"))
                 logout().then(() => {
-                    userUtils.removeUserInfo()
                     navigate('/login')
                 })
         } else if (e.key === 'changePassword') {
@@ -43,13 +38,6 @@ export const HomeMenu = () => {
             return
         }
 
-        changePassword({password: newPass}).then((response) => {
-            if (response.code === SUCCESS_CODE) {
-                alert("修改成功")
-            } else {
-                alert(response.msg)
-            }
-        })
         setVisible(false)
     }
 
