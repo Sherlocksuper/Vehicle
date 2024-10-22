@@ -4,7 +4,8 @@
   },
   "scripts": {
     "start-all": "concurrently \"npm start --prefix back_end\" \"npm run dev --prefix front_end\" \"node long/public/server.js\"",
-    "start-dev": "concurrently \"npm start --prefix back_end\" \"npm run dev --prefix front_end\""
+    "start-dev": "concurrently \"npm start --prefix back_end\" \"npm run dev --prefix front_end\"",
+    "sd": "concurrently \"npm run do --prefix back_end\" \"npm run dev --prefix front_end\""
   },
   "dependencies": {
     "xlsx": "^0.18.5"

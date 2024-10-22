@@ -16,6 +16,7 @@ import {getCurrentTestConfig} from "@/apis/request/testConfig.ts";
 import {FAIL_CODE} from "@/constants";
 import {message} from "antd";
 import {ITestConfig} from "@/apis/standard/test.ts";
+import DataAnalysis from "@/views/demo/DataAnalysis/DataAnalysis.tsx";
 
 interface RouteItem {
   key: string;
@@ -62,10 +63,15 @@ export const routeItems: RouteItem[] = [
         label: "接收数据动态监视",
         element: <DataSee/>
       },
+      // {
+      //   key: '/test-receive/offline-management',
+      //   label: '数据可视化分析',
+      //   element: <OfflineDate/>
+      // },
       {
         key: '/test-receive/offline-management',
         label: '数据可视化分析',
-        element: <OfflineDate/>
+        element: <DataAnalysis/>
       },
       {
         key: '/test-receive/history',

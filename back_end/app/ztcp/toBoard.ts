@@ -61,15 +61,18 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
         // console.log(TestConfigService.signalsMappingRelation)
         const resolveMessage = (message: IReceiveData) => {
           const result = decodingBoardMessageWithMap(message);
-          TestConfigService.pushReceiveData(messages);
 
           console.log("decodingBoardMessageWith Map result ", result);
           const msg = mapToJson(result);
 
-          TestConfigService.currentTestConfigHistoryData.push({
+          // TestConfigService.currentTestConfigHistoryData.push({
+          //   time: new Date().getTime(),
+          //   data: JSON.parse(msg)
+          // });
+          TestConfigService.pushDataToCurrentHistory({
             time: new Date().getTime(),
             data: JSON.parse(msg)
-          });
+          })
 
           // 发送消息给前端
           sendMessageToFront({

@@ -1,4 +1,3 @@
-import HistoryService from "../service/HistoryService";
 import {Context} from "koa";
 import {IResBody} from "../types";
 import {
@@ -11,8 +10,9 @@ import {
 import FileService from "../service/FileService";
 import {IRecordHistory} from "../model/History.model";
 import {transferFileSize} from "../../utils/File";
+import historyService from "../service/HistoryService";
+import testConfigService from "../service/TestConfig";
 
-const historyService = new HistoryService()
 const fileService = new FileService()
 
 export class HistoryController {
@@ -43,46 +43,72 @@ export class HistoryController {
      * @param context
      */
     async addHistory(context: Context) {
-        // @ts-ignore
-        const fatherConfigName = context.request.body['fatherConfigName']
-        const file = context.request.files!.file as any
-        const filePath = file['filepath']
-        const fileName = file['originalFilename']
+        // // @ts-ignore
+        // const fatherConfigName = context.request.body['fatherConfigName']
+        // const file = context.request.files!.file as any
+        // const filePath = file['filepath']
+        // const fileName = file['originalFilename']
+        //
+        //
+        // const storePath = await fileService.storeFile(filePath, fileName)
+        // if (storePath.length === 0) {
+        //     ((context.body as IResBody) = {
+        //         code: FAIL_CODE,
+        //         msg: WRITE_FAIL_MSG,
+        //         data: null
+        //     })
+        //     return
+        // }
+        //
+        // const record: IRecordHistory = {
+        //     fatherConfigName: fatherConfigName,
+        //     vehicleName: fileName,
+        //     size: transferFileSize(file.size),
+        //     path: storePath,
+        // }
+        //
+        // const res = await historyService.addHistory(record)
 
-
-        const storePath = await fileService.storeFile(filePath, fileName)
-        if (storePath.length === 0) {
-            ((context.body as IResBody) = {
-                code: FAIL_CODE,
-                msg: WRITE_FAIL_MSG,
-                data: null
-            })
-            return
-        }
-
-        const record: IRecordHistory = {
-            fatherConfigName: fatherConfigName,
-            vehicleName: fileName,
-            size: transferFileSize(file.size),
-            path: storePath,
-        }
-
-        const res = await historyService.addHistory(record)
-
-        res && ((context.body as IResBody) = {
+        ((context.body as IResBody) = {
             code: SUCCESS_CODE,
             msg: WRITE_SUCCESS_MSG,
-            data: storePath
+            data: ""
+        })
+        // !res && ((context.body as IResBody) = {
+        //     code: FAIL_CODE,
+        //     msg: WRITE_FAIL_MSG,
+        //     data: null
+        // })
+    }
+
+    async getHistoryById(context: Context) {
+        const historyId = context.params.id as number
+        const res = await historyService.getHistoryById(historyId)
+        res && ((context.body as IResBody) = {
+            code: SUCCESS_CODE,
+            msg: SEARCH_SUCCESS_MSG,
+            data: res
         })
         !res && ((context.body as IResBody) = {
             code: FAIL_CODE,
-            msg: WRITE_FAIL_MSG,
+            msg: SEARCH_FAIL_MSG,
             data: null
         })
     }
 
     async deleteHistory(context: Context) {
         const recordId = context.params.id as number
+
+        // 如果当前有下发配置
+        if (testConfigService.currentTestConfig !== null) {
+              ((context.body as IResBody) = {
+                code: FAIL_CODE,
+                msg: "当前有配置正在下发，不可删除",
+                data: null
+            })
+            return
+        }
+
         const res = await historyService.deleteHistory(recordId)
         res && ((context.body as IResBody) = {
             code: SUCCESS_CODE,
@@ -91,7 +117,7 @@ export class HistoryController {
         })
         !res && ((context.body as IResBody) = {
             code: FAIL_CODE,
-            msg: WRITE_FAIL_MSG,
+            msg: "删除失败，请重试",
             data: null
         })
     }

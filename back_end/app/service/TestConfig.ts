@@ -3,25 +3,27 @@
  */
 
 import TestConfig, {CurrentTestConfig, ITestConfig} from "../model/TestConfig";
-import {getBusCategory, getCollectItemFromId, getCollectType, getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
+import {getBusCategory, getCollectType, getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
 import {connectWithMultipleBoards, disconnectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
-import {IReceiveData} from "../../utils/BoardUtil/decoding";
-import HistoryService from "./HistoryService";
 import * as fs from "fs";
-import * as XLSX from "xlsx";
 import {transferFileSize} from "../../utils/File";
 import path from "node:path";
 import {ProtocolType} from "../model/PreSet/Protocol.model";
 import {getSignalMapKey} from "../../utils/BoardUtil/encoding/spConfig";
 import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
+import {IData} from "../model/Data.model";
+import DataService from "./DataService";
+import historyService from "./HistoryService";
 
+export const CURRENT_DATA_LIMIT = 100
 
-const historyService = new HistoryService()
+export const CURRENT_HISTORY_SIGN = "(正在下发...)"
+// 时间戳的base值 17
+// 用basetime，为了缩小时间戳的长度，节省存储控件
+export const BASE_TIME = 1_729_597_005_000
 
 class TestConfigService {
-
   currentTestConfig: ITestConfig | null = null
-  currentTestConfigReceiveData: IReceiveData[] = []
   currentTestConfigHistoryData: {
     time: number
     data: {
@@ -30,8 +32,12 @@ class TestConfigService {
   }[] = []
 
   resultMessages: Buffer[] = []
+  // 由采集项id、帧id等组成的key值和signal的id(之前是uuid现在是序号数组)对应的map
   signalsMappingRelation: Map<string, string[]> = new Map()
-  signalsIdNameMap: Map<string, string[]> = new Map()
+  // 信号的id和他的名称对应的数组
+  signalsIdNameMap: Map<string, string> = new Map()
+  // 当前所属历史的id
+  currentHistoryId: number = 0
   banMessage: Buffer[] = []
 
   // 因为digital解析方式比较特殊，所以需要单独处理
@@ -115,36 +121,8 @@ class TestConfigService {
     }
   }
 
-  async initTestConfig() {
-    return null;
-  }
-
   async getCurrentTestConfig() {
     return this.currentTestConfig
-  }
-
-  // 获取信号id信号名的映射表
-  async setTestConfigSignalMapping(testConfig: ITestConfig) {
-    testConfig.configs.forEach(config => {
-      config.vehicle.protocols.forEach(protocol => {
-        protocol.protocol.signalsParsingConfig.forEach(spConfig => {
-
-          const targetId = protocol.collector.collectorAddress!
-          const collectType = getCollectType(protocol)
-          const collectCategory = getBusCategory(protocol)
-
-
-          const key = getSignalMapKey(targetId, collectType, collectCategory, Number(spConfig.frameId))
-          spConfig.signals.forEach(signal => {
-            if (this.signalsIdNameMap.has(key)) {
-              this.signalsIdNameMap.get(key)!.push(signal.name)
-            } else {
-              this.signalsIdNameMap.set(key, [signal.name])
-            }
-          })
-        })
-      })
-    })
   }
 
   async getHostPortList(testConfig: ITestConfig) {
@@ -192,9 +170,7 @@ class TestConfigService {
     this.digitalKeyList = result
   }
 
-  /**
-   * 下发测试流程，设置当前的测试流程为testPrdcessN
-   */
+  // 下发测试流程，设置当前的测试流程为testPrdcessN
   async downTestConfig(testConfigId: number) {
     if (this.currentTestConfig) return "当前已经有测试配置在下发中"
     const testConfig = await this.getTestConfigById(testConfigId);
@@ -209,8 +185,10 @@ class TestConfigService {
     this.signalsMappingRelation = res.signalsMap
     this.banMessage = res.banMessages
     this.currentTestConfig = testConfig
-    await this.setTestConfigSignalMapping(testConfig!)
+    this.setSignalsIdNameMap(testConfig)
     await this.getSpecialDigitalKeyList(testConfig!)
+    // 创建一条新的记录
+    await this.createNewRecord(testConfig!)
 
     // TODO 连接下位机并且发送消息,调试的时候没有下位机所以注释掉，使用startMock
     // 下发逻辑放到后面，因为要等到所有的数据都准备好了才能下发,并且如果失败、停止下发的时候比较Ok
@@ -233,29 +211,66 @@ class TestConfigService {
     return undefined
   }
 
+  // 在数据库新建一条记录
+  async createNewRecord(testConfig: ITestConfig) {
+    const result = await historyService.addHistory({
+      testConfig: testConfig,
+      path: "",
+      vehicleName: testConfig.configs[0].vehicle.vehicleName,
+      fatherConfigName: testConfig.name + CURRENT_HISTORY_SIGN,
+      size: "0",
+    })
+    this.currentHistoryId = result.id
+  }
+
+  setSignalsIdNameMap(testConfig: ITestConfig) {
+    testConfig.configs.forEach(config => {
+      config.projects.forEach(project => {
+        project.indicators.forEach(indicator => {
+          this.signalsIdNameMap.set(indicator.signal.id, `${indicator.name}(${indicator.signal.name})`)
+        })
+      })
+    })
+  }
+
   /**
    * 停止当前下发
    */
   async stopCurrentTestConfig() {
     // stopMockBoardMessage()
     await sendMultipleMessagesBoard(this.banMessage, 200)
+    await historyService.updateHistoryName(this.currentHistoryId, this.currentTestConfig?.name!)
     await this.clearCurrent()
     return true
   }
 
-  pushReceiveData(data: IReceiveData[]) {
-    this.currentTestConfigReceiveData.push(...data)
+  async pushDataToCurrentHistory(data: {
+    time: number
+    data: {
+      [key: number]: number
+    }
+  }) {
+    // 如果当前的currentTestConfigHistory超过了十万条，那么存储到数据库
+    if (this.currentTestConfigHistoryData.length > CURRENT_DATA_LIMIT) {
+      console.log("存储到数据库")
+      this.saveCurrentDataToSql(this.currentTestConfigHistoryData)
+      this.clearOnlyData()
+    }
+    this.currentTestConfigHistoryData.push(data)
+  }
+
+  clearOnlyData() {
+    this.currentTestConfigHistoryData = []
   }
 
   async clearCurrent() {
     this.currentTestConfig = null
     this.signalsMappingRelation.clear()
-    this.currentTestConfigReceiveData = []
-    this.currentTestConfigHistoryData = []
+    this.clearOnlyData()
     this.resultMessages = []
     this.banMessage = []
-    this.signalsIdNameMap.clear()
     this.digitalKeyList = []
+    this.currentHistoryId = 0
     // 清空状态
     await this.deleteCurrentConfigFromSql()
     disconnectWithBoard()
@@ -334,12 +349,14 @@ class TestConfigService {
 
       console.log("车辆名称", this.currentTestConfig?.configs[0].vehicle.vehicleName)
 
-      await historyService.addHistory({
-        fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
-        size: transferFileSize(fileSize.size),
-        vehicleName: this.currentTestConfig?.configs[0].vehicle.vehicleName!,
-        path: staticPath
-      })
+      // @ts-ignore
+      // await historyService.addHistory({
+      //   testConfig: {},
+      //   fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
+      //   size: transferFileSize(fileSize.size),
+      //   vehicleName: this.currentTestConfig?.configs[0].vehicle.vehicleName!,
+      //   path: staticPath
+      // })
 
       // await this.downReceiveDataToXlsx(this.currentTestConfig?.name ?? "默认名称")
 
@@ -350,56 +367,26 @@ class TestConfigService {
     return true
   }
 
-  async downReceiveDataToXlsx(configName: string) {
-    const data: {
-      timeStamp: number,
-      collectType: ProtocolType,
-      frameId: number,
-      signalName: string,
-      value: number
-    }[] = []
-    // TODO 因为没有收到真实的消息，所以这里是错误的
-    this.currentTestConfigReceiveData.forEach(item => {
-      item.signals.forEach((signal, index) => {
-        const key = getSignalMapKey(item.moduleId, item.collectType, item.busType, item.frameId)
+  async saveCurrentDataToSql(currentData: {
+    time: number
+    data: {
+      [key: number]: number
+    }
+  }[]) {
+    // 存储到数据库
+    const data: IData[] = []
+    currentData.forEach(item => {
+      for (let key in item.data) {
         data.push({
-          timeStamp: item.timestamp,
-          collectType: getCollectItemFromId(signal.signalId)!,
-          frameId: item.frameId,
-          signalName: this.signalsIdNameMap.get(key)![index],
-          value: signal.value,
+          belongId: this.currentHistoryId,
+          configName: this.currentTestConfig?.name!,
+          name: this.signalsIdNameMap.get(key)!,
+          time: item.time,
+          value: item.data[key]
         })
-      })
+      }
     })
-
-
-    const name = configName + new Date().getHours() + new Date().getMinutes()
-    let dir = '../public/uploads/' + new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
-    dir = path.resolve(__dirname, dir)
-    const targetPath = dir + '/' + name + '_' + 'output' + '.xlsx'
-
-    // 创建一个新的工作簿
-    const wb = XLSX.utils.book_new();
-
-    // 将数据转换为工作表
-    const ws = XLSX.utils.json_to_sheet(data);
-
-    // 将工作表添加到工作簿
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
-    // 将工作簿写入文件
-    fs.mkdirSync(dir, {recursive: true});
-
-    XLSX.writeFile(wb, targetPath);
-
-    const fileSize = fs.statSync(targetPath)
-    await historyService.addHistory({
-      fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
-      size: transferFileSize(fileSize.size),
-      vehicleName: this.currentTestConfig?.configs[0].vehicle.vehicleName!,
-      path: targetPath
-    })
-    return true
+    await DataService.addData(data)
   }
 }
 

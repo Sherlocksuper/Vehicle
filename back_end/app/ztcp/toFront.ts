@@ -38,7 +38,7 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
         message[value] = Math.random() * 100
       })
 
-      TestConfigService.currentTestConfigHistoryData.push({
+      TestConfigService.pushDataToCurrentHistory({
         time: new Date().getTime(),
         data: message
       });
@@ -47,7 +47,7 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
         type: "DATA",
         message: JSON.stringify(message)
       })
-    }, 300)
+    }, 100)
     publicIntervalRecords.push(record)
   })
 }

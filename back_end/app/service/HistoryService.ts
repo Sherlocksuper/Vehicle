@@ -1,9 +1,8 @@
 import HistoryModel, {IRecordHistory} from "../model/History.model";
 import * as fs from "fs";
-import path from "node:path";
+import dataService from "./DataService";
 
-
-export default class HistoryService {
+class HistoryService {
     async getHistory() {
         const res = await HistoryModel.findAll()
         return res
@@ -15,19 +14,17 @@ export default class HistoryService {
     }
 
     async deleteHistory(recordId: number) {
-        const deleteFile = await HistoryModel.findOne({
+        const res = await HistoryModel.destroy({
             where: {
                 id: recordId
             }
         })
+        await dataService.deleteDataByBelongId(recordId)
+        return res
+    }
 
-        const absolutePath = path.join(__dirname, '..', 'public', deleteFile!.path)
-        const exist = fs.existsSync(absolutePath)
-        if (exist){
-            fs.unlinkSync(absolutePath)
-        }
-
-        const res = await HistoryModel.destroy({
+    async getHistoryById(recordId: number) {
+        const res = await HistoryModel.findOne({
             where: {
                 id: recordId
             }
@@ -44,4 +41,17 @@ export default class HistoryService {
         const targetFile = fs.readFileSync(res!.path)
         return targetFile
     }
+
+    async updateHistoryName(recordId: number, configName: string ) {
+        const res = await HistoryModel.update({
+            fatherConfigName: configName
+        }, {
+            where: {
+                id: recordId
+            }
+        })
+        return res
+    }
 }
+
+export default  new HistoryService()

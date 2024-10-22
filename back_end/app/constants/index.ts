@@ -1,6 +1,13 @@
 export const LOGIN_SUCCESS = "登录成功"
 export const LOGIN_FAIL = "用户名或密码错误"
 export const SUCCESS_CODE = 0
+
+export const  DELETE_SUCCESS_MSG = '删除成功'
+export const  DELETE_FAIL_MSG = '删除失败'
+
+export const  UPDATE_SUCCESS_MSG = '更新成功'
+export const  UPDATE_FAIL_MSG = '更新失败'
+
 export const SEARCH_SUCCESS_MSG = '查询成功'
 export const WRITE_SUCCESS_MSG = '操作成功'
 export const FAIL_CODE = -1

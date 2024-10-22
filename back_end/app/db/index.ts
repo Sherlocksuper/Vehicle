@@ -15,6 +15,7 @@ import Protocol from "../model/PreSet/Protocol.model";
 import TestConfig, {CurrentTestConfig} from "../model/TestConfig";
 import TestConfigService from "../service/TestConfig";
 import CollectUnit from "../model/CollectUnit.model";
+import DataModel from "../model/Data.model";
 
 const {DB_NAME, DB_USERNAME, DB_PASSWORD, DB_HOST, DB_PORT} = DB_CONFIG
 
@@ -23,7 +24,7 @@ export const sequelize = new Sequelize(DB_NAME, DB_USERNAME, DB_PASSWORD, {
     dialect: 'mysql',
     port: DB_PORT,
     logging: false,
-    models: [User, TokenBlackListItem, Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, HistoryModel, Protocol, TestConfig, CurrentTestConfig, CollectUnit]
+    models: [User, TokenBlackListItem, Controller, Collector, Signal, Vehicle, Project, TestTemplate, TestObjectN, HistoryModel, Protocol, TestConfig, CurrentTestConfig, CollectUnit, DataModel]
 });
 
 const DB_OPT = {
@@ -39,6 +40,7 @@ const DB_OPT = {
         try {
             // TODO 更新数据库
             // await sequelize.sync({force: true})
+            // await sequelize.sync()
             // // 初始化核心板卡
             // await ControllerService.initControllers()
             // // 初始化采集板卡

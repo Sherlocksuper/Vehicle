@@ -13,6 +13,7 @@ import TestObjectNController from "../controller/TestObjectNController";
 import HistoryController from "../controller/HistoryController";
 import ProtocalController from "../controller/PreSet/ProtocalController";
 import CollectUnitController from "../controller/CollectUnitController";
+import DataController from "../controller/DataController";
 
 const router = new KoaRouter({
   prefix: ''
@@ -106,6 +107,7 @@ router.post('/deleteTestObjectN/:id', TestObjectNController.deleteTestObjectNByI
  * history
  */
 router.get('/getHistory', HistoryController.getAllHistory)
+router.get('/getHistoryById/:id', HistoryController.getHistoryById)
 router.post('/addHistory', HistoryController.addHistory)
 router.post('/deleteHistory/:id', HistoryController.deleteHistory)
 
@@ -150,5 +152,10 @@ router.post('/updateCollectUnit', CollectUnitController.updateCollectUnit);
 router.get('/getCollectUnits', CollectUnitController.getCollectUnits);
 
 router.get('/getTargetHistoryFile', HistoryController.getHistoryFile);
+
+router.post('/getData', DataController.getTargetData);
+router.post('/updateData', DataController.updateData);
+router.post('/deleteData', DataController.deleteData);
+router.get('/getDataMaxMinMiddle/:belongId', DataController.getDataMaxMinMiddle);
 
 export default router

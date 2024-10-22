@@ -1,4 +1,5 @@
 import {AutoIncrement, Column, CreatedAt, DataType, Model, PrimaryKey, UpdatedAt} from "sequelize-typescript";
+import {ITestConfig} from "./TestConfig";
 
 export interface IRecordHistory {
     id?: number
@@ -8,6 +9,7 @@ export interface IRecordHistory {
     size?: string
     createdAt?: Date
     updatedAt?: Date
+    testConfig: ITestConfig
 }
 
 export default class HistoryModel extends Model<IRecordHistory> {
@@ -21,6 +23,9 @@ export default class HistoryModel extends Model<IRecordHistory> {
 
     @Column(DataType.STRING)
     fatherConfigName!: string;
+
+    @Column(DataType.JSON)
+    testConfig?: ITestConfig;
 
     @Column(DataType.STRING)
     path!: string;
