@@ -1,8 +1,9 @@
 import DataModel, {IData} from "../model/Data.model";
 import {Op} from "sequelize";
-import {sendMessageToFront} from "../ztcp/toFront";
-import fs from "fs";
-import {formatOneSignal} from "../../utils/File/format";
+import User from "../model/User.model";
+import {getReplayWorker} from "../worker";
+
+//worker_threads
 
 class DataService {
   async addData(dataGroup: IData[]) {
@@ -63,6 +64,10 @@ class DataService {
     });
   }
 
+  async getDataWithTimeScope(belongId: number, startTime: number, endTime: number) {
+
+  }
+
   async updateData(configName: string, name: string, time: number, value: number) {
     const result = await DataModel.update({value}, {
       where: {
@@ -74,7 +79,7 @@ class DataService {
     return result
   }
 
-  async deleteData(belongId: number, name: string, time: number, value:number) {
+  async deleteData(belongId: number, name: string, time: number, value: number) {
     const result = await DataModel.destroy({
       where: {
         belongId,
@@ -97,41 +102,16 @@ class DataService {
 
   // 开始数据回放
   async startDataReplay(belongHistoryId: number) {
-    // const pageNum = 1
-    // const pageSize = 100_000
-    //
-    // let writeArr = await this.getDataWithScope(belongHistoryId, pageNum, pageSize);
-    // let searchArr: any[] = [];
-    // let page = 1;
-    //
-    // const sendHalfData = async (dataArray: IData[], writeStream: fs.WriteStream) => {
-    //   const halfIndex = Math.floor(dataArray.length / 2);
-    //   for (let i = 0; i < halfIndex; i++) {
-    //
-    //   }
-    //   return dataArray.slice(halfIndex); // 返回未写入的数据
-    // };
-    //
-    // while (writeArr.length > 0 || searchArr.length > 0) {
-    //   // 写入 writeArr 前半部分数据，同时开始并行获取 searchArr
-    //   const halfWriteArr = await sendHalfData(writeArr, writeStream);
-    //
-    //   // 并行获取 searchArr（下一批数据）
-    //   const searchPromise = this.getDataWithScope(belongHistoryId, page + 1, pageSize);
-    //   page += 1;
-    //
-    //   // 写入 writeArr 剩下的部分
-    //   for (const data of halfWriteArr) {
-    //     // TODO 处理后送到前端
-    //   }
-    //
-    //   // 等待 searchArr 数据获取完成
-    //   searchArr = await searchPromise;
-    //
-    //   // 将 writeArr 替换为 searchArr，searchArr 置为空
-    //   writeArr = searchArr;
-    //   searchArr = [];
-    // }
+    const pageSize = 1000;
+    const pageNum = 1;
+
+    // 主arr 用来向前端推送消息
+    const mainArr: IData[] = []
+    // 副arr 用来在推送消息的同时查询数据库
+    const subArr: IData[] = []
+
+    // 通过replay线程， 查询数据库，并且放到mainArr中
+    const replayWorker = getReplayWorker()
   }
 }
 

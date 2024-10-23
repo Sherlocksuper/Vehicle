@@ -76,7 +76,10 @@ class DataController {
 
   async startDataReplay(context: Context) {
     const belongId = context.params.belongId;
-    dataService.startDataReplay(belongId);
+
+    Promise.resolve(belongId).then((belongId) => {
+      dataService.startDataReplay(belongId);
+    });
 
     ((context.body as IResBody) = {
       code: SUCCESS_CODE,
