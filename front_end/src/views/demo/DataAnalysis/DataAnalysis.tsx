@@ -3,8 +3,6 @@ import {getTestsHistoryById} from "@/apis/request/testhistory.ts";
 import {SUCCESS_CODE} from "@/constants";
 import {Button, Card, Descriptions, Input, message, Modal, Slider, Space} from "antd";
 import {getDataMaxMinMiddle, searchForTargetData} from "@/apis/request/data.ts";
-import {IHistory} from "@/apis/standard/history.ts";
-import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 import {debounce, formatTime} from "@/utils";
 import {IHistoryList} from "@/views/demo/History/history.tsx";
 
@@ -75,19 +73,23 @@ const DataAnalysis = () => {
         setOpenDataParsing(true)
       }}>
         查看数据分析
+        <DataParsingModal source={dataParsing} open={openDataParsing} onFinished={() => {
+          setOpenDataParsing(false)
+        }}/>
       </Button>
-      <DataParsingModal source={dataParsing} open={openDataParsing}
-                        onFinished={() => {
-                          setOpenDataParsing(false)
-                        }}/>
       <Button type={"primary"} onClick={() => {
         setOpenDetailSearch(true)
       }}>
         查询数据
+        <DetailSearchModal history={history} open={openDetailSearch} onFinished={() => {
+          setOpenDetailSearch(false)
+        }}/>
       </Button>
-      <DetailSearchModal history={history} open={openDetailSearch} onFinished={() => {
-        setOpenDetailSearch(false)
-      }}/>
+      <Button type={"primary"} onClick={() => {
+         window.open(`/test-template-for-config?historyId=${history.id}`);
+      }}>
+       查看数据回放
+      </Button>
     </Card>
   )
 }

@@ -47,7 +47,7 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
         type: "DATA",
         message: JSON.stringify(message)
       })
-    }, 100)
+    }, 4)
     publicIntervalRecords.push(record)
   })
 }

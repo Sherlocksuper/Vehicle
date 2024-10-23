@@ -15,8 +15,11 @@ import {IData} from "../model/Data.model";
 import DataService from "./DataService";
 import historyService from "./HistoryService";
 import {formatHeader, formatOneSignal} from "../../utils/File/format";
+import {Context} from "koa";
+import {IResBody} from "../types";
+import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
 
-export const CURRENT_DATA_LIMIT = 100
+export const CURRENT_DATA_LIMIT = 100_000
 export const CURRENT_HISTORY_SIGN = "(正在下发...)"
 
 class TestConfigService {
@@ -34,7 +37,7 @@ class TestConfigService {
   // 信号的id和他的名称对应的数组
   signalsIdNameMap: Map<string, {
     name: string,
-    dimension:string
+    dimension: string
   }> = new Map()
   // 当前所属历史的id
   currentHistoryId: number = 0
@@ -101,7 +104,7 @@ class TestConfigService {
   async getTestConfigById(id: number): Promise<ITestConfig | null> {
     try {
       const testConfig = await TestConfig.findByPk(id)
-      return testConfig?.dataValues!
+      return testConfig!
     } catch (error) {
       console.log(error);
       return null
@@ -229,7 +232,7 @@ class TestConfigService {
         project.indicators.forEach(indicator => {
           this.signalsIdNameMap.set(indicator.signal.id, {
             name: `${indicator.name}(${indicator.signal.name})`,
-            dimension : indicator.signal.dimension
+            dimension: indicator.signal.dimension
           })
         })
       })
@@ -242,9 +245,18 @@ class TestConfigService {
   async stopCurrentTestConfig() {
     stopMockBoardMessage()
     // await sendMultipleMessagesBoard(this.banMessage, 200)
-    await historyService.updateHistoryName(this.currentHistoryId, this.currentTestConfig?.name!)
-    await this.downHistoryDataAsFormat(this.currentHistoryId)
-    await this.clearCurrent()
+    setTimeout(async (historyId, testConfigId, currentTestConfigName, currentHistoryData) => {
+      console.log("下载文件")
+      console.log(historyId, testConfigId, currentTestConfigName, currentHistoryData.length)
+
+      await historyService.updateHistoryName(historyId, currentTestConfigName!)
+      await this.saveCurrentDataToSql(currentTestConfigName!, historyId, currentHistoryData)
+      await this.downHistoryDataAsFormat(historyId, testConfigId!);
+
+      console.log("保存完成")
+    }, 1000, this.currentHistoryId, this.currentTestConfig?.id, this.currentTestConfig?.name, Array.from(this.currentTestConfigHistoryData))
+
+    await this.clearCurrent();
     return true
   }
 
@@ -257,7 +269,10 @@ class TestConfigService {
     // 如果当前的currentTestConfigHistory超过了十万条，那么存储到数据库
     if (this.currentTestConfigHistoryData.length > CURRENT_DATA_LIMIT) {
       console.log("存储到数据库")
-      this.saveCurrentDataToSql(this.currentTestConfigHistoryData)
+      this.saveCurrentDataToSql(
+        this.currentTestConfig!.name,
+        this.currentHistoryId,
+        this.currentTestConfigHistoryData)
       this.clearOnlyData()
     }
     this.currentTestConfigHistoryData.push(data)
@@ -316,14 +331,14 @@ class TestConfigService {
     }
   }
 
-  async downHistoryDataAsFormat(historyId: number) {
-    const testConfig = await this.getTestConfigById(this.currentTestConfig?.id!);
+  async downHistoryDataAsFormat(historyId: number, testConfigId: number) {
+    const testConfig = await this.getTestConfigById(testConfigId);
     const historyName = (testConfig?.name ?? "默认名称") + new Date().getHours() + new Date().getMinutes() + new Date().getSeconds();
     const currentDate = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
 
     let dir = '../public/uploads/' + currentDate;
     dir = path.resolve(__dirname, dir);
-    fs.mkdirSync(dir, { recursive: true });
+    fs.mkdirSync(dir, {recursive: true});
 
     const targetPath = path.resolve(__dirname, `../public/uploads/${currentDate}/${historyName}.txt`);
     const writeStream = fs.createWriteStream(targetPath);
@@ -334,7 +349,7 @@ class TestConfigService {
     let writeArr = await DataService.getDataWithScope(historyId, 1, 100000);
     let searchArr: any[] = [];
     let page = 1;
-    const pageSize = 100000;
+    const pageSize = 100_000;
 
     const writeHalfData = async (dataArray: IData[], writeStream: fs.WriteStream) => {
       const halfIndex = Math.floor(dataArray.length / 2);
@@ -373,19 +388,23 @@ class TestConfigService {
     return true;
   }
 
-  async saveCurrentDataToSql(currentData: {
-    time: number
-    data: {
-      [key: number]: number
-    }
-  }[]) {
+  async saveCurrentDataToSql(
+    configName: string,
+    historyId: number,
+    currentData: {
+      time: number
+      data: {
+        [key: number]: number
+      }
+    }[]) {
     // 存储到数据库
     const data: IData[] = []
     currentData.forEach(item => {
       for (let key in item.data) {
         data.push({
-          belongId: this.currentHistoryId,
-          configName: this.currentTestConfig?.name!,
+          belongId: historyId,
+          signalId: key,
+          configName: configName,
           name: this.signalsIdNameMap.get(key)?.name!,
           dimension: this.signalsIdNameMap.get(key)?.dimension!,
           time: item.time,

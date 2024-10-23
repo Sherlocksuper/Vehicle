@@ -60,7 +60,7 @@ class DataController {
 
   async deleteData(context: Context) {
     const {belongId, name, time, value} = context.request.body
-    const res = await dataService.deleteData(belongId, name, time,value)
+    const res = await dataService.deleteData(belongId, name, time, value)
 
     res && ((context.body as IResBody) = {
       code: SUCCESS_CODE,
@@ -70,6 +70,17 @@ class DataController {
     !res && ((context.body as IResBody) = {
       code: FAIL_CODE,
       msg: "删除失败",
+      data: null
+    })
+  }
+
+  async startDataReplay(context: Context) {
+    const belongId = context.params.belongId;
+    dataService.startDataReplay(belongId);
+
+    ((context.body as IResBody) = {
+      code: SUCCESS_CODE,
+      msg: "开始成功",
       data: null
     })
   }

@@ -10,12 +10,13 @@ import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import GridLayout from "react-grid-layout";
 import {DEFAULT_TITLE, SUCCESS_CODE} from "@/constants";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
-import {downHistoryDataAsJson, getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig.ts";
+import {getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
-import {getFileToHistoryWorker} from "@/worker/app.ts";
 import {IHistory} from "@/apis/standard/history.ts";
+import {getTestsHistoryById} from "@/apis/request/testhistory.ts";
+import * as url from "url";
 import {BASE_URL} from "@/apis/url/myUrl.ts";
 
 export interface IDragItem {
@@ -105,39 +106,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     setNetDataRecorder(updatedNetDataRecorder);
   };
 
-  const startOfflineData = (dataToShow: { time: number, data: { [key: string]: number } }[]) => {
-    let index = 0;
-    let isPaused = true;  // 控制是否暂停
-    const scheduleNext = () => {
-      if (isPaused || index >= dataToShow.length - 1) return;
-      const currentTime = dataToShow[index].time;
-      const nextTime = dataToShow[index + 1]?.time;
-
-      if (nextTime === undefined) return;
-
-      setTimeout(() => {
-        if (!isPaused) {
-          throttleUpdate(dataToShow[index].data);
-          index++;
-          scheduleNext();  // 递归调用，继续调度下一个
-        }
-      }, nextTime - currentTime);
-    };
-
-    // 暴露的控制接口
-    return {
-      start: () => {
-        if (isPaused) {
-          isPaused = false;
-          scheduleNext();  // 继续执行
-        }
-      },
-      pause: () => {
-        isPaused = true;  // 暂停执行
-      },
-    };
-  };
-  // 在线数据的时候获取testConfig
+  // 在线、离线数据的时候获取testConfig
   useEffect(() => {
     if (dataMode === "OFFLINE") {
       return () => {
@@ -146,22 +115,34 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
 
     const search = window.location.search
     const params = new URLSearchParams(search)
-    const testConfigId = params.get('testConfigId')
+    const testConfigId = params.get('testConfigId') ?? undefined
+    const historyId = params.get('historyId') ?? undefined
 
     if (testConfigId) {
       let testConfig: ITestConfig = undefined
       getTestConfigById(Number(testConfigId)).then((res) => {
         if (res.code === SUCCESS_CODE) {
           testConfig = res.data as ITestConfig
-          console.log(testConfigId)
           history.current.template = testConfig.template
 
           setTestConfig(testConfig)
           setDragItems(transferITemplateToDragItems(testConfig.template))
         }
       })
+      return
     }
-  }, [])
+
+    // 从历史记录中获取数据
+    getTestsHistoryById(Number(historyId)).then((res) => {
+      if (res.code === SUCCESS_CODE) {
+        const testConfig = res.data.testConfig as ITestConfig
+        history.current.template = testConfig.template
+
+        setTestConfig(testConfig)
+        setDragItems(transferITemplateToDragItems(testConfig.template))
+      }
+    })
+  }, [dataMode])
 
   // 处理在线数据源头
   useEffect(() => {
@@ -174,8 +155,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     }
 
 
-    const url = String(BASE_URL).replace('3000/api', '8080')
-    const socket = new WebSocket(url + '/ws');
+    const socket = new WebSocket(BASE_URL + '/ws');
     socket.onopen = () => {
       socketRef.current = socket
     }
@@ -196,34 +176,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     return () => {
       socket.close();
     };
-  }, []);
-
-  // 处理离线数据源头
-  useEffect(() => {
-    if (dataMode === "ONLINE") {
-      return;
-    }
-
-    // 收到一个文件
-    window.onmessage = (event) => {
-      if (history.current.historyData.length !== 0) {
-        return
-      }
-      if (!(event.data instanceof File)) {
-        return
-      }
-      // 把文件放给worker处理
-      const worker = getFileToHistoryWorker()
-      worker.onmessage = (event) => {
-        const historyData = event.data as IHistory
-        setDragItems(transferITemplateToDragItems(historyData.template))
-        history.current.historyData = historyData.historyData
-        historyManagers.current = startOfflineData(historyData.historyData)
-      }
-      worker.postMessage(event.data)
-    }
-
-  }, [])
+  }, [dataMode, throttleUpdate]);
 
   const [, drop] = useDrop<{ id: string } & IDraggleComponent>({
     accept: 'box',
@@ -399,29 +352,6 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
           onClick={() => {
             setMode('CHANGING')
           }}>切换到配置模式</Button>
-
-        <Button onClick={() => {
-          // const worker = getHistoryToFileWorker()
-          // worker.onmessage = (event) => {
-          //   const file = event.data
-          //   downFile(file, testConfig.name, 'ACTIVE')
-          // }
-
-          downHistoryDataAsJson().then((res) => {
-            if (res.code === SUCCESS_CODE) {
-              // downFile(res.data, testConfig.name, 'ACTIVE')
-              message.success('下载成功')
-            } else {
-              message.error('下载失败,请重试')
-            }
-          })
-
-          // TODO 是否保留以前的数据
-          // history.current.endTime = Date.now()
-          // worker.postMessage(history.current)
-          // history.current.startTime = Date.now()
-          // history.current.historyData = []
-        }}>下载收集数据</Button>
       </Space>
     }
 

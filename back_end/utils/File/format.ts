@@ -94,6 +94,7 @@ const wrapOneSignal = (time: number, name: string, dimension: string, value: num
 
 const getTotalSignals = (config: ITestConfig) => {
   const result: string[] = []
+  if (!config) return result
   config.configs.forEach(config => {
     config.vehicle.protocols.forEach(protocol => {
       protocol.protocol.signalsParsingConfig.forEach(spConfig => {
@@ -108,6 +109,7 @@ const getTotalSignals = (config: ITestConfig) => {
 
 const getUsedSignals = (config: ITestConfig) => {
   const result: IProtocolSignal[] = []
+  if (!config) return result
   config.configs.forEach(config => {
     config.projects.forEach(project => {
       project.indicators.forEach(indicator => {

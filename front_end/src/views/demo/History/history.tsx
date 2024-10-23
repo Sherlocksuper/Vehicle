@@ -5,7 +5,6 @@ import {FAIL_CODE} from "@/constants";
 import {confirmDelete} from "@/utils";
 import Search from "antd/es/input/Search";
 import {BASE_URL} from "@/apis/url/myUrl.ts";
-import {getCurrentTestConfig} from "@/apis/request/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
 
 export interface IHistoryList {

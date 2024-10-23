@@ -1,5 +1,8 @@
 import DataModel, {IData} from "../model/Data.model";
 import {Op} from "sequelize";
+import {sendMessageToFront} from "../ztcp/toFront";
+import fs from "fs";
+import {formatOneSignal} from "../../utils/File/format";
 
 class DataService {
   async addData(dataGroup: IData[]) {
@@ -86,10 +89,49 @@ class DataService {
   async deleteDataByBelongId(belongId: number) {
     const result = await DataModel.destroy({
       where: {
-        belongId
+        belongId: belongId
       }
     });
     return result
+  }
+
+  // 开始数据回放
+  async startDataReplay(belongHistoryId: number) {
+    // const pageNum = 1
+    // const pageSize = 100_000
+    //
+    // let writeArr = await this.getDataWithScope(belongHistoryId, pageNum, pageSize);
+    // let searchArr: any[] = [];
+    // let page = 1;
+    //
+    // const sendHalfData = async (dataArray: IData[], writeStream: fs.WriteStream) => {
+    //   const halfIndex = Math.floor(dataArray.length / 2);
+    //   for (let i = 0; i < halfIndex; i++) {
+    //
+    //   }
+    //   return dataArray.slice(halfIndex); // 返回未写入的数据
+    // };
+    //
+    // while (writeArr.length > 0 || searchArr.length > 0) {
+    //   // 写入 writeArr 前半部分数据，同时开始并行获取 searchArr
+    //   const halfWriteArr = await sendHalfData(writeArr, writeStream);
+    //
+    //   // 并行获取 searchArr（下一批数据）
+    //   const searchPromise = this.getDataWithScope(belongHistoryId, page + 1, pageSize);
+    //   page += 1;
+    //
+    //   // 写入 writeArr 剩下的部分
+    //   for (const data of halfWriteArr) {
+    //     // TODO 处理后送到前端
+    //   }
+    //
+    //   // 等待 searchArr 数据获取完成
+    //   searchArr = await searchPromise;
+    //
+    //   // 将 writeArr 替换为 searchArr，searchArr 置为空
+    //   writeArr = searchArr;
+    //   searchArr = [];
+    // }
   }
 }
 
