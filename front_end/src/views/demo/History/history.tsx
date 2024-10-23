@@ -60,6 +60,7 @@ const HistoryData = () => {
         <Space>
           <a onClick={() => deleteHistory(record.id!)}>删除</a>
           <a href={`/test-receive/offline-management?belongId=${record.id}`}>数据分析</a>
+          <a href={`${BASE_URL + record.path}`} download={true}>导出格式化文件</a>
         </Space>
       )
     }

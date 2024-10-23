@@ -65,10 +65,6 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
           console.log("decodingBoardMessageWith Map result ", result);
           const msg = mapToJson(result);
 
-          // TestConfigService.currentTestConfigHistoryData.push({
-          //   time: new Date().getTime(),
-          //   data: JSON.parse(msg)
-          // });
           TestConfigService.pushDataToCurrentHistory({
             time: new Date().getTime(),
             data: JSON.parse(msg)

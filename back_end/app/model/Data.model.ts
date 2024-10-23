@@ -1,10 +1,12 @@
 import {Column, CreatedAt, DataType, Model, Table, UpdatedAt} from "sequelize-typescript";
 
 export interface IData {
+  // 所属历史记录的id
   belongId: number
   configName: string
   name: string
   time: number
+  dimension: string
   value: number
 }
 
@@ -23,6 +25,9 @@ export default class DataModel extends Model<IData> {
 
   @Column(DataType.BIGINT)
   time!: number;
+
+  @Column(DataType.STRING)
+  dimension!: string;
 
   @Column(DataType.FLOAT)
   value!: number;

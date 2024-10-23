@@ -47,6 +47,19 @@ class DataService {
     })
   }
 
+  async getDataWithScope(belongId: number, page: number, pageSize: number) {
+    const offset = (page - 1) * pageSize;
+    const limit = pageSize;
+
+    return await DataModel.findAll({
+      where: {
+        belongId
+      },
+      offset: offset,
+      limit: limit
+    });
+  }
+
   async updateData(configName: string, name: string, time: number, value: number) {
     const result = await DataModel.update({value}, {
       where: {

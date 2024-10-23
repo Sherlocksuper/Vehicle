@@ -52,6 +52,17 @@ class HistoryService {
         })
         return res
     }
+
+    async updateHistoryPath(recordId: number, path: string) {
+        const res = await HistoryModel.update({
+            path: path
+        }, {
+            where: {
+                id: recordId
+            },
+        })
+        return res
+    }
 }
 
 export default  new HistoryService()

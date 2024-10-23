@@ -129,7 +129,6 @@ export const getAllProtocolSignalsFromTestConfig = (testConfig: ITestConfig) => 
   testConfig.configs.forEach((config) => {
     config.projects.forEach((project) => {
       project.indicators.forEach((indicator) => {
-        console.log(indicator.signal)
         signals.push(indicator.signal)
       })
     })

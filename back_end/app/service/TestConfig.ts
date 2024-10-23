@@ -14,13 +14,10 @@ import {startMockBoardMessage, stopMockBoardMessage} from "../ztcp/toFront";
 import {IData} from "../model/Data.model";
 import DataService from "./DataService";
 import historyService from "./HistoryService";
+import {formatHeader, formatOneSignal} from "../../utils/File/format";
 
 export const CURRENT_DATA_LIMIT = 100
-
 export const CURRENT_HISTORY_SIGN = "(正在下发...)"
-// 时间戳的base值 17
-// 用basetime，为了缩小时间戳的长度，节省存储控件
-export const BASE_TIME = 1_729_597_005_000
 
 class TestConfigService {
   currentTestConfig: ITestConfig | null = null
@@ -35,7 +32,10 @@ class TestConfigService {
   // 由采集项id、帧id等组成的key值和signal的id(之前是uuid现在是序号数组)对应的map
   signalsMappingRelation: Map<string, string[]> = new Map()
   // 信号的id和他的名称对应的数组
-  signalsIdNameMap: Map<string, string> = new Map()
+  signalsIdNameMap: Map<string, {
+    name: string,
+    dimension:string
+  }> = new Map()
   // 当前所属历史的id
   currentHistoryId: number = 0
   banMessage: Buffer[] = []
@@ -192,22 +192,22 @@ class TestConfigService {
 
     // TODO 连接下位机并且发送消息,调试的时候没有下位机所以注释掉，使用startMock
     // 下发逻辑放到后面，因为要等到所有的数据都准备好了才能下发,并且如果失败、停止下发的时候比较Ok
-    try {
-      await connectWithMultipleBoards(hostPortList, 0)
-    } catch (e) {
-      return "连接下位机失败"
-    }
-
-    // 发送所有消息给板子
-    try {
-      await sendMultipleMessagesBoard(res.resultMessages, 1000)
-    } catch (e) {
-      return "向下位机发送消息失败"
-    }
+    // try {
+    //   await connectWithMultipleBoards(hostPortList, 0)
+    // } catch (e) {
+    //   return "连接下位机失败"
+    // }
+    //
+    // // 发送所有消息给板子
+    // try {
+    //   await sendMultipleMessagesBoard(res.resultMessages, 1000)
+    // } catch (e) {
+    //   return "向下位机发送消息失败"
+    // }
     await this.storeCurrentConfigToSql(testConfig!)
 
     // TODO 模拟数据
-    // startMockBoardMessage(this.signalsMappingRelation)
+    startMockBoardMessage(this.signalsMappingRelation)
     return undefined
   }
 
@@ -227,7 +227,10 @@ class TestConfigService {
     testConfig.configs.forEach(config => {
       config.projects.forEach(project => {
         project.indicators.forEach(indicator => {
-          this.signalsIdNameMap.set(indicator.signal.id, `${indicator.name}(${indicator.signal.name})`)
+          this.signalsIdNameMap.set(indicator.signal.id, {
+            name: `${indicator.name}(${indicator.signal.name})`,
+            dimension : indicator.signal.dimension
+          })
         })
       })
     })
@@ -237,9 +240,10 @@ class TestConfigService {
    * 停止当前下发
    */
   async stopCurrentTestConfig() {
-    // stopMockBoardMessage()
-    await sendMultipleMessagesBoard(this.banMessage, 200)
+    stopMockBoardMessage()
+    // await sendMultipleMessagesBoard(this.banMessage, 200)
     await historyService.updateHistoryName(this.currentHistoryId, this.currentTestConfig?.name!)
+    await this.downHistoryDataAsFormat(this.currentHistoryId)
     await this.clearCurrent()
     return true
   }
@@ -312,59 +316,61 @@ class TestConfigService {
     }
   }
 
-  async downHistoryDataAsJson() {
-    const currentTestConfigId = this.currentTestConfig?.id!
-    //获取当前测试配置的历史数据
-    const testConfig = await this.getTestConfigById(currentTestConfigId)
+  async downHistoryDataAsFormat(historyId: number) {
+    const testConfig = await this.getTestConfigById(this.currentTestConfig?.id!);
+    const historyName = (testConfig?.name ?? "默认名称") + new Date().getHours() + new Date().getMinutes() + new Date().getSeconds();
+    const currentDate = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
 
-    const historyName = (testConfig?.name ?? "默认名称") + new Date().getHours() + new Date().getMinutes()
+    let dir = '../public/uploads/' + currentDate;
+    dir = path.resolve(__dirname, dir);
+    fs.mkdirSync(dir, { recursive: true });
 
-    const history = {
-      // 月、日、时、分
-      historyName: historyName,
-      configName: this.currentTestConfig?.name ?? "默认名称",
-      startTime: this.currentTestConfigHistoryData[0].time,
-      endTime: this.currentTestConfigHistoryData[this.currentTestConfigHistoryData.length - 1].time,
-      template: testConfig?.template,
-      testConfig: testConfig,
-      historyData: this.currentTestConfigHistoryData
+    const targetPath = path.resolve(__dirname, `../public/uploads/${currentDate}/${historyName}.txt`);
+    const writeStream = fs.createWriteStream(targetPath);
+
+    const header = formatHeader(testConfig!);
+    writeStream.write(header + '\n');
+
+    let writeArr = await DataService.getDataWithScope(historyId, 1, 100000);
+    let searchArr: any[] = [];
+    let page = 1;
+    const pageSize = 100000;
+
+    const writeHalfData = async (dataArray: IData[], writeStream: fs.WriteStream) => {
+      const halfIndex = Math.floor(dataArray.length / 2);
+      for (let i = 0; i < halfIndex; i++) {
+        writeStream.write(formatOneSignal(dataArray[i]) + '\n');
+      }
+      return dataArray.slice(halfIndex); // 返回未写入的数据
+    };
+
+    while (writeArr.length > 0 || searchArr.length > 0) {
+      // 写入 writeArr 前半部分数据，同时开始并行获取 searchArr
+      const halfWriteArr = await writeHalfData(writeArr, writeStream);
+
+      // 并行获取 searchArr（下一批数据）
+      const searchPromise = DataService.getDataWithScope(historyId, page + 1, pageSize);
+      page += 1;
+
+      // 写入 writeArr 剩下的部分
+      for (const data of halfWriteArr) {
+        writeStream.write(formatOneSignal(data) + '\n');
+      }
+
+      // 等待 searchArr 数据获取完成
+      searchArr = await searchPromise;
+
+      // 将 writeArr 替换为 searchArr，searchArr 置为空
+      writeArr = searchArr;
+      searchArr = [];
     }
 
-    const currentDate = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate()
-    // 存储到的目录文件夹
-    let dir = '../public/uploads/' + currentDate
-    dir = path.resolve(__dirname, dir)
-    // 文件路径
-    const targetPath = path.resolve(__dirname, `../public/uploads/${currentDate}/${historyName}.json`)
-    // 静态资源路径
-    const staticPath = `/uploads/${currentDate}/${historyName}.json`
-    // 确保文件夹存在
-    try {
-      fs.mkdirSync(dir, {recursive: true});
+    // 关闭写入流
+    writeStream.end();
 
-      // 创建一个文件
-      fs.writeFileSync(targetPath, JSON.stringify(history, null, 2));
+    await historyService.updateHistoryPath(historyId, `/uploads/${currentDate}/${historyName}.txt`);
 
-      const fileSize = fs.statSync(targetPath)
-
-      console.log("车辆名称", this.currentTestConfig?.configs[0].vehicle.vehicleName)
-
-      // @ts-ignore
-      // await historyService.addHistory({
-      //   testConfig: {},
-      //   fatherConfigName: this.currentTestConfig?.name ?? "默认名称",
-      //   size: transferFileSize(fileSize.size),
-      //   vehicleName: this.currentTestConfig?.configs[0].vehicle.vehicleName!,
-      //   path: staticPath
-      // })
-
-      // await this.downReceiveDataToXlsx(this.currentTestConfig?.name ?? "默认名称")
-
-    } catch (error) {
-      console.error('Failed to write file:', error);
-      return false
-    }
-    return true
+    return true;
   }
 
   async saveCurrentDataToSql(currentData: {
@@ -380,7 +386,8 @@ class TestConfigService {
         data.push({
           belongId: this.currentHistoryId,
           configName: this.currentTestConfig?.name!,
-          name: this.signalsIdNameMap.get(key)!,
+          name: this.signalsIdNameMap.get(key)?.name!,
+          dimension: this.signalsIdNameMap.get(key)?.dimension!,
           time: item.time,
           value: item.data[key]
         })

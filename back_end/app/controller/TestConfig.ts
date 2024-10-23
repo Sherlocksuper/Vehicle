@@ -144,15 +144,9 @@ class TestConfigController {
 
   // async downHistoryDataAsJson() {
   async downHistoryDataAsJson(ctx: Context) {
-    const res = await TestConfigService.downHistoryDataAsJson();
-    res && ((ctx.body as IResBody) = {
+     ((ctx.body as IResBody) = {
       code: SUCCESS_CODE,
       msg: SEARCH_SUCCESS_MSG,
-      data: null
-    })
-    !res && ((ctx.body as IResBody) = {
-      code: FAIL_CODE,
-      msg: SEARCH_FAIL_MSG,
       data: null
     })
   }
