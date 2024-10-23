@@ -155,7 +155,9 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     }
 
 
-    const socket = new WebSocket(BASE_URL + '/ws');
+    let url = BASE_URL
+    url = url.replace('3000/api', '8080')
+    const socket = new WebSocket(url + '/ws');
     socket.onopen = () => {
       socketRef.current = socket
     }
