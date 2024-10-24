@@ -14,10 +14,12 @@ export const HomeMenu = () => {
     const [visible, setVisible] = React.useState(false)
     const [form] = Form.useForm()
     const items = routeItems.map(item => ({
-        key: item.key,
-        label: item.label,
-        children: item.children,
-    }));
+            key: item.key,
+            label: item.label,
+            children: item.children,
+        })
+    );
+
 
 
     const onClick: MenuProps['onClick'] = (e) => {

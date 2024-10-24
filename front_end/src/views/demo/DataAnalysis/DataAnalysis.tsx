@@ -6,7 +6,7 @@ import {getDataMaxMinMiddle, searchForTargetData} from "@/apis/request/data.ts";
 import {debounce, formatTime} from "@/utils";
 import {IHistoryList} from "@/views/demo/History/history.tsx";
 
-const DataAnalysis = () => {
+const DataAnalysis = ({belongid}) => {
   const [history, setHistory] = useState(undefined);
 
   const [openDataParsing, setOpenDataParsing] = useState(false);
@@ -16,12 +16,19 @@ const DataAnalysis = () => {
     min: number,
     middle: number
   }[]>([]);
-
   const [openDetailSearch, setOpenDetailSearch] = useState(false)
 
+  const handleCloseParsing=()=>{
+    setOpenDataParsing(false)
+  }
+  const handleCloseDetailSearch=()=>{
+    setOpenDetailSearch(true)
+  }
+
   useEffect(() => {
-    const url = new URL(window.location.href)
-    const belongId = url.searchParams.get('belongId')
+    // const url = new URL(window.location.href)
+    // const belongId = url.searchParams.get('belongId')
+    const belongId=belongid
     getTestsHistoryById(Number(belongId)).then(res => {
       if (res.code === SUCCESS_CODE) {
         setHistory(res.data)
@@ -37,7 +44,7 @@ const DataAnalysis = () => {
         setDataParsing(null)
       }
     })
-  }, [])
+  }, [belongid])
 
   if (!history) {
     return (
@@ -73,13 +80,9 @@ const DataAnalysis = () => {
         setOpenDataParsing(true)
       }}>
         查看数据分析
-        <DataParsingModal source={dataParsing} open={openDataParsing} onFinished={() => {
-          setOpenDataParsing(false)
-        }}/>
+        <DataParsingModal source={dataParsing} open={openDataParsing} onFinished={()=>{handleCloseParsing()}}/>
       </Button>
-      <Button type={"primary"} onClick={() => {
-        setOpenDetailSearch(true)
-      }}>
+      <Button type={"primary"} onClick={handleCloseDetailSearch}>
         查询数据
         <DetailSearchModal history={history} open={openDetailSearch} onFinished={() => {
           setOpenDetailSearch(false)
@@ -114,7 +117,7 @@ const DataParsingModal = ({source, open, onFinished}: {
         onFinished()
       }}
     >
-      {source.map((item, index) => {
+      {source.map((item) => {
         return (
           <div style={{marginBottom: 20}}>
             <p style={{fontWeight: 'bold', fontSize: 16}}>{item.name}</p>
