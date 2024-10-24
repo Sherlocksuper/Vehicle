@@ -1,7 +1,5 @@
 import DataModel, {IData} from "../model/Data.model";
 import {Op} from "sequelize";
-import User from "../model/User.model";
-import {getReplayWorker} from "../worker";
 
 //worker_threads
 
@@ -21,7 +19,7 @@ class DataService {
     return await DataModel.findAll({
       where: {
         belongId,
-        name :{
+        name: {
           [Op.like]: `%${name}%`
         },
         time: {
@@ -81,16 +79,15 @@ class DataService {
     return result
   }
 
-  async deleteData(belongId: number, name: string, time: number, value: number) {
-    const result = await DataModel.destroy({
-      where: {
-        belongId,
-        name,
-        time,
-        value,
-      }
-    });
-    return result
+  async deleteData(targetData: string[]) {
+    for (const id of targetData) {
+      await DataModel.destroy({
+        where: {
+          id: id
+        }
+      });
+    }
+    return true
   }
 
   async deleteDataByBelongId(belongId: number) {

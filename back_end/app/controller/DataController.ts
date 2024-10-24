@@ -59,8 +59,9 @@ class DataController {
   }
 
   async deleteData(context: Context) {
-    const {belongId, name, time, value} = context.request.body
-    const res = await dataService.deleteData(belongId, name, time, value)
+    const{targetIds} = context.request.body
+    const res = await dataService.deleteData(targetIds)
+    console.log(res)
 
     res && ((context.body as IResBody) = {
       code: SUCCESS_CODE,

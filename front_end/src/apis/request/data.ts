@@ -1,15 +1,12 @@
 import {request} from "@/utils/request.ts";
 import {DATA_API} from "@/apis/url/data.ts";
 
-export const deleteData = async (belongId: number, name: string, time: number ,value: number) => {
+export const deleteData = async (ids : string[]) => {
   const api = DATA_API.deleteData;
   return request({
     api: api,
     params: {
-      belongId,
-      name,
-      time,
-      value
+      targetIds: ids
     }
   });
 }

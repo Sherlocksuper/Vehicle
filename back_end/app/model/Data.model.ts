@@ -1,6 +1,7 @@
 import {Column, CreatedAt, DataType, Model, Table, UpdatedAt} from "sequelize-typescript";
 
 export interface IData {
+  id?: number
   // 所属历史记录的id
   belongId: number
   // 在图表中的id, 用来指明数据流向
