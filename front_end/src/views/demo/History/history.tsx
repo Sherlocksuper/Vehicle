@@ -1,11 +1,16 @@
-import {Button, Card, message, Space, Table, TableProps} from "antd";
-import React, {useEffect} from "react";
-import {deleteTestsHistory, getTestsHistory} from "@/apis/request/testhistory.ts";
-import {FAIL_CODE} from "@/constants";
-import {confirmDelete} from "@/utils";
+import {Button, Card, Input, message, Modal, Slider, Space, Table, TableProps, Select} from "antd";
+import React, {useEffect, useState} from "react";
+import {deleteTestsHistory, getTestsHistory, getTestsHistoryById} from "@/apis/request/testhistory.ts";
+import {FAIL_CODE, SUCCESS_CODE} from "@/constants";
+import {confirmDelete, debounce, formatTime} from "@/utils";
 import Search from "antd/es/input/Search";
 import {BASE_URL} from "@/apis/url/myUrl.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
+// import DataAnalysis from "@/views/demo/DataAnalysis/DataAnalysis.tsx";
+import {getDataMaxMinMiddle, searchForTargetData} from "@/apis/request/data.ts";
+import {TableRowSelection} from "antd/es/table/interface";
+
+
 
 export interface IHistoryList {
   id?: number
@@ -22,6 +27,45 @@ export interface IHistoryList {
 const HistoryData = () => {
   const [historyDataStore, setHistoryDataStore] = React.useState<IHistoryList[]>([])
   const [historyData, setHistoryData] = React.useState<IHistoryList[]>([])
+  // const [dataAnalysisVisible, setDataAnalysisVisible] = React.useState<boolean>(false)
+  const [belongId, setBelongId] = React.useState<string>(undefined)
+
+
+  const [history, setHistory] = useState(undefined);
+  const [dataParsing, setDataParsing] = useState<{
+    name: string,
+    max: number,
+    min: number,
+    middle: number
+  }[]>([]);
+  const [openDataParsing, setOpenDataParsing] = useState(false);
+  const [openDetailSearch, setOpenDetailSearch] = useState(false)
+  const handleCloseParsing=()=>{
+    setOpenDataParsing(false)
+  }
+  const handleCloseDetailSearch=()=>{
+    setOpenDetailSearch(false)
+  }
+
+  useEffect(() => {
+    getTestsHistoryById(Number(belongId)).then(res => {
+      if (res.code === SUCCESS_CODE) {
+        setHistory(res.data)
+      } else {
+        setHistory(null)
+      }
+    })
+
+    getDataMaxMinMiddle(Number(belongId)).then(res => {
+      if (res.code === SUCCESS_CODE) {
+        setDataParsing(res.data)
+      } else {
+        setDataParsing(null)
+      }
+    })
+  }, [belongId])
+
+
 
   const columns: TableProps<IHistoryList>['columns'] = [
     {
@@ -55,12 +99,43 @@ const HistoryData = () => {
     {
       title: "操作",
       key: "action",
-      render: (text, record) => (
-        <Space>
-          <a onClick={() => deleteHistory(record.id!)}>删除</a>
-          <a href={`/test-receive/offline-management?belongId=${record.id}`}>数据分析</a>
-          <a href={`${BASE_URL + record.path}`} download={true}>导出格式化文件</a>
-        </Space>
+      render: ( record) => (
+          <Space>
+            <a onClick={() => deleteHistory(record.id!)}>删除</a>
+            {/*<a onClick={() => {*/}
+            {/*  setDataAnalysisVisible(!dataAnalysisVisible);*/}
+            {/*  setBelongId(record.id.toString())*/}
+            {/*}}>数据分析</a>*/}
+            <a onClick={() => {
+              setBelongId(record.id.toString())
+              setOpenDetailSearch(true)
+            }}>
+              查询
+
+            </a>
+            <a onClick={async () => {
+              setBelongId(record.id.toString())
+              getTestsHistoryById(Number(belongId)).then(res => {
+                if (res.code === SUCCESS_CODE) {
+                  setHistory(res.data)
+                } else {
+                  setHistory(null)
+                }
+              }).then(()=>{
+                setOpenDataParsing(true)
+              })
+            }}>
+              分析
+
+            </a>
+            <a onClick={() => {
+              setBelongId(record.id.toString())
+              window.open(`/test-template-for-config?historyId=${history.id}`);
+            }}>
+              回放
+            </a>
+            <a href={`${BASE_URL + record.path}`} download={true}>格式化导出</a>
+          </Space>
       )
     }
   ];
@@ -91,27 +166,300 @@ const HistoryData = () => {
   }, [])
 
   return (
-    <Card
-      title="历史数据"
-      extra={<Space>
-        <Search placeholder="搜索" onSearch={value => {
-          setHistoryData(historyDataStore.filter(item => item.fatherConfigName.includes(value) || item.createdAt.toString().includes(value) || item.vehicleName.toString().includes(value)))
-        }}/>
-        <Space/>
-        <Button onClick={fetchHistoryData}>刷新</Button>
-      </Space>}
-      style={{
-        height: "100vh",
-        overflow: "scroll",
-      }}
-    >
-      <Table
-        columns={columns}
-        dataSource={historyData}
-        rowKey="id"
-      />
-    </Card>
+
+        <Card
+          title="历史数据"
+          extra={<Space>
+            <Search placeholder="搜索" onSearch={value => {
+              setHistoryData(historyDataStore.filter(item => item.fatherConfigName.includes(value) || item.createdAt.toString().includes(value) || item.vehicleName.toString().includes(value)))
+            }}/>
+            <Space/>
+            <Button onClick={fetchHistoryData}>刷新</Button>
+          </Space>}
+          style={{
+            height: "100vh",
+            overflow: "scroll",
+          }}
+        >
+          <Table
+            columns={columns}
+            dataSource={historyData}
+            rowKey="id"
+          />
+
+          <DetailSearchModal history={history} open={openDetailSearch} onFinished={handleCloseDetailSearch}/>
+          <DataParsingModal source={dataParsing} open={openDataParsing} onFinished={handleCloseParsing}/>
+          {/*{dataAnalysisVisible?<DataAnalysis belongid={belongId}></DataAnalysis>:<>6</>}*/}
+        </Card>
+
+
   )
+}
+
+
+const DataParsingModal = ({source, open, onFinished}: {
+  source: {
+    name: string,
+    max: number,
+    min: number,
+    middle: number
+  }[],
+  open: boolean,
+  onFinished: () => void
+}) => {
+  const handleClose=()=>{
+    onFinished()
+  }
+  const list=source.map((item) => {
+    return (
+        <div style={{marginBottom: 20}}>
+          <p style={{fontWeight: 'bold', fontSize: 16}}>{item.name}</p>
+          <p style={{fontSize: 14}}>
+            <span style={{marginRight: 30}}>最大值: {item.max}</span>
+            <span style={{marginRight: 30}}>最小值: {item.min}</span>
+            <span>均值: {item.middle}</span>
+          </p>
+        </div>
+    );
+  })
+  return (
+
+      <Modal
+          open={open}
+          onCancel={handleClose}
+          onOk={handleClose}
+      >
+        分析结果
+        {list.length?list:<div style={{textAlign:"center"}}>无数据</div>}
+      </Modal>
+  )
+}
+
+const DetailSearchModal = ({history, open, onFinished}: {
+  history: IHistoryList,
+  open: boolean,
+  onFinished: () => void
+}) => {
+  const handleClose=()=>{
+    onFinished()
+  }
+
+  // const itemHeight = 30
+  // const containerHigh = 500
+  // const [scrollTop, setScrollTop] = useState(0)
+  // const [suitableName, setSuitableName] = useState<string[]>([])
+
+
+  // 查询条件
+  const [searchCriteria, setSearchCriteria] = useState({
+    name: "",
+    startTime: new Date(history?.createdAt).getTime(),
+    endTime: new Date(history?.updatedAt).getTime(),
+    minValue: -1000,
+    maxValue: 1000
+  })
+
+
+  interface DataType {
+    time: number,
+    value: number
+  }
+  const searchResultColumns: TableProps<DataType>['columns'] = [
+    {
+      key: 'time',
+      title: '时间',
+      dataIndex: 'time',
+    },
+    {
+      key: 'value',
+      title: '结果',
+      dataIndex: 'value',
+    },
+  ]
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  const rowSelection: TableRowSelection<DataType> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+  const [searchResultArr, setSearchResultArr] = useState<DataType[]>(undefined)
+
+
+  const debounceSetPeriod = debounce((value) => {
+    setSearchCriteria({...searchCriteria, startTime: value[0], endTime: value[1]})
+  })
+
+  // const searchForSuitAbleName = (name:string) => {
+  //   const result:any[] = []
+  //   history.testConfig.configs[0].projects.forEach(project => {
+  //     project.indicators.forEach(indicator => {
+  //       if (indicator.name.includes(name) || indicator.signal.name.includes(name))
+  //         result.push(`${indicator.name}(${indicator.signal.name})`)
+  //     })
+  //   })
+  //   setSuitableName(result)
+  // }
+  // // 获取虚拟列表
+  // const getVirtualList = (scrollTop: number):any[] => {
+  //   if (searchResultArr === undefined) {
+  //     return []
+  //   }
+  //
+  //   const virtualList = []
+  //
+  //   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - 5)
+  //   const endIndex = Math.min(searchResultArr.length - 1, startIndex + Math.floor(containerHigh / itemHeight) + 5)
+  //   for (let i = startIndex; i < endIndex; i++) {
+  //     const data = searchResultArr[i]
+  //     data && virtualList.push(
+  //         <div
+  //             key={i + startIndex}
+  //             style={{
+  //               position: "relative",
+  //               display: "flex",
+  //               justifyContent: "space-between",
+  //               height: itemHeight,
+  //             }}>
+  //           <p style={{display: "inline", marginRight: 30}}>{`${(new Date(data.time)).toLocaleString()}`}</p>
+  //           <p style={{display: "inline"}}>{`${data.value}`}</p>
+  //         </div>
+  //     )
+  //   }
+  //
+  //   return virtualList
+  // }
+
+  const startSearch = (name:string) => {
+    message.loading("正在检索数据")
+    searchForTargetData(history.id,
+        name,
+        searchCriteria.startTime,
+        searchCriteria.endTime,
+        searchCriteria.minValue,
+        searchCriteria.maxValue).then(res => {
+      if (res.code === SUCCESS_CODE) {
+        setSearchResultArr(res.data)
+      }
+      message.destroy()
+    })
+  }
+
+
+
+  return <>
+    <Modal open={open}
+           onCancel={handleClose}
+           footer={[<Button onClick={handleClose}>取消</Button>]}
+           width={800}
+    >
+      <Space>
+        输入搜索名称:<Select
+          defaultValue="请输入"
+          style={{ width: 200 }}
+          onChange={(value) => {
+            setSearchCriteria({...searchCriteria, name: value})
+          }}
+          options={
+            history?.testConfig.configs[0].projects.map(project => {
+              return project.indicators.map(indicator => {
+                return {value:indicator.signal.name,label:indicator.name}
+              })
+            }).flat(2)
+          }
+      /> <Button type={"primary"} onClick={() => {
+        if (!searchCriteria.name) {
+          message.error("请输入信号名称")
+          return;
+        }
+        // searchForSuitAbleName(searchCriteria.name)
+        startSearch(searchCriteria.name)
+      }}>开始搜索</Button>
+      </Space>
+      <Space>
+        </Space>
+      <div style={{marginTop: 20}}>
+        拖动选择搜索时间:
+        <Slider range
+                defaultValue={[(new Date(history?.createdAt)).getTime(), (new Date(history?.updatedAt)).getTime()]}
+                min={(new Date(history?.createdAt)).getTime()}
+                max={(new Date(history?.updatedAt)).getTime()}
+                tooltip={{
+                  formatter: (value: number | number[] | undefined) => {
+                    if (typeof value === 'number') {
+                      return <div>{formatTime(value)}</div>;
+                    } else if (Array.isArray(value)) {
+                      return <div>{formatTime(value[0])} - {formatTime(value[1])}</div>
+                    }
+                    return null;
+                  }
+                }}
+                onChange={(value) => {
+                  debounceSetPeriod(value)
+                }}/>
+      </div>
+      <div style={{marginTop: 20}}>
+        <Space>
+          <Input placeholder={"最小值"}
+                 defaultValue={searchCriteria.minValue}
+                 onChange={(e) => {
+                   setSearchCriteria({...searchCriteria, minValue: Number(e.target.value)})
+                 }}/>
+          <Input placeholder={"最大值"}
+                 defaultValue={searchCriteria.maxValue}
+                 onChange={(e) => {
+                   setSearchCriteria({...searchCriteria, maxValue: Number(e.target.value)})
+                 }}/>
+        </Space>
+      </div>
+      <div>
+        {/*<p style={{marginTop:20}}>*/}
+        {/*  搜索到的结果：*/}
+        {/*</p>*/}
+        {/*<p style={{fontSize: 10, marginBottom: 20, color: "grey"}}>*/}
+        {/*  (点击对应信号查看结果)*/}
+        {/*</p>*/}
+        {/*{*/}
+        {/*  suitableName.map((signalName, index) => {*/}
+        {/*    return <div style={{display: "flex", justifyItems: "center",}}>*/}
+        {/*      <p style={{display: "inline"}} onClick={() => {*/}
+        {/*        startSearch(signalName)*/}
+        {/*      }}>{`${index + 1}: ${signalName}`}</p>*/}
+        {/*    </div>*/}
+        {/*  })*/}
+        {/*}*/}
+        {/*<Modal*/}
+        {/*    open={ searchResultArr !== undefined}*/}
+        {/*    onCancel={() => {*/}
+        {/*      setSearchResultArr(undefined)*/}
+        {/*    }}*/}
+        {/*    onOk={() => {*/}
+        {/*      setSearchResultArr(undefined)*/}
+        {/*    }}*/}
+        {/*    title={"搜索结果"}*/}
+        {/*    height={containerHigh}*/}
+        {/*    styles={{body: {maxHeight: containerHigh}}}*/}
+        {/*    style={{display: "flex", alignItems: "center", justifyContent: "center"}}>*/}
+
+        {/*  <div style={{overflowY: "scroll", padding: 20, border: "1px solid #f0f0f0", height: containerHigh}}*/}
+        {/*       onScroll={(e) => {*/}
+        {/*         const currentScrollTop = e.currentTarget.scrollTop*/}
+        {/*         setScrollTop(currentScrollTop)*/}
+        {/*       }}>*/}
+        {/*    <div style={{height: (searchResultArr?.length ?? 0) * itemHeight}}>*/}
+        {/*      <div style={{transform: `translateY(${Math.floor(scrollTop / itemHeight) * itemHeight}px)`,}}>*/}
+        {/*        {getVirtualList(scrollTop)}*/}
+        {/*      </div>*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*</Modal>*/}
+      </div>
+      <Table columns={searchResultColumns} rowSelection={rowSelection} dataSource={searchResultArr}></Table>
+
+    </Modal>
+  </>
 }
 
 export default HistoryData

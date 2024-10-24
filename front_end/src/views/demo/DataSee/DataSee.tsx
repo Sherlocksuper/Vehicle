@@ -13,7 +13,7 @@ const DataSee = () => {
       if (res.code === FAIL_CODE) {
         message.error(res.msg);
       } else {
-        console.log(res.data);
+        console.log('currentConfig:',res.data);
         setCurrentDownConfig(res.data);
       }
     });
@@ -55,7 +55,7 @@ const DataSee = () => {
       ),
     },
     {
-      title: '测试信号',
+      title: `测试信号${currentDownConfig?(currentDownConfig.configs[0].projects ? ('('+currentDownConfig.configs[0].projects[0].indicators.length+')') : '未配置'):'无配置'}`,
       key: 'vehicle',
       render: (text, record) => (
         <div style={{
@@ -72,21 +72,23 @@ const DataSee = () => {
         </div>
       ),
     },
-    {
-      title: '测试任务配置',
-      key: 'set',
-      render: (text, record) => (
-        <Space direction={"vertical"} align={"start"}>
-          {currentDownConfig?.id === record.id ?
-            (<Button type={"link"} onClick={() => handleShowCurrentData()}>数据监视</Button>) : (" ")}
-        </Space>
-      ),
-    },
+    // {
+    //   title: '测试任务配置',
+    //   key: 'set',
+    //   render: (text, record) => (
+    //     <Space direction={"vertical"} align={"start"}>
+    //       {currentDownConfig?.id === record.id ?
+    //         (<Button type={"link"} onClick={() => handleShowCurrentData()}>数据监视</Button>) : (" ")}
+    //     </Space>
+    //   ),
+    // },
     {
       title: '操作',
       key: 'action',
       render: (text, record) => (
-        <Space>
+        <Space align={"start"}>
+          {currentDownConfig?.id === record.id ?
+              (<Button type={"link"} onClick={() => handleShowCurrentData()}>数据监视</Button>) : (" ")}
           {(<Button type="link" onClick={() => handleStopCurrentCollect()}>停止下发</Button>)}
         </Space>
       ),

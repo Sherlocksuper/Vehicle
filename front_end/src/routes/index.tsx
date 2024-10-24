@@ -9,14 +9,9 @@ import PhyTopology from "@/views/demo/Topology/PhyTopology.tsx";
 import ProtocolTable from "@/views/demo/ProtocolTable";
 import TestConfig from "@/views/demo/TestConfig";
 import TestTemplateForConfig from "@/views/demo/TestConfig/template.tsx";
-import OfflineDate from "@/views/demo/OffLine/offline.tsx";
 import HistoryData from "@/views/demo/History/history.tsx";
 import DataSee from "@/views/demo/DataSee/DataSee.tsx";
-import {getCurrentTestConfig} from "@/apis/request/testConfig.ts";
-import {FAIL_CODE} from "@/constants";
-import {message} from "antd";
-import {ITestConfig} from "@/apis/standard/test.ts";
-import DataAnalysis from "@/views/demo/DataAnalysis/DataAnalysis.tsx";
+
 
 interface RouteItem {
   key: string;
@@ -60,7 +55,7 @@ export const routeItems: RouteItem[] = [
       // },
       {
         key: '/test-receive/view',
-        label: "接收数据动态监视",
+        label: "数据接收与监视",
         element: <DataSee/>
       },
       // {
@@ -68,15 +63,15 @@ export const routeItems: RouteItem[] = [
       //   label: '数据可视化分析',
       //   element: <OfflineDate/>
       // },
-      {
-        key: '/test-receive/offline-management',
-        label: '数据可视化分析',
-        element: <DataAnalysis/>
-      },
+      // {
+      //   key: '/test-receive/offline-management',
+      //   label: '数据可视化分析',
+      //   element: <DataAnalysis/>
+      // },
       {
         key: '/test-receive/history',
-        label: '数据管理与维护',
-        element: <HistoryData/>
+        label: '数据分析与管理',
+        element: <HistoryData/>,
       },
     ]
   },
