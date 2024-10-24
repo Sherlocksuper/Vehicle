@@ -54,11 +54,6 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
           messages.push(decodingBoardMessage(item))
         })
 
-        // TODO 调试专用
-        // console.log("this is message 0", messages[0])
-        // const message0 = messages[0];
-        // console.log(getSignalMapKey(message0.moduleId, message0.frameId, message0.busType, message0.collectType))
-        // console.log(TestConfigService.signalsMappingRelation)
         const resolveMessage = (message: IReceiveData) => {
           const result = decodingBoardMessageWithMap(message);
 

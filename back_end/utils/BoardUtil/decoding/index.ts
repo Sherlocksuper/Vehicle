@@ -26,7 +26,7 @@ export interface IReceiveData {
   moduleId: number;
   collectType: number;
   busType: number;
-  timestamp: number;
+  timestamp: string;
   frameId: number;
   signalCount: number;
   reserved: number;
@@ -44,6 +44,25 @@ interface IReceiveSignal {
 
 // 当前数据映射表 通过key值把信号id与信号值对应起来
 
+const getTimeStamp = (buffer: Buffer): string => {
+  // 把十六进制的表示转化成字符串，比如0x24转化成字符串"24"
+  // 时间戳分隔符
+  const timeStampDelimiter = "-";
+
+  const getTime = (num: number): string => {
+    return "" + num / 16 + num % 16;
+  }
+
+  const year = getTime(buffer[4]);
+  const month = getTime(buffer[5]);
+  const day = getTime(buffer[6]);
+  const hour = getTime(buffer[7]);
+  const minute = getTime(buffer[8]);
+  const second = getTime(buffer[9]);
+
+  return [year, month, day, hour, minute, second].join(timeStampDelimiter);
+}
+
 // 处理一个
 export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   const result = {} as IReceiveData;
@@ -54,7 +73,8 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   // 总线种类,如果是总线采集，表示总线种类，如果是数模采集，表示A还是D
   result.busType = buffer[3] & 0x0f;
   // 时间戳 4、5、6、7、8、9
-  result.timestamp = buffer[4] << 40 | buffer[5] << 32 | buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | buffer[9];
+  // result.timestamp = buffer[4] << 40 | buffer[5] << 32 | buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | buffer[9];
+  result.timestamp = getTimeStamp(buffer);
   // 帧id 10、11、12、13
   result.frameId = getFrameId(buffer);
   // 14字节是信号数量
