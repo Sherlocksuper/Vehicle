@@ -16,7 +16,6 @@ import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
 import {IHistory} from "@/apis/standard/history.ts";
 import {getTestsHistoryById} from "@/apis/request/testhistory.ts";
-import * as url from "url";
 import {BASE_URL} from "@/apis/url/myUrl.ts";
 
 export interface IDragItem {
@@ -70,7 +69,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   const throttleTimeoutRef = useRef(null);
 
 // 节流函数：每500ms调用一次 updateDataRecorder
-  function throttleUpdate(data) {
+  const throttleUpdate = (data) => {
     Object.assign(dataCacheRef.current, data)
     if (throttleTimeoutRef.current) {
       return;
@@ -106,54 +105,52 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     setNetDataRecorder(updatedNetDataRecorder);
   };
 
+  // 数据回放前置操作
+  const dataReplayPreparation = async (historyId: string) => {
+    // 从历史记录中获取数据
+    const res = await getTestsHistoryById(Number(historyId))
+    if (res.code === SUCCESS_CODE) {
+      const testConfig = res.data.testConfig as ITestConfig
+      history.current.template = testConfig.template
+
+      setTestConfig(testConfig)
+      setDragItems(transferITemplateToDragItems(testConfig.template))
+    }
+  }
+
+  // 在线数据展示前置操作
+  const onlinePresentation = async (testConfigId: string) => {
+    let testConfig: ITestConfig = undefined
+    const res = await getTestConfigById(Number(testConfigId))
+    if (res.code === SUCCESS_CODE) {
+      testConfig = res.data as ITestConfig
+      history.current.template = testConfig.template
+
+      setTestConfig(testConfig)
+      setDragItems(transferITemplateToDragItems(testConfig.template))
+    }
+    return
+  }
+
   // 在线、离线数据的时候获取testConfig
   useEffect(() => {
-    if (dataMode === "OFFLINE") {
-      return () => {
-      }
-    }
-
     const search = window.location.search
     const params = new URLSearchParams(search)
     const testConfigId = params.get('testConfigId') ?? undefined
     const historyId = params.get('historyId') ?? undefined
 
     if (testConfigId) {
-      let testConfig: ITestConfig = undefined
-      getTestConfigById(Number(testConfigId)).then((res) => {
-        if (res.code === SUCCESS_CODE) {
-          testConfig = res.data as ITestConfig
-          history.current.template = testConfig.template
-
-          setTestConfig(testConfig)
-          setDragItems(transferITemplateToDragItems(testConfig.template))
-        }
-      })
-      return
+      onlinePresentation(testConfigId)
+    } else if (historyId) {
+      dataReplayPreparation(historyId)
     }
-
-    // 从历史记录中获取数据
-    getTestsHistoryById(Number(historyId)).then((res) => {
-      if (res.code === SUCCESS_CODE) {
-        const testConfig = res.data.testConfig as ITestConfig
-        history.current.template = testConfig.template
-
-        setTestConfig(testConfig)
-        setDragItems(transferITemplateToDragItems(testConfig.template))
-      }
-    })
-  }, [dataMode])
+  }, [])
 
   // 处理在线数据源头
   useEffect(() => {
-    if (dataMode === "OFFLINE") {
-      return () => {
-      }
-    }
     window.onbeforeunload = function () {
       return "你确定要离开吗？";
     }
-
 
     let url = BASE_URL
     url = url.replace('3000/api', '8080')
@@ -178,7 +175,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     return () => {
       socket.close();
     };
-  }, [dataMode, throttleUpdate]);
+  }, []);
 
   const [, drop] = useDrop<{ id: string } & IDraggleComponent>({
     accept: 'box',
@@ -443,7 +440,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       <div className="dd_body">
         <div className="dd_drop_container" ref={ref}>
           <ConfigDropContainer
-            banModify={mode === "COLLECTING" || dataMode === "OFFLINE"}
+            banModify={mode === "COLLECTING"}
             items={dragItems}
             testConfig={testConfig}
 
