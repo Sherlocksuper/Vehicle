@@ -10,6 +10,8 @@ export interface IData {
   time: number
   dimension: string
   value: number
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 @Table({

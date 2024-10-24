@@ -20,4 +20,10 @@ export const DATA_API:UrlMap = {
         url: '/deleteData',
         method: Method.POST,
     },
+    //router.post('/fgetSampleData', DataController.fgetSampledData);
+    fgetSampledData: {
+        url: '/fgetSampleData',
+        method: Method.POST,
+        format: ContentType.JSON
+    }
 }

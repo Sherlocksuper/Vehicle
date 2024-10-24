@@ -100,18 +100,54 @@ class DataService {
     return result
   }
 
-  // 开始数据回放
-  async startDataReplay(belongHistoryId: number) {
-    const pageSize = 1000;
-    const pageNum = 1;
+  async getSampledDataForSignals(signalIds: number[], startTime: Date, endTime: Date) {
+    const result: { [key: number]: any[] } = {};
 
-    // 主arr 用来向前端推送消息
-    const mainArr: IData[] = []
-    // 副arr 用来在推送消息的同时查询数据库
-    const subArr: IData[] = []
+    for (const signalId of signalIds) {
+      // 第一步：查询当前 signalId 符合条件的数据条数
+      const totalCount = await DataModel.count({
+        where: {
+          signalId: signalId,
+          createdAt: {
+            [Op.between]: [startTime, endTime]
+          }
+        }
+      });
 
-    // 通过replay线程， 查询数据库，并且放到mainArr中
-    const replayWorker = getReplayWorker()
+      // 如果数据小于等于1000条，直接返回所有数据
+      if (totalCount <= 1000) {
+        result[signalId] = await DataModel.findAll({
+          where: {
+            signalId: signalId,
+            createdAt: {
+              [Op.between]: [startTime, endTime]
+            }
+          }
+        });
+      } else {
+        // 第二步：数据量大于1000条，计算步长，并按步长取样
+        const step = Math.ceil(totalCount / 1000);
+        const sampledData = [];
+
+        // 使用 OFFSET 和 LIMIT 按步长获取数据
+        for (let i = 0; i < totalCount; i += step) {
+          const data = await DataModel.findAll({
+            where: {
+              signalId: signalId,
+              createdAt: {
+                [Op.between]: [startTime, endTime]
+              }
+            },
+            offset: i,
+            limit: 1  // 每次获取一条数据
+          });
+          sampledData.push(...data);
+        }
+        result[signalId] = sampledData;
+      }
+    }
+
+    return result;
   }
 }
 

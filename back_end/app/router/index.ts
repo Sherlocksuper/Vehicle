@@ -158,4 +158,6 @@ router.post('/updateData', DataController.updateData);
 router.post('/deleteData', DataController.deleteData);
 router.get('/getDataMaxMinMiddle/:belongId', DataController.getDataMaxMinMiddle);
 
+router.post('/fgetSampleData', DataController.fgetSampledData);
+
 export default router

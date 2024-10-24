@@ -37,3 +37,16 @@ export const searchForTargetData = async (belongId: number, name: string, startT
     }
   });
 }
+
+export const fgetSampledData = async (belongId: number, startTime: number, endTime: number, num: number = 1000) => {
+  const api = DATA_API.fgetSampledData;
+  return request({
+    api: api,
+    params: {
+      belongId,
+      startTime,
+      endTime,
+      num
+    }
+  });
+}
