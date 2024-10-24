@@ -1,6 +1,7 @@
 import * as echarts from "echarts"
 import {useCallback, useEffect, useRef, useState} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
+import {ITimeData} from "@/views/demo/TestConfig/template.tsx";
 
 // 仪表盘图
 const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
@@ -23,7 +24,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
   } = props
 
 
-  const pushData = useCallback((data: Map<string, number[]>) => {
+  const pushData = useCallback((data: Map<string, ITimeData[]>) => {
     if (!requestSignals) {
       return
     }
@@ -39,7 +40,7 @@ const NumberGaugeChart: React.FC<IChartInterface> = (props, context) => {
     }
 
     // 如果value的最后一个和原有的最后一个一样，那么不更新
-    if (value[value.length - 1] === chartRef.current?.getOption()?.series[0].data[0].value ?? "undefined") {
+    if (value[value.length - 1].value === chartRef.current?.getOption()?.series[0].data[0].value ?? "undefined") {
       return
     }
 

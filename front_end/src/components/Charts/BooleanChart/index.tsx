@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useState} from 'react'
 import './index.css'
 import {IChartInterface} from "@/components/Charts/interface.ts";
+import {ITimeData} from "@/views/demo/TestConfig/template.tsx";
 
 const BooleanChart: React.FC<IChartInterface> = (props) => {
     const {
@@ -13,7 +14,7 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
     } = props
     const [value, setValue] = useState(false)
 
-    const pushData = useCallback((data: Map<string, number[]>) => {
+    const pushData = useCallback((data: Map<string, ITimeData[]>) => {
         if (!requestSignals){
             return
         }
@@ -29,7 +30,7 @@ const BooleanChart: React.FC<IChartInterface> = (props) => {
 
 
         if (signalData) {
-            setValue(signalData[signalData.length - 1] === (trueValue ? Number(trueValue) : 1))
+            setValue(signalData[signalData.length - 1].value === (trueValue ? Number(trueValue) : 1))
         }
     }, [requestSignals, trueValue]);
 

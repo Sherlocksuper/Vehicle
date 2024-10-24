@@ -265,3 +265,52 @@ const getUsedSignals = (history: IHistory) => {
   })
   return result
 }
+
+// 合并n项升序整数
+export function mergeTwoArrays(arr1, arr2) {
+  const merged = [];
+  let i = 0, j = 0;
+
+  // 合并两个数组
+  // 合并两个数组
+  while (i < arr1.length && j < arr2.length) {
+    if (arr1[i] < arr2[j]) {
+      merged.push(arr1[i]);
+      i++;
+    } else if (arr1[i] > arr2[j]) {
+      merged.push(arr2[j]);
+      j++;
+    } else {
+      // Skip pushing when arr1[i] is equal to arr2[j]
+      i++;
+      j++;
+    }
+  }
+
+  // 将剩余的元素加入结果中
+  while (i < arr1.length) {
+    merged.push(arr1[i]);
+    i++;
+  }
+
+  while (j < arr2.length) {
+    merged.push(arr2[j]);
+    j++;
+  }
+
+  return merged;
+}
+
+export function mergeKArrays(arrays) {
+  if (arrays.length === 0) return [];
+  if (arrays.length === 1) return arrays[0];
+
+  // 使用归并的方式逐步合并
+  let mergedArray = arrays[0];
+  for (let i = 1; i < arrays.length; i++) {
+    mergedArray = mergeTwoArrays(mergedArray, arrays[i]);
+  }
+
+  return mergedArray;
+}
+

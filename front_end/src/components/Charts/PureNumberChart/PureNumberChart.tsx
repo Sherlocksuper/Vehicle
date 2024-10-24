@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect,useState} from 'react'
 import {IChartInterface} from "@/components/Charts/interface.ts";
+import {ITimeData} from "@/views/demo/TestConfig/template.tsx";
 
 const PureNumberChart: React.FC<IChartInterface> = (props) => {
     const {
@@ -13,7 +14,7 @@ const PureNumberChart: React.FC<IChartInterface> = (props) => {
 
   const [map, setMap] = useState<Map<string, number>>(new Map<string, number>())
 
-  const pushData = useCallback((data: Map<string, number[]>) => {
+  const pushData = useCallback((data: Map<string, ITimeData[]>) => {
     if (data.size === 0) {
       return
     }
@@ -25,7 +26,7 @@ const PureNumberChart: React.FC<IChartInterface> = (props) => {
       const value = data.get(key)
       if (value) {
         setMap((pre) => {
-          pre.set(key, value[value.length - 1])
+          pre.set(key, value[value.length - 1].value)
           return new Map(pre)
         })
       }

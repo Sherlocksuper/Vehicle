@@ -5,7 +5,7 @@ import DraggableComponent, {
   IDraggleComponent,
   INumberChartExtra
 } from "@/views/demo/DataDisplay/DraggableComponent";
-import {Button, message, Space} from "antd";
+import {Button, Input, message, Modal, Select, Slider, Space, Table, TableProps} from "antd";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import GridLayout from "react-grid-layout";
 import {DEFAULT_TITLE, SUCCESS_CODE} from "@/constants";
@@ -14,9 +14,17 @@ import {getTestConfigById, updateTestConfigById} from "@/apis/request/testConfig
 import {ITestConfig} from "@/apis/standard/test.ts";
 import ConfigDropContainer from "@/views/demo/TestConfig/configDropContainer.tsx";
 import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
-import {IHistory} from "@/apis/standard/history.ts";
 import {getTestsHistoryById} from "@/apis/request/testhistory.ts";
 import {BASE_URL} from "@/apis/url/myUrl.ts";
+import {debounce, formatTime} from "@/utils";
+import {TableRowSelection} from "antd/es/table/interface";
+import {fgetSampledData, searchForTargetData} from "@/apis/request/data.ts";
+import {IHistoryList} from "@/views/demo/History/history.tsx";
+
+export interface ITimeData {
+  time: number,
+  value: number
+}
 
 export interface IDragItem {
   id: string

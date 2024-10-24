@@ -1,5 +1,6 @@
 import DataModel, {IData} from "../model/Data.model";
-import {Op} from "sequelize";
+import Sequelize, {Op} from "sequelize";
+import HistoryService from "./HistoryService";
 
 //worker_threads
 
@@ -99,48 +100,75 @@ class DataService {
     return result
   }
 
-  async getSampledDataForSignals(signalIds: number[], startTime: Date, endTime: Date, limit: number) {
-    const result: { [key: number]: any[] } = {};
+  async getSampledDataForSignals(belongId: number, startTime: Date, endTime: Date, limit: number = 1000) {
+    const history = await HistoryService.getHistoryById(belongId);
+    if (!history) {
+      return [];
+    }
 
-    for (const signalId of signalIds) {
-      // 第一步：查询当前 signalId 符合条件的数据条数
-      const totalCount = await DataModel.count({
-        where: {
-          signalId: signalId,
-          createdAt: {
-            [Op.between]: [startTime, endTime]
-          }
-        }
+    // 获取所有 signalId
+    const signalIds: string[] = [];
+    history.testConfig?.configs.forEach((config) => {
+      config.projects.forEach((project) => {
+        project.indicators.forEach((indicator) => {
+          signalIds.push(indicator.signal.id);
+        });
       });
+    });
 
-      // 如果数据小于等于1000条，直接返回所有数据
+    const validSignalIds = signalIds.filter(signalId => signalId !== undefined);
+
+    // 使用 group by 查询每个 signalId 的数据量
+    const counts = await DataModel.findAll({
+      attributes: ['signalId', [Sequelize.fn('COUNT', Sequelize.col('signalId')), 'totalCount']],
+      where: {
+        signalId: {
+          [Op.in]: validSignalIds
+        },
+        time: {
+          [Op.between]: [startTime, endTime]
+        }
+      },
+      group: ['signalId']
+    });
+
+    const result: { [key: string]: any[] } = {};
+
+    for (const countEntry of counts) {
+      // @ts-ignore
+      const {signalId, totalCount} = countEntry.get();
+      console.log(signalId)
       if (totalCount <= limit) {
-        result[signalId] = await DataModel.findAll({
+        const allData = await DataModel.findAll({
+          attributes: ['time', 'value'],
           where: {
             signalId: signalId,
-            createdAt: {
+            time: {
               [Op.between]: [startTime, endTime]
             }
           }
         });
+        result[signalId] = allData;
       } else {
-        // 第二步：数据量大于1000条，计算步长，并按步长取样
         const step = Math.ceil(totalCount / limit);
         const sampledData = [];
 
-        // 使用 OFFSET 和 LIMIT 按步长获取数据
         for (let i = 0; i < totalCount; i += step) {
           const data = await DataModel.findAll({
+            attributes: ['time', 'value'],
             where: {
               signalId: signalId,
-              createdAt: {
+              time: {
                 [Op.between]: [startTime, endTime]
               }
             },
             offset: i,
-            limit: 1  // 每次获取一条数据
+            limit: 1  // 每步获取一条数据
           });
-          sampledData.push(...data);
+
+          if (data.length > 0) {
+            sampledData.push(data[0]);
+          }
         }
         result[signalId] = sampledData;
       }
