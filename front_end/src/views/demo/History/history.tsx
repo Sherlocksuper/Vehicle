@@ -269,6 +269,9 @@ const DetailSearchModal = ({history, open, onFinished}: {
       key: 'time',
       title: '时间',
       dataIndex: 'time',
+      render : (text) => {
+        return formatTime(text)
+      }
     },
     {
       key: 'value',
@@ -292,45 +295,6 @@ const DetailSearchModal = ({history, open, onFinished}: {
     setSearchCriteria({...searchCriteria, startTime: value[0], endTime: value[1]})
   })
 
-  // const searchForSuitAbleName = (name:string) => {
-  //   const result:any[] = []
-  //   history.testConfig.configs[0].projects.forEach(project => {
-  //     project.indicators.forEach(indicator => {
-  //       if (indicator.name.includes(name) || indicator.signal.name.includes(name))
-  //         result.push(`${indicator.name}(${indicator.signal.name})`)
-  //     })
-  //   })
-  //   setSuitableName(result)
-  // }
-  // // 获取虚拟列表
-  // const getVirtualList = (scrollTop: number):any[] => {
-  //   if (searchResultArr === undefined) {
-  //     return []
-  //   }
-  //
-  //   const virtualList = []
-  //
-  //   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - 5)
-  //   const endIndex = Math.min(searchResultArr.length - 1, startIndex + Math.floor(containerHigh / itemHeight) + 5)
-  //   for (let i = startIndex; i < endIndex; i++) {
-  //     const data = searchResultArr[i]
-  //     data && virtualList.push(
-  //         <div
-  //             key={i + startIndex}
-  //             style={{
-  //               position: "relative",
-  //               display: "flex",
-  //               justifyContent: "space-between",
-  //               height: itemHeight,
-  //             }}>
-  //           <p style={{display: "inline", marginRight: 30}}>{`${(new Date(data.time)).toLocaleString()}`}</p>
-  //           <p style={{display: "inline"}}>{`${data.value}`}</p>
-  //         </div>
-  //     )
-  //   }
-  //
-  //   return virtualList
-  // }
 
   const startSearch = (name:string) => {
     message.loading("正在检索数据")
@@ -346,8 +310,6 @@ const DetailSearchModal = ({history, open, onFinished}: {
       message.destroy()
     })
   }
-
-
 
   return <>
     <Modal open={open}
@@ -415,48 +377,8 @@ const DetailSearchModal = ({history, open, onFinished}: {
         </Space>
       </div>
       <div>
-        {/*<p style={{marginTop:20}}>*/}
-        {/*  搜索到的结果：*/}
-        {/*</p>*/}
-        {/*<p style={{fontSize: 10, marginBottom: 20, color: "grey"}}>*/}
-        {/*  (点击对应信号查看结果)*/}
-        {/*</p>*/}
-        {/*{*/}
-        {/*  suitableName.map((signalName, index) => {*/}
-        {/*    return <div style={{display: "flex", justifyItems: "center",}}>*/}
-        {/*      <p style={{display: "inline"}} onClick={() => {*/}
-        {/*        startSearch(signalName)*/}
-        {/*      }}>{`${index + 1}: ${signalName}`}</p>*/}
-        {/*    </div>*/}
-        {/*  })*/}
-        {/*}*/}
-        {/*<Modal*/}
-        {/*    open={ searchResultArr !== undefined}*/}
-        {/*    onCancel={() => {*/}
-        {/*      setSearchResultArr(undefined)*/}
-        {/*    }}*/}
-        {/*    onOk={() => {*/}
-        {/*      setSearchResultArr(undefined)*/}
-        {/*    }}*/}
-        {/*    title={"搜索结果"}*/}
-        {/*    height={containerHigh}*/}
-        {/*    styles={{body: {maxHeight: containerHigh}}}*/}
-        {/*    style={{display: "flex", alignItems: "center", justifyContent: "center"}}>*/}
-
-        {/*  <div style={{overflowY: "scroll", padding: 20, border: "1px solid #f0f0f0", height: containerHigh}}*/}
-        {/*       onScroll={(e) => {*/}
-        {/*         const currentScrollTop = e.currentTarget.scrollTop*/}
-        {/*         setScrollTop(currentScrollTop)*/}
-        {/*       }}>*/}
-        {/*    <div style={{height: (searchResultArr?.length ?? 0) * itemHeight}}>*/}
-        {/*      <div style={{transform: `translateY(${Math.floor(scrollTop / itemHeight) * itemHeight}px)`,}}>*/}
-        {/*        {getVirtualList(scrollTop)}*/}
-        {/*      </div>*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*</Modal>*/}
       </div>
-      <Table columns={searchResultColumns} rowSelection={rowSelection} dataSource={searchResultArr}></Table>
+      <Table columns={searchResultColumns} rowSelection={rowSelection} dataSource={searchResultArr} rowKey={(record) => `${record.time}-${record.value}`}></Table>
 
     </Modal>
   </>

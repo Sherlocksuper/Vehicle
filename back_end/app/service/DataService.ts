@@ -21,7 +21,9 @@ class DataService {
     return await DataModel.findAll({
       where: {
         belongId,
-        name,
+        name :{
+          [Op.like]: `%${name}%`
+        },
         time: {
           [Op.gte]: startTime,
           [Op.lte]: endTime

@@ -6,6 +6,7 @@ import {message, Modal} from "antd";
 import {getSearchHistoryWorker} from "@/worker/app.ts";
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DetailSearch = ({history}: { history: IHistory }) => {
   const itemHeight = 30
   const containerHigh = 500
