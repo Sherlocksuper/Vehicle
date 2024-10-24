@@ -19,7 +19,7 @@ import {Context} from "koa";
 import {IResBody} from "../types";
 import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
 
-export const CURRENT_DATA_LIMIT = 100_000
+export const CURRENT_DATA_LIMIT = 10_000
 export const CURRENT_HISTORY_SIGN = "(正在下发...)"
 
 class TestConfigService {
@@ -269,7 +269,7 @@ class TestConfigService {
     // 如果当前的currentTestConfigHistory超过了十万条，那么存储到数据库
     if (this.currentTestConfigHistoryData.length > CURRENT_DATA_LIMIT) {
       console.log("存储到数据库")
-      this.saveCurrentDataToSql(
+      await this.saveCurrentDataToSql(
         this.currentTestConfig!.name,
         this.currentHistoryId,
         this.currentTestConfigHistoryData)
@@ -341,6 +341,8 @@ class TestConfigService {
     fs.mkdirSync(dir, {recursive: true});
 
     const targetPath = path.resolve(__dirname, `../public/uploads/${currentDate}/${historyName}.txt`);
+    // 確保targetPath有文件
+    fs.writeFileSync(targetPath, '')
     const writeStream = fs.createWriteStream(targetPath);
 
     const header = formatHeader(testConfig!);
