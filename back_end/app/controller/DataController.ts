@@ -76,7 +76,7 @@ class DataController {
 
   async fgetSampledData(context: Context) {
     const {belongId, startTime, endTime, count} = context.request.body
-    const res = await dataService.fgetSampledData(belongId, startTime, endTime, count)
+    const res = await dataService.getSampledDataForSignals(belongId, startTime, endTime, count)
 
     res && ((context.body as IResBody) = {
       code: SUCCESS_CODE,

@@ -100,7 +100,7 @@ class DataService {
     return result
   }
 
-  async getSampledDataForSignals(signalIds: number[], startTime: Date, endTime: Date) {
+  async getSampledDataForSignals(signalIds: number[], startTime: Date, endTime: Date, limit: number) {
     const result: { [key: number]: any[] } = {};
 
     for (const signalId of signalIds) {
@@ -115,7 +115,7 @@ class DataService {
       });
 
       // 如果数据小于等于1000条，直接返回所有数据
-      if (totalCount <= 1000) {
+      if (totalCount <= limit) {
         result[signalId] = await DataModel.findAll({
           where: {
             signalId: signalId,
@@ -126,7 +126,7 @@ class DataService {
         });
       } else {
         // 第二步：数据量大于1000条，计算步长，并按步长取样
-        const step = Math.ceil(totalCount / 1000);
+        const step = Math.ceil(totalCount / limit);
         const sampledData = [];
 
         // 使用 OFFSET 和 LIMIT 按步长获取数据
