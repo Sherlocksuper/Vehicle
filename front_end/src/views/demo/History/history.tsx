@@ -134,7 +134,13 @@ const HistoryData = () => {
             }}>
               回放
             </a>
-            <a href={`${BASE_URL + record.path}`} download={true}>格式化导出</a>
+            <a onClick={() => {
+              if (!record.path) {
+                message.error('请等待下载完毕,或刷新后再尝试');
+              } else {
+                window.location.href = `${BASE_URL + record.path}`;
+              }
+            }} download>格式化导出</a>
           </Space>
       )
     }
