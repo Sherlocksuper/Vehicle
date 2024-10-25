@@ -196,22 +196,22 @@ class TestConfigService {
 
     // TODO 连接下位机并且发送消息,调试的时候没有下位机所以注释掉，使用startMock
     // 下发逻辑放到后面，因为要等到所有的数据都准备好了才能下发,并且如果失败、停止下发的时候比较Ok
-    // try {
-    //   await connectWithMultipleBoards(hostPortList, 0)
-    // } catch (e) {
-    //   return "连接下位机失败"
-    // }
-    //
-    // // 发送所有消息给板子
-    // try {
-    //   await sendMultipleMessagesBoard(res.resultMessages, 1000)
-    // } catch (e) {
-    //   return "向下位机发送消息失败"
-    // }
+    try {
+      await connectWithMultipleBoards(hostPortList, 0)
+    } catch (e) {
+      return "连接下位机失败"
+    }
+
+    // 发送所有消息给板子
+    try {
+      await sendMultipleMessagesBoard(res.resultMessages, 1000)
+    } catch (e) {
+      return "向下位机发送消息失败"
+    }
     await this.storeCurrentConfigToSql(testConfig!)
 
     // TODO 模拟数据
-    startMockBoardMessage(this.signalsMappingRelation)
+    // startMockBoardMessage(this.signalsMappingRelation)
     return undefined
   }
 
@@ -244,8 +244,8 @@ class TestConfigService {
    * 停止当前下发
    */
   async stopCurrentTestConfig() {
-    stopMockBoardMessage()
-    // await sendMultipleMessagesBoard(this.banMessage, 200)
+    // stopMockBoardMessage()
+    await sendMultipleMessagesBoard(this.banMessage, 200)
     setTimeout(async (historyId, testConfigId, currentTestConfigName, currentHistoryData) => {
       console.log("下载文件")
       console.log(historyId, testConfigId, currentTestConfigName, currentHistoryData.length)
@@ -267,7 +267,7 @@ class TestConfigService {
       [key: number]: number
     }
   }) {
-    // 如果当前的currentTestConfigHistory超过了十万条，那么存储到数据库
+    // 如果当前的currentTestConfigHistory超过了CURRENT_DATA_LIMIT，那么存储到数据库
     if (this.currentTestConfigHistoryData.length > CURRENT_DATA_LIMIT) {
       console.log("存储到数据库")
       await this.saveCurrentDataToSql(
