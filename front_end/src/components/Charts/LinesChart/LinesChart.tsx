@@ -52,7 +52,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
   const medianFilter = (arr: { time: number, value: number }[], windowSize: number | string) :Array<[number, number]> => {
     let window = typeof windowSize === "string" ? parseInt(windowSize) : windowSize;
     if (isNaN(window) || window <= 2) {
-      window = 3;
+      return arr.map(item => [item.time,item.value])
     }
     if (window % 2 === 0) {
       window += 1;  // 确保窗口大小为奇数

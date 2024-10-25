@@ -68,19 +68,20 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   const [openReplaySearch, setOpenReplaySearch] = useState(false)
 
   const dataCacheRef = useRef<{
-    [key: string]: ITimeData
-  }>();
+    [key: string]: ITimeData[]
+  }>({});
   // 节流
   const dataThrottleTimeOut = useRef(null);
 
   const updateDataRecorder = (data: {
     [key: string]: ITimeData
   }) => {
-    // 把cache和data合并
-    dataCacheRef.current = {
-      ...dataCacheRef.current,
-      ...data
-    }
+    Object.keys(data).forEach((key) => {
+      if (!dataCacheRef.current[key]) {
+        dataCacheRef.current[key] = []
+      }
+      dataCacheRef.current[key].push(data[key])
+    })
 
     if (dataThrottleTimeOut.current !== null) {
       return
@@ -89,18 +90,20 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     dataThrottleTimeOut.current = setTimeout(() => {
       clearTimeout(dataThrottleTimeOut.current)
       dataThrottleTimeOut.current = null
-    }, 100);
+    }, 1000);
 
-    Object.keys(data).forEach((key) => {
+    Object.keys(dataCacheRef.current).forEach((key) => {
+
       if (!dataRecorderRef.current.has(key)) {
         dataRecorderRef.current.set(key, [])
       }
-      // 如果当前key的数据量超过3000，删除最早的数据
-      if (dataRecorderRef.current.get(key).length > 200) {
-        dataRecorderRef.current.get(key).shift()
+      // 把dataCache的推进去，如果大于1000，取后1000条
+      dataRecorderRef.current.get(key).push(...dataCacheRef.current[key])
+      if (dataRecorderRef.current.get(key).length > 400) {
+        dataRecorderRef.current.set(key, dataRecorderRef.current.get(key).slice(-400))
       }
-      dataRecorderRef.current.get(key).push(data[key])
     })
+    dataCacheRef.current = {}
     setNetDataRecorder(new Map(dataRecorderRef.current))
   };
 
