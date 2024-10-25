@@ -35,7 +35,7 @@ export const searchForTargetData = async (belongId: number, name: string, startT
   });
 }
 
-export const fgetSampledData = async (belongId: number, startTime: number, endTime: number, num: number = 1000) => {
+export const fgetSampledData = async (belongId: number, startTime: number, endTime: number, count: number = 1000) => {
   const api = DATA_API.fgetSampledData;
   return request({
     api: api,
@@ -43,7 +43,7 @@ export const fgetSampledData = async (belongId: number, startTime: number, endTi
       belongId,
       startTime,
       endTime,
-      num
+      count
     }
   });
 }

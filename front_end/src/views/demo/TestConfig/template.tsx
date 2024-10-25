@@ -74,6 +74,10 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       if (!dataRecorderRef.current.has(key)) {
         dataRecorderRef.current.set(key, [])
       }
+      // 如果当前key的数据量超过3000，删除最早的数据
+      if (dataRecorderRef.current.get(key).length > 200) {
+        dataRecorderRef.current.get(key).shift()
+      }
       dataRecorderRef.current.get(key).push(data[key])
     })
     setNetDataRecorder(new Map(dataRecorderRef.current))
