@@ -72,6 +72,9 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       }
     }
 
+    // result根据时间排序
+    result.sort((a, b) => a[0] - b[0]);
+
     return result;
   };
 
@@ -99,7 +102,8 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         // TODO 在这里添加中值滤波
         dataRef.current.forEach((item) => {
           if (item.id === signal.id) {
-            item.data = medianFilter(signalData, windowSize)
+            const datas = medianFilter(signalData, windowSize)
+            item.data = datas.slice(0, datas.length - 100)
           }
         });
       }

@@ -19,6 +19,7 @@ import {Context} from "koa";
 import {IResBody} from "../types";
 import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
 import {ITimeData} from "../../utils/BoardUtil/decoding";
+import {fork} from "child_process";
 
 export const CURRENT_DATA_LIMIT = 1_000
 export const CURRENT_HISTORY_SIGN = "(正在下发...)"
@@ -251,7 +252,7 @@ class TestConfigService {
       console.log(historyId, testConfigId, currentTestConfigName, currentHistoryData.length)
 
       await historyService.updateHistoryName(historyId, currentTestConfigName!)
-      await this.saveCurrentDataToSql(currentTestConfigName!, historyId, currentHistoryData)
+      await this.saveCurrentDataToSql(currentTestConfigName!, historyId, currentHistoryData, true)
       await this.downHistoryDataAsFormat(historyId, testConfigId!);
 
       console.log("保存完成")
@@ -401,7 +402,9 @@ class TestConfigService {
       data: {
         [key: number]: number
       }
-    }[]) {
+    }[],
+    isSync = false
+    ) {
     // 存储到数据库
     const data: IData[] = []
     currentData.forEach(item => {
@@ -417,7 +420,16 @@ class TestConfigService {
         })
       }
     })
-    await DataService.addData(data)
+    if (!isSync){
+      const child = fork(path.resolve(__dirname, '../worker/saveDataWorker.ts'))
+      child.send(data)
+      child.on('message', (msg) => {
+        console.log(msg)
+      })
+    } else {
+      await DataService.addData(data)
+    }
+    return true
   }
 }
 
