@@ -282,6 +282,7 @@ export function mergeTwoArrays(arr1, arr2) {
       j++;
     } else {
       // Skip pushing when arr1[i] is equal to arr2[j]
+      merged.push(arr1[i]);
       i++;
       j++;
     }

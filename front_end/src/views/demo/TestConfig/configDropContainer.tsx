@@ -9,8 +9,8 @@ import {DataSourceType} from "@/components/Charts/interface.ts";
 import {IHistory} from "@/apis/standard/history.ts";
 import PureNumberChart from "@/components/Charts/PureNumberChart/PureNumberChart.tsx";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
-import {IDragItem} from "@/views/demo/TestConfig/template.tsx";
-import {Form, Input, Modal, Select, Space, Tooltip} from "antd";
+import {IDragItem, ITimeData} from "@/views/demo/TestConfig/template.tsx";
+import {Form, Input, Modal, Select, Tooltip} from "antd";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import {getAllProtocolSignalsFromTestConfig} from "@/utils";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
@@ -23,7 +23,7 @@ const ConfigDropContainer: React.FC<{
   onLayoutChange: (layout: GridLayout.Layout[]) => void;
   updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
   fileHistory?: IHistory;
-  netHistory?: Map<string, number[]>;
+  netHistory?: Map<string, ITimeData[]>
 }> = ({
         banModify,
         items,
@@ -223,11 +223,11 @@ const UpdateItemModal: React.FC<{
   );
 };
 
-const getUsefulSignal = (requestSignals: IProtocolSignal[], signalRecordMap: Map<string, number[]>) => {
+const getUsefulSignal = (requestSignals: IProtocolSignal[], signalRecordMap: Map<string, ITimeData[]>) => {
   if (typeof requestSignals === 'string') {
     requestSignals = [requestSignals]
   }
-  const resultMap = new Map<string, number[]>()
+  const resultMap = new Map<string, ITimeData[]>()
   requestSignals.forEach((signal) => {
     const signalData = signalRecordMap.get(signal.id)
     if (signalData) {
@@ -253,7 +253,7 @@ interface ISetDragItem {
   item: IDragItem;
   banModify: boolean;
   fileHistory?: IHistory;
-  currentTestData?: Map<string, number[]>;
+  currentTestData?: Map<string, ITimeData[]>;
 }
 
 export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) => {
@@ -274,9 +274,8 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
     },
   } = item as IDragItem;
 
-  const memoizedTestData = useMemo(() => {
-    return getUsefulSignal(requestSignals || [], currentTestData || new Map());
-  }, [requestSignals, currentTestData]);
+  // const memoizedTestData = getUsefulSignal(requestSignals || [], currentTestData || new Map());
+
 
   return {
     [DragItemType.LINES]: (
@@ -290,7 +289,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
         height={height}
         historyData={[]}
         currentTestChartData={
-          memoizedTestData
+          currentTestData
         }
         windowSize={windowSize}
       />
@@ -309,7 +308,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
         height={height}
         historyData={[]}
         currentTestChartData={
-          memoizedTestData
+          currentTestData
         }
       />
     ),
@@ -326,7 +325,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
         height={height}
         historyData={[]}
         currentTestChartData={
-          memoizedTestData
+          currentTestData
         }
       />
     ),
@@ -343,7 +342,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
         height={height}
         historyData={[]}
         currentTestChartData={
-          memoizedTestData
+          currentTestData
         }
       />
     ),

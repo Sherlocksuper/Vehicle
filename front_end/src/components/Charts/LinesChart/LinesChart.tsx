@@ -1,13 +1,15 @@
 import * as echarts from "echarts"
 import {useCallback, useEffect, useRef} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
+import {ITimeData} from "@/views/demo/TestConfig/template.tsx";
+import {mergeKArrays} from "@/utils";
 
 interface ISeries {
   id: string
   name: string
   type: string
   symbol: string
-  data: number[]
+  data: Array<number>[]
 }
 
 /**
@@ -46,9 +48,24 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
   }))
 
   // 中值滤波
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const medianFilter = (arr, windowSize) => {
+    let window = windowSize
+    if (typeof window === "string") {
+      window = parseInt(window)
+      if (isNaN(window)) {
+        window = 3
+      }
+    }
+    if (!window || window <= 2) {
+      window = 3
+    }
+    if (window % 2 === 0) {
+      window = window + 1
+    }
+
     if (!arr) return []
-    const padSize = Math.floor(windowSize / 2);
+    const padSize = Math.floor(window / 2);
     const paddedArr = [...Array(padSize).fill(arr[0]), ...arr, ...Array(padSize).fill(arr[arr.length - 1])];
     const result = [];
 
@@ -62,17 +79,11 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     return result;
   }
 
-  const pushData = useCallback((data: Map<string, number[]>) => {
+  const pushData = useCallback((data: Map<string, ITimeData[]>) => {
     if (!requestSignals || requestSignals.length === 0) {
       return;
     }
 
-    const getCurrentTime = (time?: number) => {
-      if (!time) return new Date().getTime()
-      return new Date(time).getTime()
-    }
-
-    // Check if it's the first time initializing the chart data
     if (dataRef.current.length === 0) {
       requestSignals.forEach((item) => {
         dataRef.current.push({
@@ -85,49 +96,32 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       });
     }
 
-    // Add current time to the x-axis
-    xAxis.current.push(new Date(getCurrentTime()).toLocaleTimeString());
-
-    // Iterate through each series in dataRef
-    dataRef.current.forEach((seriesItem, index) => {
-      let signalData = data.get(seriesItem.id); // Get data for this particular signal
-      let ws = windowSize;
-      if (typeof ws === "string") {
-        ws = parseInt(ws)
-        //如果是NaN
-        if (isNaN(ws)) {
-          ws = 0
-        } else {
-          if (ws % 2 === 0) ws += 1; // Ensure window size is odd
-        }
-      }
-
-      if (windowSize && windowSize >= 2) {
-        signalData = medianFilter(signalData, ws); // Apply median filter to the data
-      }
-      const lastExistingValue = seriesItem.data[seriesItem.data.length - 1]; // Last value in the chart series
-
-      // Only update the data for this signal if it's changed
-      if (signalData && signalData[signalData.length - 1] !== lastExistingValue) {
-        const newValue = signalData[signalData.length - 1] || 0;
-        seriesItem.data.push(newValue);
-      } else {
-        // Keep the last value in case there's no update for this signal
-        seriesItem.data.push(lastExistingValue || 0);
+    // 把每个信号的数据push到对应的dataRef中
+    requestSignals.forEach((signal) => {
+      const signalData = data.get(signal.id)
+      if (signalData) {
+        // TODO 在这里添加中值滤波
+        dataRef.current.forEach((item) => {
+          if (item.id === signal.id) {
+            item.data = signalData.map((item) => [item.time, item.value])
+          }
+        });
       }
     });
+
+    // 合并时间
+    const time = mergeKArrays(requestSignals.map((signal) => {
+      return data.get(signal.id)?.map((item) => item.time) || []
+    }))
 
     // Update chart options
     const option = {
       xAxis: {
-        data: xAxis.current
+        type: 'time',
+        data: time
       },
-      // yAxis: {
-      //   minInterval: 0.01, // 设置较小的最小间隔，以提高精度
-      // },
       series: dataRef.current
     };
-    // console.log(option.series)
     chartRef.current?.setOption(option);
   }, [requestSignals]);
 
@@ -136,14 +130,14 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
   useEffect(() => {
     // 如果需要采集的信号变了,更新dataref，并且清空time
     let length = 0
-    dataRef.current = requestSignals.map((item, index) => {
+    dataRef.current = requestSignals.map((item) => {
       length = currentTestChartData.get(item.id)?.length || 0
       return {
         id: item.id,
         name: (item.dimension === '/') ? item.name : (item.name + '/' + item.dimension),
         type: 'line',
         symbol: 'none',
-        data: currentTestChartData.get(item.id) || []
+        data: currentTestChartData.get(item.id)?.map((item) => [item.time, item.value]) || []
       }
     })
     // 截取时间 前length个

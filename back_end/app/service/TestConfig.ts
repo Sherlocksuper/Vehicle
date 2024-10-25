@@ -18,6 +18,7 @@ import {formatHeader, formatOneSignal} from "../../utils/File/format";
 import {Context} from "koa";
 import {IResBody} from "../types";
 import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
+import {ITimeData} from "../../utils/BoardUtil/decoding";
 
 export const CURRENT_DATA_LIMIT = 10_000
 export const CURRENT_HISTORY_SIGN = "(正在下发...)"

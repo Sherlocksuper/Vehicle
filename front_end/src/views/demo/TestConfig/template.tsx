@@ -17,7 +17,6 @@ import {ITemplate, ITemplateItem} from "@/apis/standard/template.ts";
 import {getTestsHistoryById} from "@/apis/request/testhistory.ts";
 import {BASE_URL} from "@/apis/url/myUrl.ts";
 import {debounce, formatTime} from "@/utils";
-import {TableRowSelection} from "antd/es/table/interface";
 import {fgetSampledData, searchForTargetData} from "@/apis/request/data.ts";
 import {IHistoryList} from "@/views/demo/History/history.tsx";
 
@@ -60,57 +59,24 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   const ref = useRef<HTMLDivElement>(null)
   const [dragItems, setDragItems] = useState<IDragItem[]>([])
   const socketRef = useRef<WebSocket>(null)
-  const history = useRef<IHistory>({
-    testConfig: undefined,
-    historyName: "默认名称",
-    configName: '默认配置',
-    startTime: Date.now(),
-    endTime: Date.now(),
-    template: null,
-    historyData: [],
-    dataParseResult: []
-  })
-  const [netDataRecorder, setNetDataRecorder] = useState<Map<string, number[]>>(new Map())
-  const historyManagers = useRef(undefined)
 
-  const dataCacheRef = useRef({});
-  const throttleTimeoutRef = useRef(null);
+  const dataRecorderRef = useRef(new Map<string, ITimeData[]>())
+  const [netDataRecorder, setNetDataRecorder] = useState<Map<string, ITimeData[]>>(new Map())
 
-// 节流函数：每500ms调用一次 updateDataRecorder
-  const throttleUpdate = (data) => {
-    Object.assign(dataCacheRef.current, data)
-    if (throttleTimeoutRef.current) {
-      return;
-    }
+  const [history, setHistory] = useState<IHistoryList>(null)
+  // 打开
+  const [openReplaySearch, setOpenReplaySearch] = useState(false)
 
-    throttleTimeoutRef.current = setTimeout(() => {
-      updateDataRecorder(dataCacheRef.current);  // 调用 updateDataRecorder 处理缓存数据
-
-      dataCacheRef.current = {};  // 清空缓存
-      throttleTimeoutRef.current = null
-    }, 487);
-  }
-
-  const updateDataRecorder = (data, time = undefined) => {
-    const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
-    const currentData = {
-      time: time ?? new Date().getTime(),
-      data: parsedData
-    };
-
-    history.current.historyData.push(currentData);
-
-    const updatedNetDataRecorder = new Map(netDataRecorder);
-    Object.keys(parsedData).forEach((key) => {
-      if (updatedNetDataRecorder.has(key)) {
-        updatedNetDataRecorder.set(key, [...updatedNetDataRecorder.get(key), parsedData[key]]);
-      } else {
-        updatedNetDataRecorder.set(key, [parsedData[key]]);
+  const updateDataRecorder = (data: {
+    [key: string]: ITimeData
+  }) => {
+    Object.keys(data).forEach((key) => {
+      if (!dataRecorderRef.current.has(key)) {
+        dataRecorderRef.current.set(key, [])
       }
-    });
-
-    // 更新触发状态更新
-    setNetDataRecorder(updatedNetDataRecorder);
+      dataRecorderRef.current.get(key).push(data[key])
+    })
+    setNetDataRecorder(new Map(dataRecorderRef.current))
   };
 
   // 数据回放前置操作
@@ -118,8 +84,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     // 从历史记录中获取数据
     const res = await getTestsHistoryById(Number(historyId))
     if (res.code === SUCCESS_CODE) {
+      setHistory(res.data)
       const testConfig = res.data.testConfig as ITestConfig
-      history.current.template = testConfig.template
 
       setTestConfig(testConfig)
       setDragItems(transferITemplateToDragItems(testConfig.template))
@@ -132,8 +98,6 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     const res = await getTestConfigById(Number(testConfigId))
     if (res.code === SUCCESS_CODE) {
       testConfig = res.data as ITestConfig
-      history.current.template = testConfig.template
-
       setTestConfig(testConfig)
       setDragItems(transferITemplateToDragItems(testConfig.template))
     }
@@ -156,6 +120,13 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
 
   // 处理在线数据源头
   useEffect(() => {
+    const search = window.location.search
+    const params = new URLSearchParams(search)
+    const testConfigId = params.get('testConfigId') ?? undefined
+    if (!testConfigId) {
+      return
+    }
+
     window.onbeforeunload = function () {
       return "你确定要离开吗？";
     }
@@ -173,7 +144,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data)
       if (message.type === "DATA") {
-        throttleUpdate(JSON.parse(message.message));
+        updateDataRecorder(JSON.parse(message.message))
       } else if (message.type === "NOTIFICATION") {
         message.info(message.message)
       }
@@ -291,7 +262,6 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       return item
     })
     setDragItems(result)
-    history.current.template = transferDragItemsToITemplate(result)
   }
 
   const updateAllByLayout = (layout: GridLayout.Layout[]) => {
@@ -312,30 +282,9 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       return item
     })
     setDragItems(result)
-    history.current.template = transferDragItemsToITemplate(result)
   }
 
   const renderManageButton = () => {
-    if (dataMode === "OFFLINE") {
-      return <Space direction={"vertical"}>
-        <Button onClick={() => {
-          if (dragItems.length === 0) {
-            message.error('请等待数据加载完成,或重新载入数据')
-            return
-          }
-          if (historyManagers.current) {
-            console.log(historyManagers.current)
-            historyManagers.current.start()
-          }
-        }}>开始离线数据</Button>
-        <Button onClick={() => {
-          if (historyManagers.current) {
-            historyManagers.current.pause()
-          }
-        }}>暂停</Button>
-      </Space>
-    }
-
     const confirmChangeConfig = () => {
       const config = Object.assign({}, testConfig)
       config.template = transferDragItemsToITemplate(dragItems)
@@ -359,6 +308,32 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
           onClick={() => {
             setMode('CHANGING')
           }}>切换到配置模式</Button>
+
+        <Button
+          onClick={() => {
+            setOpenReplaySearch(true)
+          }}>数据回放</Button>
+        <ReplaySearchModal history={history} open={
+          openReplaySearch
+        } onFinished={
+          (startTime, endTime, count) => {
+            if (!startTime || !endTime || !count) {
+              setOpenReplaySearch(false)
+              return
+            }
+            message.success('开始查询')
+            fgetSampledData(history.id, startTime, endTime, count).then((res) => {
+              if (res.code === SUCCESS_CODE) {
+                setNetDataRecorder(new Map(Object.entries(res.data)))
+                message.success('查询成功')
+              } else {
+                message.error('查询失败')
+              }
+            })
+            setOpenReplaySearch(false)
+          }
+        }/>
+
       </Space>
     }
 
@@ -463,5 +438,67 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     </div>
   );
 };
+
+
+const ReplaySearchModal = ({history, open, onFinished}: {
+  history: IHistoryList,
+  open: boolean,
+  onFinished: (startTime?: number, endTime?: number, count?: number) => void
+}) => {
+  const handleClose = () => {
+    onFinished()
+  }
+
+  // 查询条件
+
+  const [period, setPeriod] = useState<number[]>([new Date(history?.createdAt).getTime(), new Date(history?.updatedAt).getTime()])
+  const [count, setCount] = useState(1000)
+
+  const debounceSetPeriod = debounce((value) => {
+    setPeriod(value as number[])
+  })
+
+
+  return <>
+    <Modal open={open}
+           onCancel={handleClose}
+           onClose={handleClose}
+           onOk={() => {
+             onFinished(period[0], period[1], count)
+           }}
+           width={800}>
+      <div style={{marginTop: 20}}>
+        拖动选择搜索时间:
+        <Slider range
+                defaultValue={[(new Date(history?.createdAt)).getTime(), (new Date(history?.updatedAt)).getTime()]}
+                min={(new Date(history?.createdAt)).getTime()}
+                max={(new Date(history?.updatedAt)).getTime()}
+                tooltip={{
+                  formatter: (value: number | number[] | undefined) => {
+                    if (typeof value === 'number') {
+                      return <div>{formatTime(value)}</div>;
+                    } else if (Array.isArray(value)) {
+                      return <div>{formatTime(value[0])} - {formatTime(value[1])}</div>
+                    }
+                    return null;
+                  }
+                }}
+                onChange={(value) => {
+                  debounceSetPeriod(value)
+                }}/>
+      </div>
+      <div style={{marginTop: 20}}>
+        <Space>
+          <Input placeholder={"输入在该段时间内查询数量"}
+                 defaultValue={1000}
+                 onChange={(e) => {
+                   setCount(Number(e.target.value))
+                 }}/>
+        </Space>
+      </div>
+    </Modal>
+  </>
+}
+
 
 export default TestTemplateForConfig;

@@ -22,6 +22,11 @@ export const splitBufferByDelimiter = (buffer: Buffer, delimiter: Buffer): Buffe
   return result;
 }
 
+export interface ITimeData {
+  time: number,
+  value: number
+}
+
 export interface IReceiveData {
   moduleId: number;
   collectType: number;

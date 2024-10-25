@@ -1,5 +1,6 @@
 import {IHistoryItemData} from "@/apis/standard/history.ts";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
+import {ITimeData} from "@/views/demo/TestConfig/template.tsx";
 
 export enum DataSourceType {
     NETWORK = 'network',
@@ -13,7 +14,7 @@ export interface IChartInterface {
     requestSignals: IProtocolSignal[]
 
     historyData?: IHistoryItemData[]
-    currentTestChartData?: Map<string, number[]>
+    currentTestChartData?: Map<string, ITimeData[]>
 
     requestSignalId: number | null
     width: number

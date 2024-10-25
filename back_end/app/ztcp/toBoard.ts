@@ -1,14 +1,15 @@
 import net from "node:net";
-import {decodingBoardMessage, decodingBoardMessageWithMap, IReceiveData, splitBufferByDelimiter} from "../../utils/BoardUtil/decoding";
+import {decodingBoardMessage, decodingBoardMessageWithMap, IReceiveData, ITimeData, splitBufferByDelimiter} from "../../utils/BoardUtil/decoding";
 import {IFrontMessage, sendMessageToFront} from "./toFront";
 import TestConfigService from "../service/TestConfig";
+import {getFrontFormatMessage} from "../../utils";
 
 let client: net.Socket;
 let reconnectInterval = 5000; // 重连间隔 5 秒
 let isManuallyClosed = false; // 是否主动断开
 
-const mapToJson = (map: Map<string, number>) => {
-  const obj: { [key: string]: number } = {};
+export const mapToJson = (map: Map<string, ITimeData>) => {
+  const obj: { [key: string]: ITimeData } = {};
   map.forEach((value, key) => {
     obj[key] = value;
   })
@@ -54,21 +55,31 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
           messages.push(decodingBoardMessage(item))
         })
 
-        const resolveMessage = (message: IReceiveData) => {
-          const result = decodingBoardMessageWithMap(message);
+        const resolveMessage = (receiveData: IReceiveData) => {
+          // 结果，每个信号对应的 -> 时间和值
+          const result = decodingBoardMessageWithMap(receiveData);
+
+          const message: { [key: string]: number } = {}
+          result.forEach((value, key) => {
+            message[key] = value
+          })
 
           console.log("decodingBoardMessageWith Map result ", result);
-          const msg = mapToJson(result);
+          const msg:{ [key: string]: number } = {}
+          result.forEach((value, key) => {
+            msg[key] = value
+          })
 
           TestConfigService.pushDataToCurrentHistory({
             time: new Date().getTime(),
-            data: JSON.parse(msg)
+            data: msg
           })
 
+          const responseMessage = getFrontFormatMessage(message, new Date().getTime())
           // 发送消息给前端
           sendMessageToFront({
             type: 'DATA',
-            message: mapToJson(result)
+            message: mapToJson(responseMessage)
           });
         }
 

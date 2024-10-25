@@ -1,6 +1,9 @@
 // @ts-ignore
 import WebSocket from 'app/ztcp/toFront';
 import TestConfigService from "../service/TestConfig";
+import {ITimeData} from "../../utils/BoardUtil/decoding";
+import {getFrontFormatMessage} from "../../utils";
+import {mapToJson} from "./toBoard";
 
 export let webSockets: Set<WebSocket> = new Set()
 
@@ -38,16 +41,18 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
         message[value] = Math.random() * 100
       })
 
+      const currentTime = new Date().getTime()
       TestConfigService.pushDataToCurrentHistory({
-        time: new Date().getTime(),
+        time: currentTime,
         data: message
       });
+      const responseMessage = getFrontFormatMessage(message, currentTime)
 
       sendMessageToFront({
         type: "DATA",
-        message: JSON.stringify(message)
+        message: mapToJson(responseMessage)
       })
-    }, 4)
+    }, 3000)
     publicIntervalRecords.push(record)
   })
 }
