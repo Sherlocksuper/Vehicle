@@ -20,7 +20,7 @@ import {IResBody} from "../types";
 import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
 import {ITimeData} from "../../utils/BoardUtil/decoding";
 
-export const CURRENT_DATA_LIMIT = 10_000
+export const CURRENT_DATA_LIMIT = 1_000
 export const CURRENT_HISTORY_SIGN = "(正在下发...)"
 
 class TestConfigService {
@@ -269,17 +269,19 @@ class TestConfigService {
   }) {
     // 如果当前的currentTestConfigHistory超过了CURRENT_DATA_LIMIT，那么存储到数据库
     if (this.currentTestConfigHistoryData.length > CURRENT_DATA_LIMIT) {
-      console.log("存储到数据库")
+      console.log("存储到数据库,当前数据量", this.currentTestConfigHistoryData.length)
+      const arr = Array.from(this.currentTestConfigHistoryData)
+      this.clearOnlyData()
       await this.saveCurrentDataToSql(
         this.currentTestConfig!.name,
         this.currentHistoryId,
-        this.currentTestConfigHistoryData)
-      this.clearOnlyData()
+        arr)
     }
     this.currentTestConfigHistoryData.push(data)
   }
 
   clearOnlyData() {
+    console.log("清空数据")
     this.currentTestConfigHistoryData = []
   }
 
