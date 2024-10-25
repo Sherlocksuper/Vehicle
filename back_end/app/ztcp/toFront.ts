@@ -29,6 +29,10 @@ export const sendMessageToFront = (message: IFrontMessage) => {
 
 let publicIntervalRecords: NodeJS.Timeout[] = []
 
+const generateSineWave = (frequency: number, amplitude: number, phase: number, time: number) => {
+  return amplitude * Math.sin(2 * Math.PI * frequency * time + phase);
+}
+
 export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
   // signalMap是一个Map，忽略key，以每组的value为键值，模拟数据源
   // 每个value是一个数组，数组的每个元素是一个信号的值
@@ -38,8 +42,12 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
     const record = setInterval(() => {
       const message: { [key: string]: number } = {}
       values.forEach((value) => {
-        message[value] = Math.random() * 100
-      })
+        const frequency = 1; // 频率，可以根据需要调整
+        const amplitude = 100; // 振幅，可以根据需要调整
+        const phase = 0; // 相位，可以根据需要调整
+        const time = new Date().getTime() / 1000; // 当前时间，单位为秒
+        message[value] = generateSineWave(frequency, amplitude, phase, time);
+      });
 
       const currentTime = new Date().getTime()
       TestConfigService.pushDataToCurrentHistory({
