@@ -67,9 +67,30 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   // 打开
   const [openReplaySearch, setOpenReplaySearch] = useState(false)
 
+  const dataCacheRef = useRef<{
+    [key: string]: ITimeData
+  }>();
+  // 节流
+  const dataThrottleTimeOut = useRef(null);
+
   const updateDataRecorder = (data: {
     [key: string]: ITimeData
   }) => {
+    // 把cache和data合并
+    dataCacheRef.current = {
+      ...dataCacheRef.current,
+      ...data
+    }
+
+    if (dataThrottleTimeOut.current !== null) {
+      return
+    }
+
+    dataThrottleTimeOut.current = setTimeout(() => {
+      clearTimeout(dataThrottleTimeOut.current)
+      dataThrottleTimeOut.current = null
+    }, 100);
+
     Object.keys(data).forEach((key) => {
       if (!dataRecorderRef.current.has(key)) {
         dataRecorderRef.current.set(key, [])

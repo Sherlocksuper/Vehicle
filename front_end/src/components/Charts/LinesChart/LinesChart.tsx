@@ -49,35 +49,31 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
 
   // 中值滤波
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const medianFilter = (arr, windowSize) => {
-    let window = windowSize
-    if (typeof window === "string") {
-      window = parseInt(window)
-      if (isNaN(window)) {
-        window = 3
-      }
-    }
-    if (!window || window <= 2) {
-      window = 3
+  const medianFilter = (arr: { time: number, value: number }[], windowSize: number | string) :Array<[number, number]> => {
+    let window = typeof windowSize === "string" ? parseInt(windowSize) : windowSize;
+    if (isNaN(window) || window <= 2) {
+      window = 3;
     }
     if (window % 2 === 0) {
-      window = window + 1
+      window += 1;  // 确保窗口大小为奇数
     }
 
-    if (!arr) return []
-    const padSize = Math.floor(window / 2);
-    const paddedArr = [...Array(padSize).fill(arr[0]), ...arr, ...Array(padSize).fill(arr[arr.length - 1])];
+    if (!arr || arr.length === 0) return [];  // 处理空数组情况
     const result = [];
+    const halfWindow = Math.floor(window / 2);
 
-    for (let i = padSize; i < paddedArr.length - padSize; i++) {
-      const window = paddedArr.slice(i - padSize, i + padSize + 1);
-      window.sort((a, b) => a - b);
-      const median = window[Math.floor(window.length / 2)];
-      result.push(median);
+    for (let i = 0; i < arr.length; i++) {
+      if (i < halfWindow || i >= arr.length - halfWindow) {
+        result.push([arr[i].time, arr[i].value]);  // 边界处保持原值
+      } else {
+        const temp = arr.slice(i - halfWindow, i + halfWindow + 1).map(item => item.value);
+        temp.sort((a, b) => a - b);  // 排序
+        result.push([arr[i].time, temp[Math.floor(window / 2)]]);  // 获取中间值，格式为 [time, value]
+      }
     }
 
     return result;
-  }
+  };
 
   const pushData = useCallback((data: Map<string, ITimeData[]>) => {
     if (!requestSignals || requestSignals.length === 0) {
@@ -103,7 +99,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         // TODO 在这里添加中值滤波
         dataRef.current.forEach((item) => {
           if (item.id === signal.id) {
-            item.data = signalData.map((item) => [item.time, item.value])
+            item.data = medianFilter(signalData, windowSize)
           }
         });
       }
