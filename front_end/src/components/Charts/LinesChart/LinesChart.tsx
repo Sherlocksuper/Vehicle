@@ -73,10 +73,36 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     }
 
     // result根据时间排序
-    result.sort((a, b) => a[0] - b[0]);
+    // result.sort((a, b) => a[0] - b[0]);
 
     return result;
   };
+
+  // 让曲线更平滑的函数,取滤波后的值，然后根据时间戳的差值，取最接近的时间戳
+  const smoothMedianFilter = (arr: { time: number, value: number }[], windowSize: number | string): Array<[number, number]> => {
+    const result = medianFilter(arr, windowSize);
+    // 小于400个点不进行平滑，因为可能会有误差
+    if (result.length < 400) {
+      return result;
+    }
+    const smoothResult = [];
+    const length = result.length;
+    let timeStep = (result[length - 1][0] - result[0][0]) / (length + 1);
+    // 取1、10、100、1000中最接近的一个
+    if (timeStep < 1) {
+      timeStep = 1;
+    }
+    timeStep = Math.pow(10, Math.round(Math.log10(timeStep)));
+    timeStep = Math.floor(timeStep);
+    //最后一个减去倒数第二个
+    // 矣最后一个时间为基准，前面的时间递减
+    let time = result[length - 1][0];
+    for (let i = length - 1; i >= 0; i--) {
+      smoothResult.push([time, result[i][1]]);
+      time -= timeStep;
+    }
+    return smoothResult;
+  }
 
   const pushData = useCallback((data: Map<string, ITimeData[]>) => {
     if (!requestSignals || requestSignals.length === 0) {
@@ -95,14 +121,14 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       });
     }
 
-    // 把每个信号的数据push到对应的dataRef中
+    // 把每个信号的数据push到对应的dataRef中, 同时进行滤波、修改时间戳等操作
     requestSignals.forEach((signal) => {
       const signalData = data.get(signal.id)
       if (signalData) {
-        // TODO 在这里添加中值滤波
+        // TODO 在这里添加中值滤波、平滑滤波等操作
         dataRef.current.forEach((item) => {
           if (item.id === signal.id) {
-            const datas = medianFilter(signalData, windowSize)
+            const datas = smoothMedianFilter(signalData, windowSize)
             item.data = datas.slice(0, datas.length - 100)
           }
         });
@@ -111,7 +137,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
 
     // 合并时间
     const time = mergeKArrays(requestSignals.map((signal) => {
-      return data.get(signal.id)?.map((item) => item.time) || []
+      return dataRef.current.find((item) => item.id === signal.id)?.data.map((item) => item[0]) || []
     }))
 
     // Update chart options

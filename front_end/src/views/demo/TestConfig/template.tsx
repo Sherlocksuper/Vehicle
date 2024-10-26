@@ -99,8 +99,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       }
       // 把dataCache的推进去，如果大于1000，取后1000条
       dataRecorderRef.current.get(key).push(...dataCacheRef.current[key])
-      if (dataRecorderRef.current.get(key).length > 400) {
-        dataRecorderRef.current.set(key, dataRecorderRef.current.get(key).slice(-400))
+      if (dataRecorderRef.current.get(key).length > 1000) {
+        dataRecorderRef.current.set(key, dataRecorderRef.current.get(key).slice(-1000))
       }
     })
     dataCacheRef.current = {}
