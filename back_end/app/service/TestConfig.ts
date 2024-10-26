@@ -394,6 +394,8 @@ class TestConfigService {
     return true;
   }
 
+  child = fork(path.resolve(__dirname, '../worker/saveDataWorker.ts'))
+
   async saveCurrentDataToSql(
     configName: string,
     historyId: number,
@@ -420,15 +422,18 @@ class TestConfigService {
         })
       }
     })
-    if (!isSync){
-      const child = fork(path.resolve(__dirname, '../worker/saveDataWorker.ts'))
-      child.send(data)
-      child.on('message', (msg) => {
+    // if (!isSync){
+    //   const child = fork(path.resolve(__dirname, '../worker/saveDataWorker.ts'))
+      this.child.send(data)
+      this.child.on('message', (msg) => {
         console.log(msg)
       })
-    } else {
-      await DataService.addData(data)
-    }
+    this.child.on('exit', (code) => {
+      console.log(`子进程已退出，退出码 ${code}`);
+    });
+    // } else {
+    //   await DataService.addData(data)
+    // }
     return true
   }
 }
