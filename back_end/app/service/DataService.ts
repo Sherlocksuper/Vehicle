@@ -7,7 +7,12 @@ import HistoryService from "./HistoryService";
 class DataService {
   async addData(dataGroup: IData[]) {
     // Add data to the database
-    const result = await DataModel.bulkCreate(dataGroup);
+    const result = await DataModel.bulkCreate(dataGroup,
+      // 不插入重复的数据
+      {
+        ignoreDuplicates: true,
+        logging: false
+      });
     return result
   }
 
