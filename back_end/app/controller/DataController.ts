@@ -43,8 +43,8 @@ class DataController {
   }
 
   async updateData(context: Context) {
-    const {configName, name, time, value} = context.request.body
-    const res = await dataService.updateData(configName, name, time, value)
+    const {id, value} = context.request.body
+    const res = await dataService.updateData(id, value)
 
     res && ((context.body as IResBody) = {
       code: SUCCESS_CODE,

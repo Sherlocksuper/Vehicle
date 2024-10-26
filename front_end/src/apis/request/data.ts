@@ -11,6 +11,17 @@ export const deleteData = async (ids : string[]) => {
   });
 }
 
+export const updateData = async (id: string, value: number) => {
+  const api = DATA_API.updateData;
+  return request({
+    api: api,
+    params: {
+      id,
+      value
+    }
+  });
+}
+
 export const getDataMaxMinMiddle = async (belongId: number) => {
   const api = {...DATA_API.getDataMaxMinMiddle};
   api.url = api.url.replace(':belongId', belongId.toString());

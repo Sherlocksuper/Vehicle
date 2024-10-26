@@ -74,12 +74,10 @@ class DataService {
 
   }
 
-  async updateData(configName: string, name: string, time: number, value: number) {
+  async updateData(id: string, value: number) {
     const result = await DataModel.update({value}, {
       where: {
-        configName,
-        name,
-        time
+        id
       }
     });
     return result
