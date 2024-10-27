@@ -145,6 +145,11 @@ router.get('/stopCurrentTestConfig', TestConfigController.stopCurrentTestConfig)
 //async downHistoryDataAsJson() {
 router.get('/downHistoryDataAsJson', TestConfigController.downHistoryDataAsJson);
 
+router.get('/startTcpConnect', TestConfigController.startTcpConnect);
+router.get('/stopTcpConnect', TestConfigController.stopTcpConnect);
+// getTcpConnectStatus
+router.get('/getTcpConnectStatus', TestConfigController.getTcpConnectStatus);
+
 // CollectUnit
 router.post('/addCollectUnit', CollectUnitController.addCollectUnit);
 router.post('/deleteCollectUnit/:id', CollectUnitController.deleteCollectUnit);

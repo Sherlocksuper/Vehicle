@@ -17,11 +17,16 @@ export const mapToJson = (map: Map<string, ITimeData>) => {
 }
 
 // 定义一个递归函数来遍历host和port数组
-export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, port: number }>, index = 0, useBeidou: boolean = true) => {
+export const connectWithMultipleBoards = (
+  hostPortList: Array<{ host: string, port: number }>,
+  index = 0,
+  useBeidou: boolean = true
+) => {
+
   isManuallyClosed = false
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<boolean>((resolve, reject) => {
     if (index >= hostPortList.length) {
-      reject(new Error('所有的连接尝试均失败'));
+      reject(false);
       return;
     }
 
@@ -42,7 +47,7 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
     }, () => {
       console.log(`${port} ${host} 建立链接成功`);
       clearTimeout(timeOut);
-      resolve();
+      resolve(true);
     });
 
     client.on('data', (data) => {
@@ -132,9 +137,10 @@ export const reconnectWithMultipleBoards = async (hostPortList: Array<{ host: st
       type: 'NOTIFICATION',
       message: '正在尝试与下位机重新连接...'
     });
-    await connectWithMultipleBoards(hostPortList, index);
+    return await connectWithMultipleBoards(hostPortList, index);
   } else {
     console.log("不重连");
+    return false;
   }
 };
 
@@ -181,4 +187,8 @@ export const sendMultipleMessagesBoard = (messages: Buffer[], interval = 1000) =
 
     sendNextMessage();
   });
+}
+
+export const getTcpClient = () => {
+  return client
 }

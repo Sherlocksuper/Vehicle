@@ -4,7 +4,7 @@
 
 import TestConfig, {CurrentTestConfig, ITestConfig} from "../model/TestConfig";
 import {getBusCategory, getCollectType, getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
-import {connectWithMultipleBoards, disconnectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
+import {connectWithMultipleBoards, disconnectWithBoard, reconnectWithMultipleBoards, sendMultipleMessagesBoard} from "../ztcp/toBoard";
 import * as fs from "fs";
 import path from "node:path";
 import {ProtocolType} from "../model/PreSet/Protocol.model";
@@ -445,6 +445,16 @@ class TestConfigService {
         }
       }
     });
+  }
+
+  // 停止当前tcp连接
+  async stopCurrentTcp(){
+    disconnectWithBoard();
+  }
+
+  async startCurrentTcp() {
+    const hortList = await this.getHostPortList(this.currentTestConfig!)
+    return await reconnectWithMultipleBoards(hortList, 0)
   }
 }
 

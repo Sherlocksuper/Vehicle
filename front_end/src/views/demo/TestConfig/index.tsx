@@ -154,7 +154,7 @@ const TestConfig = () => {
         <Space>
           <Button type="link" onClick={() => copyConfig(record)}>复制</Button>
           {currentDownConfig?.id === record.id ?
-            (<Button type="link" onClick={() => handleStopCurrentCollect()}>停止下发</Button>)
+            (<Button type="link" onClick={() => handleStopCurrentCollect()}>使用中</Button>)
             :
             <>
               <Button type="link" onClick={() => deleteConfig(record.id)}>删除</Button>

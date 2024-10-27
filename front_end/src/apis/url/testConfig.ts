@@ -72,5 +72,21 @@ export const TEST_CONFIG_API = {
   downHistoryDataAsJson: {
     url: '/downHistoryDataAsJson',
     method: Method.GET,
-  }
+  },
+  //router.get('/startTcpConnect', TestConfigController.startTcpConnect);
+  // router.get('/stopTcpConnect', TestConfigController.stopTcpConnect);
+  startTcpConnect: {
+    url: '/startTcpConnect',
+    method: Method.GET,
+  },
+  stopTcpConnect: {
+    url: '/stopTcpConnect',
+    method: Method.GET,
+  },
+
+  // router.get('/getTcpConnectStatus', TestConfigController.getTcpConnectStatus);
+  getTcpConnectStatus: {
+    url: '/getTcpConnectStatus',
+    method: Method.GET,
+  },
 }

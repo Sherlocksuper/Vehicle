@@ -1,19 +1,20 @@
 import React, {useEffect} from "react";
 import {Button, Card, message, Space, Table, TableProps} from "antd";
 import {FAIL_CODE} from "@/constants";
-import {getCurrentTestConfig, stopCurrentTestConfig} from "@/apis/request/testConfig.ts";
+import {getCurrentTestConfig, getTcpConnectStatus, startTcpConnect, stopCurrentTestConfig, stopTcpConnect} from "@/apis/request/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
 
 
 const DataSee = () => {
   const [currentDownConfig, setCurrentDownConfig] = React.useState<ITestConfig | undefined>(undefined);
+  const [isReceiving, setIsReceiving] = React.useState<boolean>(false);
 
   const fetchCurrentConfig = () => {
     getCurrentTestConfig().then(res => {
       if (res.code === FAIL_CODE) {
         message.error(res.msg);
       } else {
-        console.log('currentConfig:',res.data);
+        console.log('currentConfig:', res.data);
         setCurrentDownConfig(res.data);
       }
     });
@@ -25,15 +26,51 @@ const DataSee = () => {
     if (!win) return
   }
 
-  const handleStopCurrentCollect = () => {
-    stopCurrentTestConfig().then(res => {
-      if (res.code === FAIL_CODE) {
-        message.error(res.msg);
-      } else {
-        message.success('停止成功');
-        setCurrentDownConfig(undefined);
-      }
-    });
+  // // 停止当前采集
+  // const handleStopCurrentCollect = () => {
+  //   stopCurrentTestConfig().then(res => {
+  //     if (res.code === FAIL_CODE) {
+  //       message.error(res.msg);
+  //     } else {
+  //       message.success('停止成功');
+  //       setCurrentDownConfig(undefined);
+  //     }
+  //   });
+  // }
+  //
+
+  // 停止接收-断开tcp连接
+  const handleStopTcpConnect = async () => {
+    const res = await stopTcpConnect()
+    if (res.code === FAIL_CODE) {
+      message.error(res.msg);
+    } else {
+      message.success('停止成功');
+      setIsReceiving(false)
+    }
+  }
+
+  // 开始接收-建立tcp连接
+  const handleStartTcpConnect = async () => {
+    const res = await startTcpConnect()
+    if (res.code === FAIL_CODE) {
+      message.error(res.msg);
+    } else {
+      message.success('开始接收');
+      setIsReceiving(true)
+    }
+  }
+
+  // 获取tcp连接状态
+  const handleGetTcpConnectStatus = async () => {
+    const res = await getTcpConnectStatus()
+    if (res.code === FAIL_CODE) {
+      message.error(res.msg);
+    } else {
+      message.info(res.msg);
+      console.log(res.data)
+      setIsReceiving(res.data)
+    }
   }
 
   const columns: TableProps<ITestConfig>['columns'] = [
@@ -48,6 +85,11 @@ const DataSee = () => {
       key: 'name',
     },
     {
+      title: '测试状态',
+      dataIndex: 'testStat',
+      key: 'testStat',
+    },
+    {
       title: '测试车辆',
       key: 'vehicle',
       render: (text, record) => (
@@ -55,7 +97,7 @@ const DataSee = () => {
       ),
     },
     {
-      title: `测试信号${currentDownConfig?(currentDownConfig.configs[0].projects ? ('('+currentDownConfig.configs[0].projects[0].indicators.length+')') : '未配置'):'无配置'}`,
+      title: `测试信号${currentDownConfig ? (currentDownConfig.configs[0].projects ? ('(' + currentDownConfig.configs[0].projects[0].indicators.length + ')') : '未配置') : '无配置'}`,
       key: 'vehicle',
       render: (text, record) => (
         <div style={{
@@ -85,11 +127,18 @@ const DataSee = () => {
     {
       title: '操作',
       key: 'action',
-      render: (text, record) => (
+      render: () => (
         <Space align={"start"}>
-          {currentDownConfig?.id === record.id ?
-              (<Button type={"link"} onClick={() => handleShowCurrentData()}>数据监视</Button>) : (" ")}
-          {(<Button type="link" onClick={() => handleStopCurrentCollect()}>停止下发</Button>)}
+          {
+            isReceiving ? (
+              <>
+                <Button type={"link"} onClick={() => handleShowCurrentData()}>数据监视</Button>
+                <Button type={"link"} onClick={() => handleStopTcpConnect()}>停止接收</Button>
+              </>
+            ) : (
+              <Button type={"link"} onClick={() => handleStartTcpConnect()}>开始接收</Button>
+            )
+          }
         </Space>
       ),
     },
@@ -97,6 +146,7 @@ const DataSee = () => {
 
   useEffect(() => {
     fetchCurrentConfig()
+    handleGetTcpConnectStatus()
   }, []);
 
   return (

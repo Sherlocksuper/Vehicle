@@ -5,6 +5,7 @@ import {Context} from "koa";
 import {ITestObjectNModel} from "../model/2TestObjectN.model";
 import TestConfigService from "../service/TestConfig";
 import {ITestConfig} from "../model/TestConfig";
+import {getTcpClient} from "../ztcp/toBoard";
 
 
 class TestConfigController {
@@ -144,10 +145,74 @@ class TestConfigController {
 
   // async downHistoryDataAsJson() {
   async downHistoryDataAsJson(ctx: Context) {
-     ((ctx.body as IResBody) = {
+    ((ctx.body as IResBody) = {
       code: SUCCESS_CODE,
       msg: SEARCH_SUCCESS_MSG,
       data: null
+    })
+  }
+
+  // 断开tcp连接
+  async stopTcpConnect(ctx: Context) {
+    const tcpClient = getTcpClient()
+    // 如果tcp不存在或者已经断开
+    if (!tcpClient || tcpClient.destroyed) {
+      ((ctx.body as IResBody) = {
+        code: SUCCESS_CODE,
+        msg: "当前没有连接",
+        data: null
+      })
+      return
+    }
+    await TestConfigService.stopCurrentTcp();
+    ((ctx.body as IResBody) = {
+      code: SUCCESS_CODE,
+      msg: "停止接收成功",
+      data: null
+    })
+  }
+
+  // 建立tcp连接
+  async startTcpConnect(ctx: Context) {
+    const tcpClient = getTcpClient()
+    // 如果tcp存在并且没有断开
+    if (tcpClient && !tcpClient.destroyed) {
+      ((ctx.body as IResBody) = {
+        code: SUCCESS_CODE,
+        msg: "当前已经连接",
+        data: null
+      })
+      return
+    }
+
+    const result = await TestConfigService.startCurrentTcp();
+    result && ((ctx.body as IResBody) = {
+      code: SUCCESS_CODE,
+      msg: "开始接收成功",
+      data: null
+    })
+    !result && ((ctx.body as IResBody) = {
+      code: FAIL_CODE,
+      msg: "开始接收失败，请重新下发尝试",
+      data: null
+    })
+  }
+
+  async getTcpConnectStatus(ctx: Context) {
+    const tcpClient = getTcpClient()
+    // 如果tcp存在并且没有断开
+    if (tcpClient && !tcpClient.destroyed && tcpClient.connecting) {
+      ((ctx.body as IResBody) = {
+        code: SUCCESS_CODE,
+        msg: "当前已经连接",
+        data: true
+      })
+      return
+    }
+    ((ctx.body as IResBody) = {
+      code: SUCCESS_CODE,
+      msg: "当前连接断开",
+      data: false
     })
   }
 }

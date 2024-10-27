@@ -95,3 +95,26 @@ export const downHistoryDataAsJson = async () => {
     api: api
   });
 }
+
+//router.get('/startTcpConnect', TestConfigController.startTcpConnect);
+// router.get('/stopTcpConnect', TestConfigController.stopTcpConnect);
+export const startTcpConnect = async () => {
+  const api = TEST_CONFIG_API.startTcpConnect;
+  return request({
+    api: api
+  });
+}
+
+export const stopTcpConnect = async () => {
+  const api = TEST_CONFIG_API.stopTcpConnect;
+  return request({
+    api: api
+  });
+}
+
+export const getTcpConnectStatus = async () => {
+  const api = TEST_CONFIG_API.getTcpConnectStatus;
+  return request({
+    api: api
+  });
+}
