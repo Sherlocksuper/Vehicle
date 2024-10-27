@@ -101,8 +101,8 @@ const DataSee = () => {
                     {
                       unit.collectors.map((board, index) => {
                         return <div key={index}>
-                          <span style={{color: !boardStatus[board.collectorAddress] ? 'red' : "green",}}>
-                            {`${board.collectorName}:${!boardStatus[board.collectorAddress] ? '异常' : '正常'}`}
+                          <span style={{color: !boardStatus[board.collectorAddress - 2] ? 'red' : "green",}}>
+                            {`${board.collectorName}:${!boardStatus[board.collectorAddress - 2] ? '异常' : '正常'}`}
                           </span>
                         </div>
                       })

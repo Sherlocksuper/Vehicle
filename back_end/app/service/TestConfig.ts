@@ -292,7 +292,7 @@ class TestConfigService {
     this.banMessage = []
     this.digitalKeyList = []
     this.currentHistoryId = 0
-    this.signalsIdNameMap.clear()
+    // this.signalsIdNameMap.clear()
     this.boardConnectStatus = []
     // 清空状态
     await this.deleteCurrentConfigFromSql()
