@@ -73,6 +73,9 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
   // 节流
   const dataThrottleTimeOut = useRef(null);
 
+  // 是数据回放
+  const [isReplayModal,setIsReplayModal] = useState(false)
+
   const updateDataRecorder = (data: {
     [key: string]: ITimeData
   }) => {
@@ -139,9 +142,12 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     const testConfigId = params.get('testConfigId') ?? undefined
     const historyId = params.get('historyId') ?? undefined
 
+    // 如果是在线数据源
     if (testConfigId) {
       onlinePresentation(testConfigId)
     } else if (historyId) {
+      // 如果是离线数据回放
+      setIsReplayModal(true)
       dataReplayPreparation(historyId)
     }
   }, [])
@@ -330,17 +336,17 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       >
         <Button onClick={() => {
           confirmChangeConfig()
-        }}>确定更改配置</Button>
+        }}>保存此布局</Button>
 
-        <Button
-          onClick={() => {
-            setMode('CHANGING')
-          }}>切换到配置模式</Button>
+        <Button onClick={() => {
+          setMode('CHANGING')
+        }}>切换至配置模式</Button>
 
-        <Button
-          onClick={() => {
+        {
+          isReplayModal && <Button onClick={() => {
             setOpenReplaySearch(true)
           }}>数据回放</Button>
+        }
         <ReplaySearchModal history={history} open={
           openReplaySearch
         } onFinished={
@@ -377,11 +383,8 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
     }}>
       <Button onClick={() => {
         confirmChangeConfig()
-      }}>确定更改配置</Button>
-      <Button onClick={() => {
-        confirmChangeConfig()
         setMode('COLLECTING')
-      }}>查看收集数据</Button>
+      }}>切换至查看模式</Button>
       <div className="dd_info">
         {renderADDModeInfo()}
       </div>
