@@ -78,6 +78,13 @@ const DataSee = () => {
       key: 'name',
     },
     {
+      title: '测试车辆',
+      key: 'vehicle',
+      render: (text, record) => (
+        <span>{record.configs[0].vehicle.vehicleName}</span>
+      ),
+    },
+    {
       title: '测试状态',
       dataIndex: 'testStat',
       key: 'testStat',
@@ -108,15 +115,9 @@ const DataSee = () => {
         </Space>
       }
     },
+
     {
-      title: '测试车辆',
-      key: 'vehicle',
-      render: (text, record) => (
-        <span>{record.configs[0].vehicle.vehicleName}</span>
-      ),
-    },
-    {
-      title: `测试信号${currentDownConfig ? (currentDownConfig.configs[0].projects ? ('(' + currentDownConfig.configs[0].projects[0].indicators.length + ')') : '未配置') : '无配置'}`,
+      title: `采集数据项${currentDownConfig ? (currentDownConfig.configs[0].projects ? ('(' + currentDownConfig.configs[0].projects[0].indicators.length + ')') : '未配置') : '无配置'}`,
       key: 'vehicle',
       render: (text, record) => (
         <div style={{
