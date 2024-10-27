@@ -15,6 +15,9 @@ import {ITestConfig} from "@/apis/standard/test.ts";
 import {getAllProtocolSignalsFromTestConfig} from "@/utils";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
 import {QuestionCircleOutlined} from "@ant-design/icons";
+import {DataParsingModal} from "@/views/demo/History/history.tsx";
+import {getDataMaxMinMiddle} from "@/apis/request/data.ts";
+import {SUCCESS_CODE} from "@/constants";
 
 const ConfigDropContainer: React.FC<{
   banModify: boolean;
@@ -40,6 +43,35 @@ const ConfigDropContainer: React.FC<{
 
   const pathRef = useRef(window.location.pathname);
 
+  const [belongId, setBelongId] = React.useState<string>(undefined)
+  const [openDataParsing, setOpenDataParsing] = useState(false);
+
+  const handleCloseParsing=()=>{
+    setOpenDataParsing(false)
+  }
+  const handleOpenParsing=()=>{
+    setBelongId(getQueryParam('testConfigId'))
+    setOpenDataParsing(true)
+  }
+  const getQueryParam=(param:string)=> {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+  const [dataParsing, setDataParsing] = useState<{
+    name: string,
+    max: number,
+    min: number,
+    middle: number
+  }[]>([]);
+  useEffect(()=>{
+    getDataMaxMinMiddle(Number(belongId)).then(res => {
+      if (res.code === SUCCESS_CODE) {
+        setDataParsing(res.data)
+      } else {
+        setDataParsing(null)
+      }
+    })
+  },[belongId])
 
   return (
     <div className="dc_container">
@@ -80,6 +112,7 @@ const ConfigDropContainer: React.FC<{
                 h: item.itemConfig.height / 30,
                 i: item.id,
               }}
+              onClick={()=>{handleOpenParsing()}}
               onContextMenu={(e) => {
                 e.preventDefault();
                 if (pathRef.current === "/offline-show") {
@@ -101,6 +134,7 @@ const ConfigDropContainer: React.FC<{
           );
         })}
       </GridLayout>
+      <DataParsingModal source={dataParsing} open={openDataParsing} onFinished={handleCloseParsing}></DataParsingModal>
     </div>
   );
 };
@@ -223,19 +257,19 @@ const UpdateItemModal: React.FC<{
   );
 };
 
-const getUsefulSignal = (requestSignals: IProtocolSignal[], signalRecordMap: Map<string, ITimeData[]>) => {
-  if (typeof requestSignals === 'string') {
-    requestSignals = [requestSignals]
-  }
-  const resultMap = new Map<string, ITimeData[]>()
-  requestSignals.forEach((signal) => {
-    const signalData = signalRecordMap.get(signal.id)
-    if (signalData) {
-      resultMap.set(signal.id, signalData)
-    }
-  })
-  return resultMap
-}
+// const getUsefulSignal = (requestSignals: IProtocolSignal[], signalRecordMap: Map<string, ITimeData[]>) => {
+//   if (typeof requestSignals === 'string') {
+//     requestSignals = [requestSignals]
+//   }
+//   const resultMap = new Map<string, ITimeData[]>()
+//   requestSignals.forEach((signal) => {
+//     const signalData = signalRecordMap.get(signal.id)
+//     if (signalData) {
+//       resultMap.set(signal.id, signalData)
+//     }
+//   })
+//   return resultMap
+// }
 
 
 /**
