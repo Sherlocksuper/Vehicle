@@ -82,7 +82,12 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   result.busType = buffer[3] & 0x0f;
   // 时间戳 4、5、6、7、8、9
   // result.timestamp = buffer[4] << 40 | buffer[5] << 32 | buffer[6] << 24 | buffer[7] << 16 | buffer[8] << 8 | buffer[9];
-  result.timestamp = getTimeStamp(buffer);
+  // 如果都是0，用new Date().getTime()代替
+  if (buffer[5] === 0) {
+    result.timestamp = new Date().getTime();
+  } else {
+    result.timestamp = getTimeStamp(buffer);
+  }
   // 帧id 10、11、12、13
   result.frameId = getFrameId(buffer);
   // 14字节是信号数量
