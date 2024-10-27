@@ -100,44 +100,44 @@ const HistoryData = () => {
       title: "操作",
       key: "action",
       render: ( record) => (
-          <Space>
-            <a onClick={() => deleteHistory(record.id!)}>删除</a>
-            {/*<a onClick={() => {*/}
-            {/*  setDataAnalysisVisible(!dataAnalysisVisible);*/}
-            {/*  setBelongId(record.id.toString())*/}
-            {/*}}>数据分析</a>*/}
-            <a onClick={() => {
-              setBelongId(record.id.toString())
-              setOpenDetailSearch(true)
-            }}>
-              查询
+        <Space>
+          {/*<a onClick={() => {*/}
+          {/*  setDataAnalysisVisible(!dataAnalysisVisible);*/}
+          {/*  setBelongId(record.id.toString())*/}
+          {/*}}>数据分析</a>*/}
+          <a onClick={() => {
+            setBelongId(record.id.toString())
+            setOpenDetailSearch(true)
+          }}>
+            查询
 
-            </a>
-            <a onClick={async () => {
-              setBelongId(record.id.toString())
-              getTestsHistoryById(Number(belongId)).then(res => {
-                if (res.code === SUCCESS_CODE) {
-                  setHistory(res.data)
-                } else {
-                  setHistory(null)
-                }
-              }).then(()=>{
-                setOpenDataParsing(true)
-              })
-            }}>
-              分析
+          </a>
+          <a onClick={async () => {
+            setBelongId(record.id.toString())
+            getTestsHistoryById(Number(belongId)).then(res => {
+              if (res.code === SUCCESS_CODE) {
+                setHistory(res.data)
+              } else {
+                setHistory(null)
+              }
+            }).then(() => {
+              setOpenDataParsing(true)
+            })
+          }}>
+            分析
 
-            </a>
-            <a onClick={() => {
-              setBelongId(record.id.toString())
-              window.open(`/test-template-for-config?historyId=${history.id}`);
-            }}>
-              回放
-            </a>
-            {
-              record.path === "" ? null : <a href={`${BASE_URL + record.path}`} download={true}>格式化导出</a>
-            }
-          </Space>
+          </a>
+          <a onClick={() => {
+            setBelongId(record.id.toString())
+            window.open(`/test-template-for-config?historyId=${history.id}`);
+          }}>
+            回放
+          </a>
+          {
+            record.path === "" ? null : <a href={`${BASE_URL + record.path}`} download={true}>导出</a>
+          }
+          <a onClick={() => deleteHistory(record.id!)}>删除</a>
+        </Space>
       )
     }
   ];

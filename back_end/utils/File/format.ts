@@ -73,8 +73,10 @@ const wrapOneSignal = (time: number, name: string, dimension: string, value: num
 
   // 迭代直到numLength稳定
   // eslint-disable-next-line no-constant-condition
-  while (true) {
+  let times = 0
+  while (times < 100) {
     // 构造包含当前numLength的字符串
+    times ++
     const partialResult = [dateResult, numLength, numResult].join(" ")
     const newNumLength = encode(partialResult).length
 
