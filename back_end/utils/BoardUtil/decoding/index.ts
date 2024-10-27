@@ -31,7 +31,7 @@ export interface IReceiveData {
   moduleId: number;
   collectType: number;
   busType: number;
-  timestamp: string;
+  timestamp: number;
   frameId: number;
   signalCount: number;
   reserved: number;
@@ -49,13 +49,13 @@ interface IReceiveSignal {
 
 // 当前数据映射表 通过key值把信号id与信号值对应起来
 
-const getTimeStamp = (buffer: Buffer): string => {
+const getTimeStamp = (buffer: Buffer): number => {
   // 把十六进制的表示转化成字符串，比如0x24转化成字符串"24"
   // 时间戳分隔符
   const timeStampDelimiter = "-";
 
-  const getTime = (num: number): string => {
-    return "" + num / 16 + num % 16;
+  const getTime = (num: number): number => {
+    return num / 16 + num % 16;
   }
 
   const year = getTime(buffer[4]);
@@ -65,7 +65,10 @@ const getTimeStamp = (buffer: Buffer): string => {
   const minute = getTime(buffer[8]);
   const second = getTime(buffer[9]);
 
-  return [year, month, day, hour, minute, second].join(timeStampDelimiter);
+  // 获得对应的时间戳  毫秒时间戳
+  const data = new Date(year + 2000, month - 1, day, hour, minute, second);
+
+  return data.getTime()
 }
 
 // 处理一个

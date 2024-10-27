@@ -17,7 +17,7 @@ export const mapToJson = (map: Map<string, ITimeData>) => {
 }
 
 // 定义一个递归函数来遍历host和port数组
-export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, port: number }>, index = 0) => {
+export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, port: number }>, index = 0, useBeidou: boolean = true) => {
   isManuallyClosed = false
   return new Promise<void>((resolve, reject) => {
     if (index >= hostPortList.length) {
@@ -70,10 +70,12 @@ export const connectWithMultipleBoards = (hostPortList: Array<{ host: string, po
             msg[key] = value
           })
 
-          TestConfigService.pushDataToCurrentHistory({
-            time: new Date().getTime(),
-            data: msg
-          })
+          if (messages.length > 0) {
+            TestConfigService.pushDataToCurrentHistory({
+              time: useBeidou ? messages[0].timestamp : new Date().getTime(),
+              data: msg
+            })
+          }
 
           const responseMessage = getFrontFormatMessage(message, new Date().getTime())
           // 发送消息给前端

@@ -33,7 +33,7 @@ const generateSineWave = (frequency: number, amplitude: number, phase: number, t
   return amplitude * Math.sin(2 * Math.PI * frequency * time + phase);
 }
 
-export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
+export const startMockBoardMessage = (signalMap: Map<string, string[]>, useBeidou: boolean = true) => {
   // signalMap是一个Map，忽略key，以每组的value为键值，模拟数据源
   // 每个value是一个数组，数组的每个元素是一个信号的值
   const valueGroups = Array.from(signalMap.values())
@@ -49,7 +49,12 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
         message[value] = generateSineWave(frequency, amplitude, phase, time);
       });
 
-      const currentTime = new Date().getTime()
+      // 如果用北斗，时间换2004，但是只换时间
+      let currentTime: Date | number = new Date()
+      if (useBeidou) {
+        currentTime = new Date(currentTime.setFullYear(2004))
+      }
+      currentTime = currentTime.getTime()
       TestConfigService.pushDataToCurrentHistory({
         time: currentTime,
         data: message
@@ -60,7 +65,7 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>) => {
         type: "DATA",
         message: mapToJson(responseMessage)
       })
-    }, 3000)
+    }, 100)
     publicIntervalRecords.push(record)
   })
 }

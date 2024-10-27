@@ -796,6 +796,15 @@ export const CollectDataWrap: React.FC<{
                      rules={[{required: true, message: '请输入装备ID'}]}>
             <Input/>
           </Form.Item>
+          <Form.Item label={"使用北斗授时"}
+                     name={"useBeidou"}
+                     rules={[{required: true, message: '请输入装备ID'}]}
+                     initialValue={true}>
+            <Select>
+              <Select.Option value={true}>是</Select.Option>
+              <Select.Option value={false}>否</Select.Option>
+            </Select>
+          </Form.Item>
         </Form>
       </Modal>
     </>

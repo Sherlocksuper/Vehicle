@@ -20,6 +20,7 @@ export interface ITestConfig {
     equipmentType: string,
     equipmentId: string,
     version: string,
+    useBeidou: boolean
   }
   template: ITemplate
 }
@@ -68,6 +69,7 @@ export default class TestConfig extends Model<ITestConfig> {
     equipmentType: string,
     equipmentId: string,
     version: string,
+    useBeidou: boolean
   }
 
   @Column(DataType.JSON)
@@ -107,6 +109,14 @@ export class CurrentTestConfig extends Model<ITestConfig> {
       }[]
     }[]
   }[]
+
+  @Column(DataType.JSON)
+  dataWrap!: {
+    equipmentType: string,
+    equipmentId: string,
+    version: string,
+    useBeidou: boolean
+  }
 
   @Column(DataType.JSON)
   template!: ITemplate
