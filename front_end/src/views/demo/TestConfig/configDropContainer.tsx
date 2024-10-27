@@ -50,7 +50,15 @@ const ConfigDropContainer: React.FC<{
     setOpenDataParsing(false)
   }
   const handleOpenParsing=()=>{
-    setBelongId(getQueryParam('testConfigId'))
+    if (!banModify) {
+      return
+    }
+    const belongId = getQueryParam('historyId')
+    console.log("belongId",belongId)
+    if (!belongId) {
+      return
+    }
+    setBelongId(belongId)
     setOpenDataParsing(true)
   }
   const getQueryParam=(param:string)=> {
