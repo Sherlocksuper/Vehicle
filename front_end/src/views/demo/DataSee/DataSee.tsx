@@ -42,6 +42,10 @@ const DataSee = () => {
   // 开始接收-建立tcp连接
   const handleStartTcpConnect = async () => {
     const res = await startTcpConnect()
+    if (!res) {
+      message.error("请求失败或超时，请重新尝试")
+      return
+    }
     if (res.code === FAIL_CODE) {
       message.error(res.msg);
     } else {

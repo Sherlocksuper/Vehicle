@@ -1,5 +1,5 @@
 import net from "node:net";
-import {decodingBoardMessage, decodingBoardMessageWithMap, IReceiveData, ITimeData, splitBufferByDelimiter} from "../../utils/BoardUtil/decoding";
+import {decodingBoardMessage, decodingBoardMessageWithMap, decodingBoardStatus, IReceiveData, ITimeData, splitBufferByDelimiter} from "../../utils/BoardUtil/decoding";
 import {IFrontMessage, sendMessageToFront} from "./toFront";
 import TestConfigService from "../service/TestConfig";
 import {getFrontFormatMessage} from "../../utils";
@@ -136,7 +136,13 @@ export const connectWithMultipleBoards = (
 };
 
 // 重连逻辑，使用相同的数组
-export const reconnectWithMultipleBoards = async (hostPortList: Array<{ host: string, port: number }>, index = 0) => {
+export const reconnectWithMultipleBoards = async (hostPortList: Array<{ host: string, port: number }>,
+                                                  index = 0,
+                                                  clearManuallyClosed: boolean = false
+) => {
+  if (clearManuallyClosed) {
+    isManuallyClosed = false
+  }
   if (!isManuallyClosed) {
     console.log("重连中");
     sendMessageToFront({

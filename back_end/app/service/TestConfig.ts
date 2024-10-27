@@ -459,7 +459,9 @@ class TestConfigService {
 
   async startCurrentTcp() {
     const hortList = await this.getHostPortList(this.currentTestConfig!)
-    return await reconnectWithMultipleBoards(hortList, 0)
+    return await reconnectWithMultipleBoards(hortList, 0,true)
+  }
+
   updateBoardStatus(status: boolean[]) {
     this.boardConnectStatus = status
   }
