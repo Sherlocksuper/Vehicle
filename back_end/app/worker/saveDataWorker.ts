@@ -3,6 +3,7 @@ import DataModel, {IData} from "../model/Data.model";
 import DataService from "../service/DataService";
 
 // 初始化 Sequelize 实例
+console.log("初始化 Sequelize 实例");
 const sequelize = new Sequelize({
   dialect: 'mysql',    // 数据库类型
   host: 'localhost',   // 数据库地址
@@ -40,6 +41,7 @@ const manageData = (data: IData[]): IData[] => {
       time -= timeStep;
     }
   }
+  result.sort((a, b) => a.time - b.time);
   return result;
 }
 
@@ -81,8 +83,10 @@ async function processQueue() {
     await DataService.addData(uniqueData!);
 
     // 向主进程发送成功消息
-    // @ts-ignore
-    process.send('success');
+    if (messageQueue.length === 0) {
+      // @ts-ignore
+      process.send('all data is stored');
+    }
   } catch (error) {
     // 向主进程发送错误消息并打印错误
     // @ts-ignore

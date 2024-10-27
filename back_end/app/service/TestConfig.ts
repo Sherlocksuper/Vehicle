@@ -6,7 +6,6 @@ import TestConfig, {CurrentTestConfig, ITestConfig} from "../model/TestConfig";
 import {getBusCategory, getCollectType, getConfigBoardMessage} from "../../utils/BoardUtil/encoding";
 import {connectWithMultipleBoards, disconnectWithBoard, sendMultipleMessagesBoard} from "../ztcp/toBoard";
 import * as fs from "fs";
-import {transferFileSize} from "../../utils/File";
 import path from "node:path";
 import {ProtocolType} from "../model/PreSet/Protocol.model";
 import {getSignalMapKey} from "../../utils/BoardUtil/encoding/spConfig";
@@ -15,10 +14,6 @@ import {IData} from "../model/Data.model";
 import DataService from "./DataService";
 import historyService from "./HistoryService";
 import {formatHeader, formatOneSignal} from "../../utils/File/format";
-import {Context} from "koa";
-import {IResBody} from "../types";
-import {FAIL_CODE, SEARCH_FAIL_MSG, SEARCH_SUCCESS_MSG, SUCCESS_CODE} from "../constants";
-import {ITimeData} from "../../utils/BoardUtil/decoding";
 import {fork} from "child_process";
 
 export const CURRENT_DATA_LIMIT = 1_000
@@ -105,8 +100,8 @@ class TestConfigService {
    */
   async getTestConfigById(id: number): Promise<ITestConfig | null> {
     try {
-      const testConfig = await TestConfig.findByPk(id)
-      return testConfig!
+      const testConfig = await TestConfig.findByPk(id);
+      return testConfig
     } catch (error) {
       console.log(error);
       return null
@@ -233,7 +228,7 @@ class TestConfigService {
       config.projects.forEach(project => {
         project.indicators.forEach(indicator => {
           this.signalsIdNameMap.set(indicator.signal.id, {
-            name: `${indicator.name}(${indicator.signal.name})`,
+            name: `${indicator.name}`,
             dimension: indicator.signal.dimension
           })
         })
@@ -400,15 +395,15 @@ class TestConfigService {
     configName: string,
     historyId: number,
     currentData: {
-      time: number
+      time: number;
       data: {
-        [key: number]: number
-      }
+        [key: number]: number;
+      };
     }[],
-    isSync = false
-    ) {
+    waitClear: boolean = false
+  ): Promise<boolean> {
     // 存储到数据库
-    const data: IData[] = []
+    const data: IData[] = [];
     currentData.forEach(item => {
       for (let key in item.data) {
         data.push({
@@ -418,23 +413,38 @@ class TestConfigService {
           name: this.signalsIdNameMap.get(key)?.name!,
           dimension: this.signalsIdNameMap.get(key)?.dimension!,
           time: item.time,
-          value: item.data[key]
-        })
+          value: item.data[key],
+        });
       }
-    })
-    // if (!isSync){
-    //   const child = fork(path.resolve(__dirname, '../worker/saveDataWorker.ts'))
-      this.child.send(data)
-      this.child.on('message', (msg) => {
-        console.log(msg)
-      })
-    this.child.on('exit', (code) => {
-      console.log(`子进程已退出，退出码 ${code}`);
     });
-    // } else {
-    //   await DataService.addData(data)
-    // }
-    return true
+    return new Promise((resolve, reject) => {
+      const handleMessage = (message: string) => {
+        if (message === 'all data is stored' || (waitClear && message === 'all data clear')) {
+          resolve(true);
+        }
+      };
+
+      this.child.once('message', handleMessage);
+
+      try {
+        this.child.send(data);
+
+        if (!waitClear) {
+          // 如果不需要等待清空，则直接返回
+          resolve(true);
+        }
+      } catch (error) {
+        this.child.kill();
+        this.child = fork(path.resolve(__dirname, '../worker/saveDataWorker.ts'));
+        this.child.once('message', handleMessage);
+        this.child.send(data);
+
+        if (!waitClear) {
+          // 如果不需要等待清空，则直接返回
+          resolve(true);
+        }
+      }
+    });
   }
 }
 
