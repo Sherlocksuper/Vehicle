@@ -139,6 +139,16 @@ export const decodingBoardMessage = (buffer: Buffer): IReceiveData => {
   return result;
 }
 
+// 处理板卡状态的信息
+export const decodingBoardStatus = (buffer: Buffer): boolean[] => {
+  const result: boolean[] = []
+  for (let i = 3; i <= 8; i++) {
+    // 和1与
+    result.push((buffer[i] & 0x01) === 0x01)
+  }
+  return result
+}
+
 // 做一个数据映射
 // 把接收到的数据映射为一个object，key为getSignalKey，value为信号值
 export const decodingBoardMessageWithMap = (receiveData: IReceiveData): Map<string, number> => {

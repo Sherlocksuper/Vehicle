@@ -118,3 +118,11 @@ export const getTcpConnectStatus = async () => {
     api: api
   });
 }
+
+//router.get('/getBoardStatus', TestConfigController.getBoardStatus);
+export const getBoardStatus = async () => {
+  const api = TEST_CONFIG_API.getBoardStatus;
+  return request({
+    api: api
+  });
+}

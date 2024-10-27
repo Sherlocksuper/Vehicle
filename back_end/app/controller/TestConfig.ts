@@ -215,6 +215,14 @@ class TestConfigController {
       data: false
     })
   }
+
+  getBoardStatus(ctx: Context) {
+    ((ctx.body as IResBody) = {
+      code: SUCCESS_CODE,
+      msg: "获取板卡状态成功",
+      data: TestConfigService.getBoardStatus()
+    })
+  }
 }
 
 export default new TestConfigController()

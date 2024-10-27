@@ -43,6 +43,9 @@ class TestConfigService {
   // 因为digital解析方式比较特殊，所以需要单独处理
   digitalKeyList: string[] = []
 
+  // 各个板卡的连接状态
+  boardConnectStatus: boolean[] = []
+
   /**
    * 创建测试配置
    * @param param
@@ -289,6 +292,8 @@ class TestConfigService {
     this.banMessage = []
     this.digitalKeyList = []
     this.currentHistoryId = 0
+    this.signalsIdNameMap.clear()
+    this.boardConnectStatus = []
     // 清空状态
     await this.deleteCurrentConfigFromSql()
     disconnectWithBoard()
@@ -455,6 +460,12 @@ class TestConfigService {
   async startCurrentTcp() {
     const hortList = await this.getHostPortList(this.currentTestConfig!)
     return await reconnectWithMultipleBoards(hortList, 0)
+  updateBoardStatus(status: boolean[]) {
+    this.boardConnectStatus = status
+  }
+
+  getBoardStatus() {
+    return this.boardConnectStatus
   }
 }
 

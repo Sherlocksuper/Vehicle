@@ -89,4 +89,9 @@ export const TEST_CONFIG_API = {
     url: '/getTcpConnectStatus',
     method: Method.GET,
   },
+  //router.get('/getBoardStatus', TestConfigController.getBoardStatus);
+  getBoardStatus: {
+    url: '/getBoardStatus',
+    method: Method.GET,
+  },
 }

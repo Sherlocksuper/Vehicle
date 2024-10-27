@@ -150,6 +150,8 @@ router.get('/stopTcpConnect', TestConfigController.stopTcpConnect);
 // getTcpConnectStatus
 router.get('/getTcpConnectStatus', TestConfigController.getTcpConnectStatus);
 
+router.get('/getBoardStatus', TestConfigController.getBoardStatus);
+
 // CollectUnit
 router.post('/addCollectUnit', CollectUnitController.addCollectUnit);
 router.post('/deleteCollectUnit/:id', CollectUnitController.deleteCollectUnit);

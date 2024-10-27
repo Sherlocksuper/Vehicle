@@ -56,7 +56,13 @@ export const connectWithMultipleBoards = (
         const datas = splitBufferByDelimiter(data, Buffer.from([0xcd, 0xef]));
         const messages: IReceiveData[] = []
         datas.forEach((item) => {
-          console.log(item)
+          // 用来处理表示各个板卡是否有用的信息
+          if (item[0] === 0xcd && item[1] === 0xef && item[2] === 0xed) {
+            const status = decodingBoardStatus(item)
+            console.log("获取板卡状态:", status)
+            TestConfigService.updateBoardStatus(status)
+            return
+          }
           messages.push(decodingBoardMessage(item))
         })
 

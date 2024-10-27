@@ -1,13 +1,15 @@
 import React, {useEffect} from "react";
-import {Button, Card, message, Space, Table, TableProps} from "antd";
+import {Affix, Button, Card, Descriptions, message, Space, Table, TableProps} from "antd";
 import {FAIL_CODE} from "@/constants";
-import {getCurrentTestConfig, getTcpConnectStatus, startTcpConnect, stopCurrentTestConfig, stopTcpConnect} from "@/apis/request/testConfig.ts";
+import {getBoardStatus, getCurrentTestConfig, getTcpConnectStatus, startTcpConnect, stopCurrentTestConfig, stopTcpConnect} from "@/apis/request/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
 
 
 const DataSee = () => {
   const [currentDownConfig, setCurrentDownConfig] = React.useState<ITestConfig | undefined>(undefined);
   const [isReceiving, setIsReceiving] = React.useState<boolean>(false);
+
+  const [boardStatus, setBoardStatus] = React.useState<boolean[]>([]);
 
   const fetchCurrentConfig = () => {
     getCurrentTestConfig().then(res => {
@@ -25,19 +27,6 @@ const DataSee = () => {
     const win = window.open(`/test-template-for-config?testConfigId=${currentDownConfig?.id}`);
     if (!win) return
   }
-
-  // // 停止当前采集
-  // const handleStopCurrentCollect = () => {
-  //   stopCurrentTestConfig().then(res => {
-  //     if (res.code === FAIL_CODE) {
-  //       message.error(res.msg);
-  //     } else {
-  //       message.success('停止成功');
-  //       setCurrentDownConfig(undefined);
-  //     }
-  //   });
-  // }
-  //
 
   // 停止接收-断开tcp连接
   const handleStopTcpConnect = async () => {
@@ -88,6 +77,32 @@ const DataSee = () => {
       title: '测试状态',
       dataIndex: 'testStat',
       key: 'testStat',
+      render: (text, record) => {
+        return <Space
+          direction={"vertical"}
+          align={"start"}
+          style={{width: "300px"}}>
+          <Descriptions size={"small"}>
+            {
+              record.configs.map(config => {
+                return config.vehicle.collectUnits.map(unit => {
+                  return <Descriptions.Item label={unit.collectUnitName} key={unit.collectUnitName}>
+                    {
+                      unit.collectors.map((board, index) => {
+                        return <div key={index}>
+                          <span style={{color: !boardStatus[board.collectorAddress] ? 'red' : "green",}}>
+                            {`${board.collectorName}:${!boardStatus[board.collectorAddress] ? '异常' : '正常'}`}
+                          </span>
+                        </div>
+                      })
+                    }
+                  </Descriptions.Item>
+                }).flat(2)
+              }).flat(2)
+            }
+          </Descriptions>
+        </Space>
+      }
     },
     {
       title: '测试车辆',
@@ -147,6 +162,24 @@ const DataSee = () => {
   useEffect(() => {
     fetchCurrentConfig()
     handleGetTcpConnectStatus()
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const sendTime = new Date().getTime()
+      getBoardStatus().then(res => {
+        if (new Date().getTime() - sendTime > 300) {
+          return;
+        }
+        if (res.code === FAIL_CODE) {
+          message.error(res.msg);
+        } else {
+          setBoardStatus(res.data)
+        }
+      })
+    }, 2000)
+
+    return () => clearInterval(timer)
   }, []);
 
   return (
