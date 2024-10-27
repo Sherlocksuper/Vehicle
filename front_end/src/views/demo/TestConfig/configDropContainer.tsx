@@ -45,23 +45,25 @@ const ConfigDropContainer: React.FC<{
 
   const [belongId, setBelongId] = React.useState<string>(undefined)
   const [openDataParsing, setOpenDataParsing] = useState(false);
+  const [filiterData, setFiliterData] = useState<IProtocolSignal[]>([])
 
-  const handleCloseParsing=()=>{
+  const handleCloseParsing = () => {
     setOpenDataParsing(false)
   }
-  const handleOpenParsing=()=>{
+  const handleOpenParsing = (targetData: IProtocolSignal[]) => {
     if (!banModify) {
       return
     }
     const belongId = getQueryParam('historyId')
-    console.log("belongId",belongId)
+    console.log("belongId", belongId)
     if (!belongId) {
       return
     }
     setBelongId(belongId)
     setOpenDataParsing(true)
+    setFiliterData(targetData)
   }
-  const getQueryParam=(param:string)=> {
+  const getQueryParam = (param: string) => {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
   }
@@ -71,7 +73,7 @@ const ConfigDropContainer: React.FC<{
     min: number,
     middle: number
   }[]>([]);
-  useEffect(()=>{
+  useEffect(() => {
     getDataMaxMinMiddle(Number(belongId)).then(res => {
       if (res.code === SUCCESS_CODE) {
         setDataParsing(res.data)
@@ -79,7 +81,7 @@ const ConfigDropContainer: React.FC<{
         setDataParsing(null)
       }
     })
-  },[belongId])
+  }, [belongId])
 
   return (
     <div className="dc_container">
@@ -120,7 +122,9 @@ const ConfigDropContainer: React.FC<{
                 h: item.itemConfig.height / 30,
                 i: item.id,
               }}
-              onClick={()=>{handleOpenParsing()}}
+              onClick={() => {
+                handleOpenParsing(item.itemConfig.requestSignals)
+              }}
               onContextMenu={(e) => {
                 e.preventDefault();
                 if (pathRef.current === "/offline-show") {
@@ -142,7 +146,10 @@ const ConfigDropContainer: React.FC<{
           );
         })}
       </GridLayout>
-      <DataParsingModal source={dataParsing} open={openDataParsing} onFinished={handleCloseParsing}></DataParsingModal>
+      <DataParsingModal
+        source={dataParsing.filter((item) => filiterData.some((signal) => signal.name === item.name || signal.name.includes(item.name) || item.name.includes(signal.name)))}
+        open={openDataParsing}
+        onFinished={handleCloseParsing}></DataParsingModal>
     </div>
   );
 };
