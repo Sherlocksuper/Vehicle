@@ -9,6 +9,7 @@ import {ITestConfig} from "@/apis/standard/test.ts";
 // import DataAnalysis from "@/views/demo/DataAnalysis/DataAnalysis.tsx";
 import {getDataMaxMinMiddle, searchForTargetData} from "@/apis/request/data.ts";
 import {TableRowSelection} from "antd/es/table/interface";
+import {deleteData,updateData} from "@/apis/request/data.ts";
 
 
 
@@ -101,7 +102,7 @@ const HistoryData = () => {
       key: "action",
       render: ( record) => (
           <Space>
-            <a onClick={() => deleteHistory(record.id!)}>删除</a>
+
             {/*<a onClick={() => {*/}
             {/*  setDataAnalysisVisible(!dataAnalysisVisible);*/}
             {/*  setBelongId(record.id.toString())*/}
@@ -121,7 +122,7 @@ const HistoryData = () => {
                 } else {
                   setHistory(null)
                 }
-              }).then(()=>{
+              }).then(() => {
                 setOpenDataParsing(true)
               })
             }}>
@@ -135,8 +136,9 @@ const HistoryData = () => {
               回放
             </a>
             {
-              record.path === "" ? null : <a href={`${BASE_URL + record.path}`} download={true}>格式化导出</a>
+              record.path === "" ? null : <a href={`${BASE_URL + record.path}`} download={true}>导出</a>
             }
+            <a onClick={() => deleteHistory(record.id!)}>删除</a>
           </Space>
       )
     }
@@ -212,9 +214,9 @@ const DataParsingModal = ({source, open, onFinished}: {
   const handleClose=()=>{
     onFinished()
   }
-  const list=source.map((item) => {
+  const list=source.map((item,index) => {
     return (
-        <div style={{marginBottom: 20}}>
+        <div style={{marginBottom: 20}} key={index}>
           <p style={{fontWeight: 'bold', fontSize: 16}}>{item.name}</p>
           <p style={{fontSize: 14}}>
             <span style={{marginRight: 30}}>最大值: {item.max}</span>
@@ -263,6 +265,8 @@ const DetailSearchModal = ({history, open, onFinished}: {
 
 
   interface DataType {
+    id:number,
+    key:string,
     time: number,
     value: number
   }
@@ -285,7 +289,38 @@ const DetailSearchModal = ({history, open, onFinished}: {
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
+  const handleSearchResultDelete=()=>{
+    console.log(selectedRowKeys)
+    if (!selectedRowKeys.length) {
+      message.error('请选中要删除的项')
+      return
+    }
+    const ids:string[]=selectedRowKeys as string[]
+    deleteData(ids).then((res)=>{
+      if (res.code===SUCCESS_CODE) {
+        message.success(res.msg)
+        startSearch(searchCriteria.name)
+      }else{
+        message.error('删除失败'+res.msg)
+      }
+    }).catch(()=>{message.error('删除失败')})
+  }
+  const [updateDataVisible, setUpdateDataVisible] = useState<boolean>(false)
+  const [nowUpdateData,setNowUpdateData] = useState<string>()
+  const handleSearchResultEdit=()=>{
 
+    if (selectedRowKeys.length == 0){
+      message.error('选择要编辑的项')
+      return
+    }
+    if (selectedRowKeys.length >1){
+      message.error('只能编辑一项')
+      return
+    }
+    setUpdateDataVisible(true)
+    const ids:string[]=selectedRowKeys as string[]
+    setNowUpdateData(ids[0])
+  }
   const rowSelection: TableRowSelection<DataType> = {
     selectedRowKeys,
     onChange: onSelectChange,
@@ -316,7 +351,7 @@ const DetailSearchModal = ({history, open, onFinished}: {
   return <>
     <Modal open={open}
            onCancel={handleClose}
-           footer={[<Button onClick={handleClose}>取消</Button>]}
+           footer={<Button onClick={handleClose}>取消</Button>}
            width={800}
     >
       <Space>
@@ -364,7 +399,7 @@ const DetailSearchModal = ({history, open, onFinished}: {
                   debounceSetPeriod(value)
                 }}/>
       </div>
-      <div style={{marginTop: 20}}>
+      <div style={{marginTop: 20,marginBottom:8}}>
         <Space>
           <Input placeholder={"最小值"}
                  defaultValue={searchCriteria.minValue}
@@ -376,13 +411,35 @@ const DetailSearchModal = ({history, open, onFinished}: {
                  onChange={(e) => {
                    setSearchCriteria({...searchCriteria, maxValue: Number(e.target.value)})
                  }}/>
+          <Button onClick={handleSearchResultDelete}  style={{color:"red"}}>删除</Button>
+          <Button onClick={()=>{handleSearchResultEdit()}}>编辑</Button>
+          {updateDataVisible ? <>
+          <Input placeholder={`当前ID：${nowUpdateData}`} defaultValue={0} onChange={(e)=>{
+            setNowUpdateData(e.target.value)
+          }}></Input>
+            <Button onClick={()=>{
+              updateData(selectedRowKeys[0] as string,Number(nowUpdateData)).then((res)=>{
+                if (res.code===SUCCESS_CODE) {
+                  message.success('更改成功')
+                  startSearch(searchCriteria.name)
+                }
+                else {
+                  message.error('更改失败',res.msg)
+                }
+              }).catch((err)=>{
+                message.error(err)
+              })
+            }}>确认</Button>
+          </>: <></>}
         </Space>
       </div>
       <div>
+
       </div>
-      <Table columns={searchResultColumns} rowSelection={rowSelection} dataSource={searchResultArr} rowKey={(record) => `${record.time}-${record.value}`}></Table>
+      <Table columns={searchResultColumns} rowSelection={rowSelection} dataSource={searchResultArr} rowKey={(record) => `${record.id}`}></Table>
 
     </Modal>
+
   </>
 }
 

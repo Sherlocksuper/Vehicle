@@ -19,6 +19,7 @@ export const DATA_API:UrlMap = {
     deleteData: {
         url: '/deleteData',
         method: Method.POST,
+        format: ContentType.JSON
     },
     //router.post('/fgetSampleData', DataController.fgetSampledData);
     fgetSampledData: {

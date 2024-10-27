@@ -1,7 +1,7 @@
 import {request} from "@/utils/request.ts";
 import {DATA_API} from "@/apis/url/data.ts";
 
-export const deleteData = async (ids : string[]) => {
+export const deleteData = async (ids: string[]) => {
   const api = DATA_API.deleteData;
   return request({
     api: api,
