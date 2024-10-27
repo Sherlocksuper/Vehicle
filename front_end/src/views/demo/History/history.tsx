@@ -114,21 +114,21 @@ const HistoryData = () => {
               查询
 
             </a>
-            <a onClick={async () => {
-              setBelongId(record.id.toString())
-              getTestsHistoryById(Number(belongId)).then(res => {
-                if (res.code === SUCCESS_CODE) {
-                  setHistory(res.data)
-                } else {
-                  setHistory(null)
-                }
-              }).then(() => {
-                setOpenDataParsing(true)
-              })
-            }}>
-              分析
+            {/*<a onClick={async () => {*/}
+            {/*  setBelongId(record.id.toString())*/}
+            {/*  getTestsHistoryById(Number(belongId)).then(res => {*/}
+            {/*    if (res.code === SUCCESS_CODE) {*/}
+            {/*      setHistory(res.data)*/}
+            {/*    } else {*/}
+            {/*      setHistory(null)*/}
+            {/*    }*/}
+            {/*  }).then(() => {*/}
+            {/*    setOpenDataParsing(true)*/}
+            {/*  })*/}
+            {/*}}>*/}
+            {/*  分析*/}
 
-            </a>
+            {/*</a>*/}
             <a onClick={() => {
               setBelongId(record.id.toString())
               window.open(`/test-template-for-config?historyId=${history.id}`);
@@ -201,7 +201,7 @@ const HistoryData = () => {
 }
 
 
-const DataParsingModal = ({source, open, onFinished}: {
+export const DataParsingModal = ({source, open, onFinished}: {
   source: {
     name: string,
     max: number,
@@ -234,7 +234,7 @@ const DataParsingModal = ({source, open, onFinished}: {
           onOk={handleClose}
       >
         分析结果
-        {list.length?list:<div style={{textAlign:"center"}}>无数据</div>}
+        {list.length?<div style={{maxHeight:600,overflowY:"scroll"}}>{list}</div>:<div style={{textAlign:"center"}}>无数据</div>}
       </Modal>
   )
 }
