@@ -9,6 +9,7 @@ export interface APIStandard {
     format?: ContentType
     params?: any,
     responseType?: ResponseType
+    timeOut?: number
 }
 
 export enum Method {

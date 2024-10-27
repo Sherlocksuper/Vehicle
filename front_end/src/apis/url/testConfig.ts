@@ -78,6 +78,7 @@ export const TEST_CONFIG_API = {
   startTcpConnect: {
     url: '/startTcpConnect',
     method: Method.GET,
+    timeOut: 3000,
   },
   stopTcpConnect: {
     url: '/stopTcpConnect',

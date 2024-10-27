@@ -26,8 +26,9 @@ export const request = ({api, params}: {
     const method = api.method
     const format = api.format
     const responseType = api.responseType || ResponseType.JSON
+    const timeOut =  api.timeOut
 
-    const axiosConfig = getAxiosConfig(url, method, params, format || ContentType.WWW_FORM, responseType)
+    const axiosConfig = getAxiosConfig(url, method, params, format || ContentType.WWW_FORM, responseType, timeOut)
 
 
     return axiosInstance(axiosConfig).then(response => {
@@ -37,7 +38,7 @@ export const request = ({api, params}: {
     });
 };
 
-const getAxiosConfig = (url: string, method: string, params: any, format: ContentType, responseType: ResponseType): AxiosRequestConfig => {
+const getAxiosConfig = (url: string, method: string, params: any, format: ContentType, responseType: ResponseType, timeOut: number|null): AxiosRequestConfig => {
     return {
         baseURL: BASE_URL,
         headers: {
@@ -47,7 +48,8 @@ const getAxiosConfig = (url: string, method: string, params: any, format: Conten
         url: url,
         method: method,
         responseType: responseType,
-        [shouldUseData(method) ? 'data' : 'params']: method === 'GET' ? params : getFormatData(format, params)
+        [shouldUseData(method) ? 'data' : 'params']: method === 'GET' ? params : getFormatData(format, params),
+        timeout: timeOut
     }
 }
 
