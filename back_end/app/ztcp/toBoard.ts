@@ -81,7 +81,7 @@ export const connectWithMultipleBoards = (
             msg[key] = value
           })
 
-          if (messages.length > 0) {
+          if (messages.length > 0 && messages[0].timestamp !== undefined) {
             TestConfigService.pushDataToCurrentHistory({
               time: useBeidou ? messages[0].timestamp : new Date().getTime(),
               data: msg

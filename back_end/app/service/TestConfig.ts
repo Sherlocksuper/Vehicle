@@ -411,15 +411,17 @@ class TestConfigService {
     const data: IData[] = [];
     currentData.forEach(item => {
       for (let key in item.data) {
-        data.push({
-          belongId: historyId,
-          signalId: key,
-          configName: configName,
-          name: this.signalsIdNameMap.get(key)?.name!,
-          dimension: this.signalsIdNameMap.get(key)?.dimension!,
-          time: item.time,
-          value: item.data[key],
-        });
+        if (item.time !== undefined) {
+          data.push({
+            belongId: historyId,
+            signalId: key,
+            configName: configName,
+            name: this.signalsIdNameMap.get(key)?.name!,
+            dimension: this.signalsIdNameMap.get(key)?.dimension!,
+            time: item.time,
+            value: item.data[key],
+          });
+        }
       }
     });
     return new Promise((resolve, reject) => {
