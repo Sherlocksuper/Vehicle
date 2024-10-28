@@ -54,8 +54,8 @@ const getTimeStamp = (buffer: Buffer): number => {
   // 时间戳分隔符
   const timeStampDelimiter = "-";
 
-  const getTime = (num: number): number => {
-    return num / 16 + num % 16;
+  const getTime = (num:number) => {
+    return Math.floor((num / 16)) * 10 + num % 16;
   }
 
   const year = getTime(buffer[4]);

@@ -51,9 +51,6 @@ export const startMockBoardMessage = (signalMap: Map<string, string[]>, useBeido
 
       // 如果用北斗，时间换2004，但是只换时间
       let currentTime: Date | number = new Date()
-      if (useBeidou) {
-        currentTime = new Date(currentTime.setFullYear(2004))
-      }
       currentTime = currentTime.getTime()
       TestConfigService.pushDataToCurrentHistory({
         time: currentTime,
