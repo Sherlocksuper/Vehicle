@@ -154,16 +154,6 @@ class TestConfigController {
 
   // 断开tcp连接
   async stopTcpConnect(ctx: Context) {
-    const tcpClient = getTcpClient()
-    // 如果tcp不存在或者已经断开
-    if (!tcpClient || tcpClient.destroyed) {
-      ((ctx.body as IResBody) = {
-        code: SUCCESS_CODE,
-        msg: "当前没有连接",
-        data: null
-      })
-      return
-    }
     await TestConfigService.stopCurrentTcp();
     ((ctx.body as IResBody) = {
       code: SUCCESS_CODE,
@@ -199,20 +189,18 @@ class TestConfigController {
   }
 
   async getTcpConnectStatus(ctx: Context) {
-    const tcpClient = getTcpClient()
-    // 如果tcp存在并且没有断开
-    if (tcpClient && !tcpClient.destroyed && !tcpClient.connecting) {
-      ((ctx.body as IResBody) = {
-        code: SUCCESS_CODE,
-        msg: "当前已经连接",
-        data: true
-      })
-      return
-    }
-    ((ctx.body as IResBody) = {
+    const isEnabling = TestConfigService.isEnabling
+
+    isEnabling && ((ctx.body as IResBody) = {
       code: SUCCESS_CODE,
-      msg: "当前连接断开",
-      data: false
+      msg: "正在连接",
+      data: isEnabling
+    })
+
+    !isEnabling && ((ctx.body as IResBody) = {
+      code: FAIL_CODE,
+      msg: "未连接",
+      data: isEnabling
     })
   }
 

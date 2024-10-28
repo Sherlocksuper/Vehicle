@@ -39,6 +39,8 @@ class TestConfigService {
   // 当前所属历史的id
   currentHistoryId: number = 0
   banMessage: Buffer[] = []
+  enableMessage: Buffer[] = []
+  isEnabling: boolean = false
 
   // 因为digital解析方式比较特殊，所以需要单独处理
   digitalKeyList: string[] = []
@@ -180,13 +182,16 @@ class TestConfigService {
     if (!testConfig) return "获取对应配置失败"
 
     const res = getConfigBoardMessage(testConfig!)
+    console.log(res)
     const hostPortList = await this.getHostPortList(testConfig)
 
     // 解析下发的配置，获取需要下发的信息、信号的映射
     this.resultMessages = res.resultMessages
+    this.isEnabling = false
     console.log(this.resultMessages)
     this.signalsMappingRelation = res.signalsMap
     this.banMessage = res.banMessages
+    this.enableMessage = res.enableMessage
     this.currentTestConfig = testConfig
     this.setSignalsIdNameMap(testConfig)
     await this.getSpecialDigitalKeyList(testConfig!)
@@ -454,14 +459,18 @@ class TestConfigService {
     });
   }
 
-  // 停止当前tcp连接
+  // 发送ban的消息
   async stopCurrentTcp(){
-    disconnectWithBoard();
+    await sendMultipleMessagesBoard(this.banMessage, 200)
+    this.isEnabling = false
+    return true
   }
 
+  // 发送使能消息
   async startCurrentTcp() {
-    const hortList = await this.getHostPortList(this.currentTestConfig!)
-    return await reconnectWithMultipleBoards(hortList, 0,true)
+    await sendMultipleMessagesBoard(this.enableMessage, 200)
+    this.isEnabling = true
+    return true
   }
 
   updateBoardStatus(status: boolean[]) {

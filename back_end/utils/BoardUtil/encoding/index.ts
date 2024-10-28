@@ -108,6 +108,7 @@ export const transferTo32 = (num: number) => {
 export const getConfigBoardMessage = (config: ITestConfig) => {
   const result: Buffer[] = []
   const banMessages: Buffer[] = []
+  const enableMessage: Buffer[] = []
   const signalsMap = new Map<string, string[]>()
 
   config.configs.forEach((config) => {
@@ -127,14 +128,15 @@ export const getConfigBoardMessage = (config: ITestConfig) => {
       })
 
       const enableConfig = getEnableConfig(protocol)
-      result.push(enableConfig)
+      // result.push(enableConfig)
+      enableMessage.push(enableConfig)
 
       const banConfig = getBanConfig(protocol)
       banMessages.push(banConfig)
     })
   })
 
-  return {resultMessages: result, signalsMap: signalsMap, banMessages: banMessages}
+  return {resultMessages: result, signalsMap: signalsMap, banMessages: banMessages, enableMessage: enableMessage}
 }
 
 // 使能：ff 00 02(目标ID，Flexray、CAN、MIC、1552B、串口为02，模拟量、数字量为03) 02(采集项，Flexray01,CAN02,MIC03,1552B04,串口：422为05，232为06，模拟量07，数字量08)
