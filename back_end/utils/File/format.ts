@@ -60,7 +60,7 @@ export const formatOneSignal = (signal: IData) => {
 
 const wrapOneSignal = (time: number, name: string, dimension: string, value: number) => {
   const date = new Date(time)
-  const dateResultP1 = [date.getFullYear(), date.getMonth(), date.getDay() + 1].join("-")
+  const dateResultP1 = [date.getFullYear(), date.getMonth() + 1, date.getDate() + 1].join("-")
   const dateResultP2 = [date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds()].join("-")
   const dateResult = dateResultP1 + "." + dateResultP2
   let numResult = name + ":" + value
