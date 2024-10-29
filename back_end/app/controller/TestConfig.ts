@@ -164,17 +164,6 @@ class TestConfigController {
 
   // 建立tcp连接
   async startTcpConnect(ctx: Context) {
-    const tcpClient = getTcpClient()
-    // 如果tcp存在并且正在连接
-    if (tcpClient && !tcpClient.destroyed && !tcpClient.connecting) {
-      ((ctx.body as IResBody) = {
-        code: SUCCESS_CODE,
-        msg: "当前已经连接",
-        data: null
-      })
-      return
-    }
-
     const result = await TestConfigService.startCurrentTcp();
     result && ((ctx.body as IResBody) = {
       code: SUCCESS_CODE,
