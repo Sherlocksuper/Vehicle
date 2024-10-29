@@ -1,4 +1,4 @@
-import {Button, Card, Input, message, Modal, Slider, Space, Table, TableProps, Select} from "antd";
+import {Button, Card, Input, message, Modal, Space, Table, TableProps, Select,DatePicker } from "antd";
 import React, {useEffect, useState} from "react";
 import {deleteTestsHistory, getTestsHistory, getTestsHistoryById} from "@/apis/request/testhistory.ts";
 import {FAIL_CODE, SUCCESS_CODE} from "@/constants";
@@ -6,11 +6,11 @@ import {confirmDelete, debounce, formatTime} from "@/utils";
 import Search from "antd/es/input/Search";
 import {BASE_URL} from "@/apis/url/myUrl.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
-// import DataAnalysis from "@/views/demo/DataAnalysis/DataAnalysis.tsx";
 import {getDataMaxMinMiddle, searchForTargetData} from "@/apis/request/data.ts";
 import {TableRowSelection} from "antd/es/table/interface";
 import {deleteData,updateData} from "@/apis/request/data.ts";
-
+// import dayjs from 'dayjs';
+const { RangePicker } = DatePicker;
 
 
 export interface IHistoryList {
@@ -65,7 +65,6 @@ const HistoryData = () => {
       }
     })
   }, [belongId])
-
 
 
   const columns: TableProps<IHistoryList>['columns'] = [
@@ -238,22 +237,20 @@ export const DataParsingModal = ({source, open, onFinished}: {
   )
 }
 
+
+//------------------------查询弹出框开始---------------------------
 const DetailSearchModal = ({history, open, onFinished}: {
   history: IHistoryList,
   open: boolean,
   onFinished: () => void
 }) => {
+
   const handleClose=()=>{
     onFinished()
   }
 
-  // const itemHeight = 30
-  // const containerHigh = 500
-  // const [scrollTop, setScrollTop] = useState(0)
-  // const [suitableName, setSuitableName] = useState<string[]>([])
 
-
-  // 查询条件
+  // 查询功能
   const [searchCriteria, setSearchCriteria] = useState({
     name: "",
     startTime: new Date(history?.createdAt).getTime(),
@@ -261,14 +258,31 @@ const DetailSearchModal = ({history, open, onFinished}: {
     minValue: -1000,
     maxValue: 1000
   })
-
-
+  const startSearch = (name:string) => {
+    if (!rangePickerVisible ) {
+      message.error('必选选择时间范围')
+      return
+    }
+    message.loading("正在检索数据")
+    searchForTargetData(history.id,
+        name,
+        searchCriteria.startTime,
+        searchCriteria.endTime,
+        searchCriteria.minValue,
+        searchCriteria.maxValue).then(res => {
+      if (res.code === SUCCESS_CODE) {
+        setSearchResultArr(res.data)
+      }
+      message.destroy()
+    })
+  }
   interface DataType {
     id:number,
     key:string,
     time: number,
     value: number
   }
+  const [searchResultArr, setSearchResultArr] = useState<DataType[]>(undefined)
   const searchResultColumns: TableProps<DataType>['columns'] = [
     {
       key: 'time',
@@ -284,12 +298,25 @@ const DetailSearchModal = ({history, open, onFinished}: {
       dataIndex: 'value',
     },
   ]
+
+  //时间筛选功能
+  const [rangePickerVisible, setRangePickerVisible] = useState<boolean>(false)
+  const debounceSetPeriod = debounce((value) => {
+    setSearchCriteria({...searchCriteria, startTime: value[0], endTime: value[1]})
+  })
+
+
+
+  //删除功能
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
+  const rowSelection: TableRowSelection<DataType> = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
   const handleSearchResultDelete=()=>{
-    console.log(selectedRowKeys)
     if (!selectedRowKeys.length) {
       message.error('请选中要删除的项')
       return
@@ -304,8 +331,14 @@ const DetailSearchModal = ({history, open, onFinished}: {
       }
     }).catch(()=>{message.error('删除失败')})
   }
+
+  //编辑功能
   const [updateDataVisible, setUpdateDataVisible] = useState<boolean>(false)
-  const [nowUpdateData,setNowUpdateData] = useState<string>()
+  const [nowUpdateDataValue,setNowUpdateDataValue] = useState<string>()
+  const getValueById = (id:number) => {
+    const nowRow=searchResultArr.filter(item => item.id == id)[0]
+    return nowRow.value
+  }
   const handleSearchResultEdit=()=>{
 
     if (selectedRowKeys.length == 0){
@@ -316,36 +349,12 @@ const DetailSearchModal = ({history, open, onFinished}: {
       message.error('只能编辑一项')
       return
     }
+    setNowUpdateDataValue(getValueById(selectedRowKeys[0] as number).toString())
     setUpdateDataVisible(true)
-    const ids:string[]=selectedRowKeys as string[]
-    setNowUpdateData(ids[0])
+    // const ids:string[]=selectedRowKeys as string[]
+    // setNowUpdateDataId(ids[0])
   }
-  const rowSelection: TableRowSelection<DataType> = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-  const [searchResultArr, setSearchResultArr] = useState<DataType[]>(undefined)
 
-
-  const debounceSetPeriod = debounce((value) => {
-    setSearchCriteria({...searchCriteria, startTime: value[0], endTime: value[1]})
-  })
-
-
-  const startSearch = (name:string) => {
-    message.loading("正在检索数据")
-    searchForTargetData(history.id,
-        name,
-        searchCriteria.startTime,
-        searchCriteria.endTime,
-        searchCriteria.minValue,
-        searchCriteria.maxValue).then(res => {
-      if (res.code === SUCCESS_CODE) {
-        setSearchResultArr(res.data)
-      }
-      message.destroy()
-    })
-  }
 
   return <>
     <Modal open={open}
@@ -353,6 +362,7 @@ const DetailSearchModal = ({history, open, onFinished}: {
            footer={<Button onClick={handleClose}>取消</Button>}
            width={800}
     >
+      {/*搜索栏*/}
       <Space>
         输入搜索名称:<Select
           defaultValue="请输入"
@@ -376,30 +386,56 @@ const DetailSearchModal = ({history, open, onFinished}: {
         startSearch(searchCriteria.name)
       }}>开始搜索</Button>
       </Space>
-      <Space>
-        </Space>
+      {/*时间选择栏*/}
       <div style={{marginTop: 20}}>
-        拖动选择搜索时间:
-        <Slider range
-                defaultValue={[(new Date(history?.createdAt)).getTime(), (new Date(history?.updatedAt)).getTime()]}
-                min={(new Date(history?.createdAt)).getTime()}
-                max={(new Date(history?.updatedAt)).getTime()}
-                tooltip={{
-                  formatter: (value: number | number[] | undefined) => {
-                    if (typeof value === 'number') {
-                      return <div>{formatTime(value)}</div>;
-                    } else if (Array.isArray(value)) {
-                      return <div>{formatTime(value[0])} - {formatTime(value[1])}</div>
-                    }
-                    return null;
-                  }
-                }}
-                onChange={(value) => {
-                  debounceSetPeriod(value)
-                }}/>
+
+            {/*拖动选择搜索时间:*/}
+            {/*<Slider range*/}
+            {/*        defaultValue={[(new Date(history?.createdAt)).getTime(), (new Date(history?.updatedAt)).getTime()]}*/}
+            {/*        min={(new Date(history?.createdAt)).getTime()}*/}
+            {/*        max={(new Date(history?.updatedAt)).getTime()}*/}
+            {/*        tooltip={{*/}
+            {/*          formatter: (value: number | number[] | undefined) => {*/}
+            {/*            if (typeof value === 'number') {*/}
+            {/*              return <div>{formatTime(value)}</div>;*/}
+            {/*            } else if (Array.isArray(value)) {*/}
+            {/*              return <div>{formatTime(value[0])} - {formatTime(value[1])}</div>*/}
+            {/*            }*/}
+            {/*            return null;*/}
+            {/*          }*/}
+            {/*        }}*/}
+            {/*        onChange={(value) => {*/}
+            {/*          debounceSetPeriod(value)*/}
+            {/*        }}*/}
+            {/*/>*/}
+
+            <Space>
+              <RangePicker
+                  showTime={{
+                    format: 'HH:mm：ss',
+                  }}
+                  format="YYYY-MM-DD HH:mm:ss"
+                  // minDate={dayjs((new Date(history?.createdAt)).toLocaleString(),'YYYY-MM-DD HH:mm:ss')}
+                  // maxDate={dayjs((new Date(history?.updatedAt)).toLocaleString(),'YYYY-MM-DD HH:mm:ss')}
+                  // defaultValue={[dayjs(((new Date()).toLocaleString()), 'YYYY-MM-DD HH:mm:ss'), dayjs(((new Date()).toLocaleString()),'YYYY-MM-DD HH:mm:ss')]}
+                  onChange={(value, dateString) => {
+                    if (value==null){
+                      setRangePickerVisible(false)
+                    }else {setRangePickerVisible(true)}
+                    const timestamps = dateString.map(date => {
+                      const dateObj = new Date(date);
+                      return dateObj.getTime();
+                    });
+                    debounceSetPeriod(timestamps)
+                  }}
+
+              />
+            </Space>
       </div>
+      {/*最大最小值筛选，删除，编辑按钮*/}
       <div style={{marginTop: 20,marginBottom:8}}>
         <Space>
+
           <Input placeholder={"最小值"}
                  defaultValue={searchCriteria.minValue}
                  onChange={(e) => {
@@ -410,16 +446,20 @@ const DetailSearchModal = ({history, open, onFinished}: {
                  onChange={(e) => {
                    setSearchCriteria({...searchCriteria, maxValue: Number(e.target.value)})
                  }}/>
+
+
           <Button onClick={handleSearchResultDelete}  style={{color:"red"}}>删除</Button>
           <Button onClick={()=>{handleSearchResultEdit()}}>编辑</Button>
           {updateDataVisible ? <>
-          <Input placeholder={`当前ID：${nowUpdateData}`} defaultValue={0} onChange={(e)=>{
-            setNowUpdateData(e.target.value)
-          }}></Input>
+          <Input placeholder={`请输入新的值`} defaultValue={nowUpdateDataValue.toString()} onChange={(e)=>{
+            setNowUpdateDataValue(e.target.value)
+          }}>
+          </Input>
             <Button onClick={()=>{
-              updateData(selectedRowKeys[0] as string,Number(nowUpdateData)).then((res)=>{
+              updateData(selectedRowKeys[0] as string,Number(nowUpdateDataValue)).then((res)=>{
                 if (res.code===SUCCESS_CODE) {
                   message.success('更改成功')
+                  setUpdateDataVisible(false)
                   startSearch(searchCriteria.name)
                 }
                 else {
@@ -428,18 +468,18 @@ const DetailSearchModal = ({history, open, onFinished}: {
               }).catch((err)=>{
                 message.error(err)
               })
-            }}>确认</Button>
+            }}>确认
+            </Button>
           </>: <></>}
         </Space>
       </div>
-      <div>
-
-      </div>
+      {/*数据表格显示*/}
       <Table columns={searchResultColumns} rowSelection={rowSelection} dataSource={searchResultArr} rowKey={(record) => `${record.id}`}></Table>
 
     </Modal>
 
   </>
 }
+//-------------------------查询弹出框结束----------------------------
 
 export default HistoryData
