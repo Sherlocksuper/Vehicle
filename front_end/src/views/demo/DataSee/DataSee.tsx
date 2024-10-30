@@ -1,8 +1,10 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import {Affix, Button, Card, Descriptions, message, Space, Table, TableProps} from "antd";
 import {FAIL_CODE} from "@/constants";
 import {getBoardStatus, getCurrentTestConfig, getTcpConnectStatus, startTcpConnect, stopCurrentTestConfig, stopTcpConnect} from "@/apis/request/testConfig.ts";
 import {ITestConfig} from "@/apis/standard/test.ts";
+import {getActiveControllerList} from "@/apis/request/board-signal/controller.ts";
+import {IController} from "@/views/demo/Topology/PhyTopology.tsx";
 
 
 const DataSee = () => {
@@ -10,6 +12,24 @@ const DataSee = () => {
   const [isReceiving, setIsReceiving] = React.useState<boolean>(false);
 
   const [boardStatus, setBoardStatus] = React.useState<boolean[]>([]);
+
+  // 核心卡id和板卡状态对应键值的映射
+  const coreBoardStatusMap = useRef<Map<number, number>>(new Map());
+
+  useEffect(() => {
+    // 获取核心板卡列表
+    getActiveControllerList().then(res => {
+      if (res.code === FAIL_CODE) {
+        message.error("核心办卡状态对应失败，请刷新重试")
+        return;
+      }
+      let start = 6
+      res.data.forEach((controller: IController) => {
+        coreBoardStatusMap.current.set(controller.id, start);
+        start++;
+      });
+    })
+  }, []);
 
   const fetchCurrentConfig = () => {
     getCurrentTestConfig().then(res => {
@@ -97,16 +117,26 @@ const DataSee = () => {
             {
               record.configs.map(config => {
                 return config.vehicle.collectUnits.map(unit => {
-                  return <Descriptions.Item label={unit.collectUnitName} key={unit.collectUnitName}>
-                    {
-                      unit.collectors.map((board, index) => {
-                        return <div key={index}>
+                  return <Descriptions.Item label={unit.collectUnitName} key={unit.collectUnitName}
+                  >
+                    <Space direction={"vertical"}>
+                      {
+                        <div style={{display: 'block'}}>
+                          <span style={{color: !boardStatus[coreBoardStatusMap.current.get(unit.core.id)] ? 'red' : "green",}}>
+                            {`核心板卡${unit.core.controllerName}:${!boardStatus[coreBoardStatusMap.current.get(unit.core.id)] ? '异常' : '正常'}`}
+                          </span>
+                        </div>
+                      }
+                      {
+                        unit.collectors.map((board, index) => {
+                          return <div key={index} style={{display: "block"}}>
                           <span style={{color: !boardStatus[board.collectorAddress - 2] ? 'red' : "green",}}>
                             {`${board.collectorName}:${!boardStatus[board.collectorAddress - 2] ? '异常' : '正常'}`}
                           </span>
-                        </div>
-                      })
-                    }
+                          </div>
+                        })
+                      }
+                    </Space>
                   </Descriptions.Item>
                 }).flat(2)
               }).flat(2)

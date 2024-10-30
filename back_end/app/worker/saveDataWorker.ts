@@ -20,7 +20,7 @@ const messageQueue: IData[][] = [];
 let isProcessing = false;
 
 const getRoundedTimeStep = (timeStep: number) => {
-  return Math.pow(10, Math.round(Math.log10(timeStep )));
+  return Math.pow(10, Math.round(Math.log10(timeStep)));
 }
 
 const manageData = (data: IData[]): IData[] => {
@@ -75,12 +75,15 @@ async function processQueue() {
     return true;
   });
 
+  // 过滤值不是number
+  const result = uniqueData.filter(item => item.time !== undefined && typeof item.time !== 'number');
+
   try {
     // 确保数据库同步
     await sequelize.sync();
 
     // 调用 DataService 的 addData 方法
-    await DataService.addData(uniqueData!);
+    await DataService.addData(result!);
 
     // 向主进程发送成功消息
     if (messageQueue.length === 0) {
