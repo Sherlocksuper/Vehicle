@@ -1,15 +1,17 @@
 import * as echarts from "echarts"
-import {useCallback, useEffect, useRef} from "react"
+import React, {useCallback, useEffect, useRef} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
 import {ITimeData} from "@/views/demo/TestConfig/template.tsx";
 import {mergeKArrays} from "@/utils";
+import {Modal} from "antd";
 
 interface ISeries {
   id: string
   name: string
   type: string
   symbol: string
-  data: Array<number>[]
+  data: Array<number>[],
+  color?: string
 }
 
 /**
@@ -29,7 +31,8 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
   const {
     requestSignals,
     currentTestChartData,
-    windowSize
+    windowSize,
+    colors,
   } = props
 
 
@@ -42,8 +45,9 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       id: item.id,
       name: item.name,
       type: 'line',
-      symbol: 'none',
-      data: []
+      data: [],
+      color: colors ? colors[index] : undefined,
+      symbol: 'circle'
     }
   }))
 
@@ -110,13 +114,14 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     }
 
     if (dataRef.current.length === 0) {
-      requestSignals.forEach((item) => {
+      requestSignals.forEach((item,index) => {
         dataRef.current.push({
           id: item.id,
           name: item.name + '/' + item.dimension,
           type: 'line',
-          symbol: 'none',
-          data: []
+          symbol: 'circle',
+          data: [],
+          color: colors ? colors[index] : undefined,
         });
       });
     }
@@ -162,14 +167,15 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         id: item.id,
         name: (item.dimension === '/') ? item.name : (item.name + '/' + item.dimension),
         type: 'line',
-        symbol: 'none',
-        data: currentTestChartData.get(item.id)?.map((item) => [item.time, item.value]) || []
+        symbol: 'circle',
+        data: currentTestChartData.get(item.id)?.map((item) => [item.time, item.value]) || [],
+        color: colors ? colors[requestSignals.indexOf(item)] : undefined
       }
     })
     // 截取时间 前length个
     xAxis.current = xAxis.current.slice(-length)
 
-  }, [requestSignalIds])
+  }, [requestSignalIds,colors])
 
   // 同步netWorkData
   useEffect(() => {

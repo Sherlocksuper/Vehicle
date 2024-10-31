@@ -31,6 +31,7 @@ export interface IDragItem {
   itemConfig: {
     requestSignalId: number | null
     requestSignals: IProtocolSignal[]
+    colors?: string[]
     x: number,
     y: number,
     width: number
@@ -200,6 +201,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
       const itemConfig: IDragItem['itemConfig'] = {
         requestSignalId: null,
         requestSignals: [],
+        colors: [],
         x: defaultX,
         y: defaultY,
         width: defaultWidth,
@@ -400,6 +402,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
           type: item.type,
           requestSignalId: item.itemConfig.requestSignalId,
           requestSignals: item.itemConfig.requestSignals,
+          colors: item.itemConfig.colors,
           x: item.itemConfig.x,
           y: item.itemConfig.y,
           width: item.itemConfig.width,
@@ -427,6 +430,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
         itemConfig: {
           requestSignalId: item.requestSignalId,
           requestSignals: item.requestSignals,
+          colors: item.colors,
           x: item.x,
           y: item.y,
           width: item.width,

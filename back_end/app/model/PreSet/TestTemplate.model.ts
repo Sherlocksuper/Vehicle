@@ -20,6 +20,7 @@ export interface ITemplate {
         type: TestTemplateType
         requestSignalId: number | null
         requestSignals: IProtocolSignal[]
+        colors?: string[]
         x: number
         y: number
         width: number
@@ -68,6 +69,7 @@ export default class TestTemplate extends Model<ITemplate> {
         type: TestTemplateType
         requestSignalId: number | null
         requestSignals: IProtocolSignal[]
+        colors?: string[]
         x: number
         y: number
         width: number

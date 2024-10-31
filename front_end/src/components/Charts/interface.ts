@@ -12,6 +12,7 @@ export interface IChartInterface {
     startRequest: boolean
     sourceType?: DataSourceType
     requestSignals: IProtocolSignal[]
+    colors?: string[]
 
     historyData?: IHistoryItemData[]
     currentTestChartData?: Map<string, ITimeData[]>
