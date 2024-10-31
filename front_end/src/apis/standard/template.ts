@@ -22,6 +22,7 @@ export interface ITemplateItem {
     type: DragItemType
     requestSignalId: number | null
     requestSignals: IProtocolSignal[]
+    colors?: string[]
     x: number
     y: number
     width: number

@@ -10,7 +10,7 @@ import {IHistory} from "@/apis/standard/history.ts";
 import PureNumberChart from "@/components/Charts/PureNumberChart/PureNumberChart.tsx";
 import {DragItemType} from "@/views/demo/DataDisplay/display.tsx";
 import {IDragItem, ITimeData} from "@/views/demo/TestConfig/template.tsx";
-import {Form, Input, Modal, Select, Tooltip} from "antd";
+import {Button, Form, Input, Modal, Select, Tooltip} from "antd";
 import {ITestConfig} from "@/apis/standard/test.ts";
 import {getAllProtocolSignalsFromTestConfig} from "@/utils";
 import {IProtocolSignal} from "@/views/demo/ProtocolTable/protocolComponent.tsx";
@@ -166,9 +166,12 @@ const UpdateItemModal: React.FC<{
 
   const itemConfig = useMemo(() => item.itemConfig, [item])
   const [requestSignals, setRequestSignals] = useState<IProtocolSignal[]>([])
+  const [colors, setColors] = useState<string[]>([])
+  const [currentColor, setCurrentColor] = useState<string>("#000000")
 
   useEffect(() => {
     setRequestSignals(getAllProtocolSignalsFromTestConfig(testConfig))
+    setColors(itemConfig.colors)
   }, [testConfig])
 
   const isSingleChart = (type: DragItemType) => !(type === DragItemType.LINES) && !(type === DragItemType.PURENUMBER)
@@ -178,16 +181,18 @@ const UpdateItemModal: React.FC<{
     console.log(itemConfig)
     form.setFieldsValue(itemConfig)
     form.setFieldsValue({requestSignals: itemConfig.requestSignals.map((signal) => JSON.stringify(signal))})
+    form.setFieldsValue({colors: colors})
   }, [form, itemConfig, open])
 
   const handleUpdate = () => {
     console.log(itemConfig)
     const newConfig = form.getFieldsValue()
-    console.log(newConfig)
     newConfig.requestSignals = newConfig.requestSignals.map((signal: string) => {
       return JSON.parse(signal)
     })
+    newConfig.colors = colors
     itemConfig.requestSignals = newConfig.requestSignals
+    itemConfig.colors = newConfig.colors
     itemConfig.title = newConfig.title
     itemConfig.min = newConfig.min
     itemConfig.max = newConfig.max
@@ -229,7 +234,36 @@ const UpdateItemModal: React.FC<{
           </Select>
         </Form.Item>
         {
-          item.type === DragItemType.LINES && (
+          item.type === DragItemType.LINES && <>
+            <Form.Item label="颜色">
+              {
+                colors?.map((color, index) => (
+                  <div key={index} style={{
+                    display: "inline-block",
+                    width: "20px",
+                    height: "20px",
+                    backgroundColor: color,
+                    marginRight: "10px",
+                  }}></div>
+                ))
+              }
+              {
+                <>
+                  <input type={"color"} value={currentColor} onChange={(e) => {
+                    setCurrentColor(e.target.value)
+                  }}/>
+                  <Button onClick={() => {
+                    setColors([...(colors ?? []), currentColor])
+                  }}>添加颜色</Button>
+                  <Button onClick={() => {
+                    if (!colors || colors.length === 0) {
+                      return
+                    }
+                    setColors(colors.slice(0, colors.length - 1))
+                  }}>删除颜色</Button>
+                </>
+              }
+            </Form.Item>
             <Form.Item label="滤波窗口长度" name="windowSize" initialValue={0}
                        extra={
                          <Tooltip title={"滤波窗口长度为奇数"}>
@@ -238,7 +272,7 @@ const UpdateItemModal: React.FC<{
                        }>
               <Input type={"number"} defaultValue={0}/>
             </Form.Item>
-          )
+          </>
         }
         {
           item.type === DragItemType.NUMBER && (
@@ -272,21 +306,6 @@ const UpdateItemModal: React.FC<{
   );
 };
 
-// const getUsefulSignal = (requestSignals: IProtocolSignal[], signalRecordMap: Map<string, ITimeData[]>) => {
-//   if (typeof requestSignals === 'string') {
-//     requestSignals = [requestSignals]
-//   }
-//   const resultMap = new Map<string, ITimeData[]>()
-//   requestSignals.forEach((signal) => {
-//     const signalData = signalRecordMap.get(signal.id)
-//     if (signalData) {
-//       resultMap.set(signal.id, signalData)
-//     }
-//   })
-//   return resultMap
-// }
-
-
 /**
  *
  * @param item
@@ -311,6 +330,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
     itemConfig: {
       requestSignalId,
       requestSignals,
+      colors,
       width,
       height,
       title,
@@ -332,6 +352,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
         startRequest={banModify}
         requestSignalId={requestSignalId}
         requestSignals={requestSignals || []}
+        colors={colors || []}
         sourceType={DataSourceType.RANDOM}
         title={title}
         width={width}

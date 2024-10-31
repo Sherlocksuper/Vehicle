@@ -58,6 +58,7 @@ export function transferToDragItems(template: ITemplate): IDragItem[] {
       itemConfig: {
         requestSignalId: null,
         requestSignals: item.requestSignals,
+        colors: item.colors,
         x: item.x,
         y: item.y,
         width: item.width,
