@@ -244,6 +244,35 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
         setStartRange(data[0])
         setEndRange(-1)
       }
+      const option = {
+        series: [{
+          markLine: {
+            data: [
+              {
+                xAxis: startRange === -1 ? data[0] : startRange,
+                type: 'time',
+                // 把时间戳转换为时间
+                label: {
+                  formatter: (params) => {
+                    return new Date(params.value).toLocaleString()
+                  }
+                }
+              },
+              {
+                xAxis: endRange === -1 ? data[0] : endRange,
+                type: 'time',
+                label: {
+                  formatter: (params) => {
+                    return new Date(params.value).toLocaleString()
+                  }
+                }
+              }
+            ],
+          }
+        }]
+      };
+      chartRef.current?.setOption(option);
+
       console.log(chartRef.current)
     });
 
@@ -251,6 +280,10 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       chartRef.current?.off('click')
     }
   }, [startRange, endRange]);
+
+  const isDuring = (time: number, timeOne: number, timeTwo: number) => {
+    return (time >= timeOne && time <= timeTwo) || (time <= timeOne && time >= timeTwo)
+  }
 
   return <div ref={chartContainerRef} style={{
     width: '100%', height: '100%'
@@ -261,9 +294,9 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
           dataRef.current.map((item) => {
             const result = {
               name: item.name,
-              max: Math.max(...item.data.filter((item) => item[0] >= startRange && item[0] <= endRange).map((item) => item[1])),
-              min: Math.min(...item.data.filter((item) => item[0] >= startRange && item[0] <= endRange).map((item) => item[1])),
-              middle: item.data.filter((item) => item[0] >= startRange && item[0] <= endRange).reduce((prev, current) => prev + current[1], 0) / item.data.filter((item) => item[0] >= startRange && item[0] <= endRange).length
+              max: Math.max(...item.data.filter((item) => isDuring(item[0], startRange, endRange)).map((item) => item[1])),
+              min: Math.min(...item.data.filter((item) => isDuring(item[0], startRange, endRange)).map((item) => item[1])),
+              middle: item.data.filter((item) => isDuring(item[0], startRange, endRange)).reduce((prev, current) => prev + current[1], 0) / item.data.filter((item) => isDuring(item[0], startRange, endRange)).length
             }
             console.log(result)
             return result
