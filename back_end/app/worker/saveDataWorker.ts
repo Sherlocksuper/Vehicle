@@ -76,7 +76,7 @@ async function processQueue() {
   });
 
   // 过滤值不是number
-  const result = uniqueData.filter(item => item.time !== undefined && typeof item.time !== 'number');
+  const result = uniqueData.filter(item => item.time !== undefined);
 
   try {
     // 确保数据库同步
