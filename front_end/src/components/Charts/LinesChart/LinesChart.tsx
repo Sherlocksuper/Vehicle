@@ -1,5 +1,5 @@
 import * as echarts from "echarts"
-import React, {useCallback, useEffect, useRef} from "react"
+import React, {useCallback, useEffect, useRef, useState} from "react"
 import {IChartInterface} from "@/components/Charts/interface.ts";
 import {ITimeData} from "@/views/demo/TestConfig/template.tsx";
 import {mergeKArrays} from "@/utils";
@@ -14,19 +14,7 @@ interface ISeries {
   color?: string
 }
 
-/**
- * 生成格式的random数据
- * @returns
- * 格式：{
- *     xAxis: '时间',
- *     data: {
- *     '信号1': 1,
- *     '信号2': 2,
- *     '信号3': 3,
- * }
- * data key的格式根据ISignalItem的id来决定
- * @param props
- */
+
 const LinesChart: React.FC<IChartInterface> = (props) => {
   const {
     requestSignals,
@@ -51,12 +39,16 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     }
   }))
 
+  // 选择区间
+  const [startRange, setStartRange] = useState(-1)
+  const [endRange, setEndRange] = useState(-1)
+
   // 中值滤波
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const medianFilter = (arr: { time: number, value: number }[], windowSize: number | string) :Array<[number, number]> => {
+  const medianFilter = (arr: { time: number, value: number }[], windowSize: number | string): Array<[number, number]> => {
     let window = typeof windowSize === "string" ? parseInt(windowSize) : windowSize;
     if (isNaN(window) || window <= 2) {
-      return arr.map(item => [item.time,item.value])
+      return arr.map(item => [item.time, item.value])
     }
     if (window % 2 === 0) {
       window += 1;  // 确保窗口大小为奇数
@@ -114,7 +106,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     }
 
     if (dataRef.current.length === 0) {
-      requestSignals.forEach((item,index) => {
+      requestSignals.forEach((item, index) => {
         dataRef.current.push({
           id: item.id,
           name: item.name + '/' + item.dimension,
@@ -175,7 +167,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     // 截取时间 前length个
     xAxis.current = xAxis.current.slice(-length)
 
-  }, [requestSignalIds,colors])
+  }, [requestSignalIds, colors])
 
   // 同步netWorkData
   useEffect(() => {
@@ -240,9 +232,93 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     }
   }, [requestSignals.length])
 
+  useEffect(() => {
+    chartRef.current?.on('click', (params) => {
+      console.log(params)
+      const {data} = params;
+      if (startRange === -1) {
+        setStartRange(data[0])
+      } else if (endRange === -1) {
+        setEndRange(data[0])
+      } else {
+        setStartRange(data[0])
+        setEndRange(-1)
+      }
+      console.log(chartRef.current)
+    });
+
+    return () => {
+      chartRef.current?.off('click')
+    }
+  }, [startRange, endRange]);
+
   return <div ref={chartContainerRef} style={{
     width: '100%', height: '100%'
-  }}></div>
+  }}>
+    <LinesDataParsingModal
+      source={
+        startRange !== -1 && endRange !== -1 ?
+          dataRef.current.map((item) => {
+            const result = {
+              name: item.name,
+              max: Math.max(...item.data.filter((item) => item[0] >= startRange && item[0] <= endRange).map((item) => item[1])),
+              min: Math.min(...item.data.filter((item) => item[0] >= startRange && item[0] <= endRange).map((item) => item[1])),
+              middle: item.data.filter((item) => item[0] >= startRange && item[0] <= endRange).reduce((prev, current) => prev + current[1], 0) / item.data.filter((item) => item[0] >= startRange && item[0] <= endRange).length
+            }
+            console.log(result)
+            return result
+          }) : []}
+      open={startRange !== -1 && endRange !== -1}
+      startRange={startRange}
+      endRange={endRange}
+      onFinished={() => {
+        setStartRange(-1)
+        setEndRange(-1)
+      }}/>
+  </div>
 }
 
 export default LinesChart
+
+const LinesDataParsingModal = ({source, open, startRange, endRange, onFinished}: {
+  source: {
+    name: string,
+    max: number,
+    min: number,
+    middle: number
+  }[],
+  startRange: number,
+  endRange: number,
+  open: boolean,
+  onFinished: () => void
+}) => {
+
+  const handleClose = () => {
+    onFinished()
+  }
+
+  const list = source.map((item, index) => {
+    return (
+      <div style={{marginBottom: 20}} key={index}>
+        <p style={{fontWeight: 'bold', fontSize: 16}}>{item.name}</p>
+        <p style={{fontSize: 14}}>
+          <span style={{marginRight: 30}}>最大值: {item.max}</span>
+          <span style={{marginRight: 30}}>最小值: {item.min}</span>
+          <span>均值: {item.middle}</span>
+        </p>
+      </div>
+    );
+  })
+
+  return (
+    <Modal
+      open={open}
+      onCancel={handleClose}
+      onOk={handleClose}
+    >
+      <h3> 分析结果：{new Date(startRange).toLocaleString()} - {new Date(endRange).toLocaleString()} </h3>
+      {list.length ? <div style={{maxHeight: 600, overflowY: "scroll"}}>{list}</div> : <div style={{textAlign: "center"}}>无数据</div>}
+    </Modal>
+  )
+}
+

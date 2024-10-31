@@ -55,7 +55,6 @@ const ConfigDropContainer: React.FC<{
       return
     }
     const belongId = getQueryParam('historyId')
-    console.log("belongId", belongId)
     if (!belongId) {
       return
     }
@@ -123,7 +122,9 @@ const ConfigDropContainer: React.FC<{
                 i: item.id,
               }}
               onClick={() => {
-                handleOpenParsing(item.itemConfig.requestSignals)
+                if (item.type !== DragItemType.LINES) {
+                  handleOpenParsing(item.itemConfig.requestSignals)
+                }
               }}
               onContextMenu={(e) => {
                 e.preventDefault();
@@ -201,6 +202,7 @@ const UpdateItemModal: React.FC<{
     itemConfig.falseLabel = newConfig.falseLabel
     itemConfig.windowSize = (newConfig.windowSize % 2) === 0 ? newConfig.windowSize + 1 : newConfig.windowSize
     setOpenItemId("");
+    console.log("新的颜色", itemConfig.colors)
     updateDragItem(item.id, itemConfig);
   };
 
