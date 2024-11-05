@@ -23,6 +23,7 @@ const ConfigDropContainer: React.FC<{
   banModify: boolean;
   items: IDragItem[];
   testConfig: ITestConfig;
+  isReplayModal:boolean;
   onLayoutChange: (layout: GridLayout.Layout[]) => void;
   updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
   fileHistory?: IHistory;
@@ -31,6 +32,7 @@ const ConfigDropContainer: React.FC<{
         banModify,
         items,
         testConfig,
+        isReplayModal,
         onLayoutChange,
         fileHistory,
         netHistory,
@@ -142,6 +144,7 @@ const ConfigDropContainer: React.FC<{
                 banModify={banModify}
                 fileHistory={fileHistory}
                 currentTestData={netHistory}
+                isReplayModal={isReplayModal}
               />
             </div>
           );
@@ -158,7 +161,7 @@ const ConfigDropContainer: React.FC<{
 const UpdateItemModal: React.FC<{
   item: IDragItem;
   open: boolean;
-  testConfig: ITestConfig
+  testConfig: ITestConfig;
   setOpenItemId: (id: string) => void;
   updateDragItem: (id: string, itemConfig: IDragItem["itemConfig"]) => void;
 }> = ({item, open, setOpenItemId, updateDragItem, testConfig}) => {
@@ -322,11 +325,12 @@ const UpdateItemModal: React.FC<{
 interface ISetDragItem {
   item: IDragItem;
   banModify: boolean;
+  isReplayModal:boolean;
   fileHistory?: IHistory;
   currentTestData?: Map<string, ITimeData[]>;
 }
 
-export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) => {
+export const SetDragItem = ({item, banModify, currentTestData,isReplayModal}: ISetDragItem) => {
   const {
     type,
     itemConfig: {
@@ -364,6 +368,7 @@ export const SetDragItem = ({item, banModify, currentTestData,}: ISetDragItem) =
           currentTestData
         }
         windowSize={windowSize}
+        isReplayModal={isReplayModal}
       />
     ),
     [DragItemType.NUMBER]: (

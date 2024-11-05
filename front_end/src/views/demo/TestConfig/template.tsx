@@ -461,7 +461,7 @@ const TestTemplateForConfig: React.FC<{ dataMode: 'OFFLINE' | 'ONLINE' }> = ({
             banModify={mode === "COLLECTING"}
             items={dragItems}
             testConfig={testConfig}
-
+            isReplayModal = {isReplayModal}
             onLayoutChange={updateAllByLayout}
             updateDragItem={updateDragItem}
             fileHistory={undefined}

@@ -30,4 +30,5 @@ export interface IChartInterface {
     max?: number
     label?: string
     windowSize?: number
+    isReplayModal?:boolean
 }

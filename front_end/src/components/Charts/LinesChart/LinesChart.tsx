@@ -21,6 +21,7 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
     currentTestChartData,
     windowSize,
     colors,
+    isReplayModal
   } = props
 
 
@@ -178,7 +179,73 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
 
   useEffect(() => {
     chartRef.current = echarts.init(chartContainerRef.current)
-    const option = {
+    const option = isReplayModal ? {
+      dataZoom: [
+        {
+          type: 'slider',
+          show: true,
+          xAxisIndex: [0],
+          start: 1,
+          end: 100
+        },
+        {
+          type: 'inside',
+          xAxisIndex: [0],
+          start: 1,
+          end: 100
+        },
+        {
+          type: 'inside',
+          orient: 'vertical',
+        }
+      ],
+      toolbox: { 
+        show: true,
+        feature: {
+          brush: {
+            show: true,
+            title: {
+              lineX: '框选计算',
+              clear: '关闭框选'
+            }
+          },
+          saveAsImage: { show: true }
+        },
+        top: 0,
+        right: 15,
+        itemSize: 20
+      },
+      brush: {
+        toolbox: ['lineX', 'clear'],
+        xAxisIndex: 0,
+        brushStyle: {
+          borderWidth: 1,
+          color: 'rgba(120,140,180,0.2)',
+          borderColor: 'rgba(120,140,180,0.8)'
+        }
+      },
+      tooltip: {
+        trigger: 'axis'
+      },
+      legend: {
+        data: dataRef.current.map((item) => item.name)
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: xAxis.current,
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: []
+    } : {
       dataZoom: [
         {
           type: 'slider',
@@ -276,10 +343,79 @@ const LinesChart: React.FC<IChartInterface> = (props) => {
       console.log(chartRef.current)
     });
 
+    chartRef.current?.on('brushSelected',(params)=>{
+      if (params.batch.length < 1 || params.batch[0].areas.length < 1) {
+        return;
+      }
+
+      const infoGroup = [];
+      const textGroup = [];
+      const group = {};
+      const range = params.batch[0].areas[0].coordRange; 
+      const startDate = new Date(range[0]),
+            endDate = new Date(range[range.length - 1]);
+      const timeData = startDate.toLocaleString() + "至" + endDate.toLocaleString();
+      
+      range[range.length - 1] = range[range.length - 1] + 1;      
+      //获取区域范围内的数据
+      for (let sIdx = 0; sIdx < params.batch[0].selected.length; sIdx++) {
+          const name = params.batch[0].selected[sIdx].seriesName;
+          const newArr = chartRef.current?.getOption().series[sIdx].data;
+          newArr.forEach(item=>{
+            if(item[0] > range[0] && item[0] < range[1]){
+              if(!group[name]){
+                group[name] = [];
+              }
+              group[name].push({
+                time:item[0],
+                value:item[1],
+              })
+            }
+          })
+      }
+      //计算展示的值
+      for(const key in group){
+        let sum = 0,
+            average = 0;
+        group[key].forEach(x=>{
+          if(x) sum += x.value;
+        })
+        average = sum / group[key].length;
+        infoGroup.push({[key] : {
+          sum:sum.toFixed(2),
+          average:average.toFixed(2),
+          num:group[key].length,
+        }});
+      }
+      for(const key in infoGroup){
+        const keys = Object.keys(infoGroup[key])
+        const values = Object.values(infoGroup[key])        
+        const str = "名称:" + keys[0] + " 总值:" + values[0].sum +  
+                    " 均值:" + values[0].average + " 数量:" + values[0].num;
+        textGroup.push(str)
+      }
+      const info = "时间:" + timeData + "\n" + textGroup.join("\n")
+      chartRef.current?.setOption({
+        title: {
+          backgroundColor: '#333',
+          text: info,
+          bottom: 0,
+          right: '10%',
+          width: 100,
+          textStyle: {
+            fontSize: 12,
+            color: '#fff'
+          }
+        }
+    });
+    })
+
     return () => {
       chartRef.current?.off('click')
     }
   }, [startRange, endRange]);
+
+
 
   const isDuring = (time: number, timeOne: number, timeTwo: number) => {
     return (time >= timeOne && time <= timeTwo) || (time <= timeOne && time >= timeTwo)
